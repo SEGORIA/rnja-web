@@ -3614,6 +3614,19 @@ async function rechazarSolicitud(id){
   // Detectar flujo de invitación ANTES de que createClient procese el hash
   var _hashParams = new URLSearchParams(window.location.hash.substring(1));
   window._isInviteFlow = _hashParams.get('type') === 'invite';
+  // Detectar errores en el hash (ej: otp_expired)
+  var _hashError = _hashParams.get('error_code');
+  if(_hashError){
+    history.replaceState(null,'',window.location.pathname);
+    setTimeout(function(){
+      if(_hashError === 'otp_expired'){
+        showToast('⚠️ El link de invitación expiró — solicita al administrador que te reenvíe la invitación');
+      } else {
+        showToast('⚠️ Error de autenticación: '+(_hashParams.get('error_description')||_hashError).replace(/\+/g,' '));
+      }
+      showView('v-login');
+    }, 500);
+  }
 
   // Si el CDN no cargó, crear un stub para no romper el resto de la página
   if(typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function'){
