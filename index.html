@@ -3546,7 +3546,8 @@ async function rechazarSolicitud(id){
     if(session && session.user){
       window.currentUser = session.user;
       if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
-        await loadUserProfile();
+        // Sin await — evita bloquear el cliente Supabase internamente
+        loadUserProfile().catch(console.error);
       }
       if(event === 'PASSWORD_RECOVERY'){
         showView('v-login');
@@ -3560,17 +3561,43 @@ async function rechazarSolicitud(id){
 })();
 
 // Carga el perfil del usuario autenticado desde la tabla perfiles
+// Usa fetch directo para evitar bug del cliente Supabase JS CDN con Promises
 async function loadUserProfile(){
-  if(!window.currentUser || !window.supabase) return;
-  var res = await window.supabase.from('perfiles').select('*').eq('id', window.currentUser.id).single();
-  if(res.error || !res.data){
-    showToast('Perfil no encontrado - contacta al administrador');
-    await window.supabase.auth.signOut(); return;
+  if(!window.currentUser || !window._SB_URL) return;
+  var uid = window.currentUser.id;
+  var token = window.currentUser.access_token || '';
+  // Obtener token actualizado desde la sesión
+  try {
+    var sess = await window.supabase.auth.getSession();
+    token = sess.data?.session?.access_token || token;
+  } catch(e){}
+
+  try{
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/perfiles?select=*&id=eq.' + uid + '&limit=1',
+      {
+        headers:{
+          'apikey': window._SB_KEY,
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/json'
+        }
+      }
+    );
+    if(!resp.ok){ throw new Error('HTTP '+resp.status); }
+    var rows = await resp.json();
+    if(!rows || rows.length === 0){
+      showToast('Perfil no encontrado - contacta al administrador');
+      if(window.supabase) window.supabase.auth.signOut();
+      return;
+    }
+    window.currentProfile = rows[0];
+    updateProfileForRole(rows[0].rol);
+    loginAs(rows[0].rol);
+    if(rows[0].rol === 'super_admin' || rows[0].rol === 'coord_nacional') cargarSolicitudes();
+  }catch(e){
+    console.error('loadUserProfile error:',e);
+    showToast('Error cargando perfil: '+e.message);
   }
-  window.currentProfile = res.data;
-  updateProfileForRole(res.data.rol);
-  loginAs(res.data.rol);
-  if(res.data.rol === 'super_admin' || res.data.rol === 'coord_nacional') cargarSolicitudes();
 }
 </script></body>
 </html>
