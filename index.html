@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -2132,6 +2132,79 @@ tr:hover td{background:var(--surface2);}
 <!-- ════════════════════════════════════════
   MODAL: REGISTRO / SOLICITUD DE INGRESO
 ════════════════════════════════════════ -->
+<!-- MODAL: Perfil de Usuario (Admin) -->
+<div id="modal-perfil-usuario" class="modal-overlay">
+  <div style="background:var(--surface);border-radius:20px;max-width:560px;width:100%;padding:0;margin:auto;box-shadow:0 40px 80px rgba(0,0,0,.5);overflow:hidden;border:1px solid var(--border);">
+    <div style="background:linear-gradient(135deg,var(--g800),var(--g700));padding:24px 28px;position:relative;">
+      <button onclick="closeModal('modal-perfil-usuario')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;color:white;font-size:15px;cursor:pointer;">&#x2715;</button>
+      <div style="font-family:Montserrat,sans-serif;font-size:17px;font-weight:700;color:white;">&#x1F464; Perfil de usuario</div>
+      <div id="mu-nombre-header" style="color:rgba(255,255,255,.65);font-size:13px;margin-top:4px;">—</div>
+    </div>
+    <div style="padding:24px 28px;display:flex;flex-direction:column;gap:14px;">
+      <input type="hidden" id="mu-id">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Nombres</label>
+          <div id="mu-nombres" style="color:var(--ink);font-weight:600;margin-top:3px;">—</div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Apellidos</label>
+          <div id="mu-apellidos" style="color:var(--ink);font-weight:600;margin-top:3px;">—</div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">C&#233;dula</label>
+          <div id="mu-cedula" style="color:var(--ink);margin-top:3px;">—</div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Tel&#233;fono</label>
+          <div id="mu-telefono" style="color:var(--ink);margin-top:3px;">—</div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Departamento</label>
+          <div id="mu-departamento" style="color:var(--ink);margin-top:3px;">—</div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Municipio</label>
+          <div id="mu-municipio" style="color:var(--ink);margin-top:3px;">—</div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Email</label>
+          <div id="mu-email" style="color:var(--ink);margin-top:3px;word-break:break-all;">—</div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Ingreso</label>
+          <div id="mu-ingreso" style="color:var(--ink);margin-top:3px;">—</div>
+        </div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:4px 0;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Rol</label>
+          <select id="mu-rol" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;">
+            <option value="voluntario">Voluntario</option>
+            <option value="coord_municipal">Coord. Municipal</option>
+            <option value="coord_departamental">Coord. Departamental</option>
+            <option value="coord_nacional">Coord. Nacional</option>
+            <option value="etica">Comit&#233; &#201;tica</option>
+            <option value="super_admin">Super Admin</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Estado</label>
+          <select id="mu-estado" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="suspendido">Suspendido</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn btn-neon" style="flex:1;" id="mu-save-btn" onclick="guardarUsuario()">&#x1F4BE; Guardar cambios</button>
+        <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 18px;" onclick="closeModal('modal-perfil-usuario')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="modal-registro" class="modal-overlay">
   <div style="background:white;border-radius:20px;max-width:640px;width:100%;padding:0;margin:auto;box-shadow:0 40px 80px rgba(0,0,0,.3);overflow:hidden;">
     <!-- Header -->
@@ -2542,25 +2615,22 @@ tr:hover td{background:var(--surface2);}
 
         <!-- TODOS LOS USUARIOS -->
         <div class="page-section" id="sec-sa-usuarios">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">👥 Todos los usuarios</div><button class="btn btn-neon btn-sm" onclick="showToast('&#x2795; Formulario de nuevo usuario')">+ Nuevo</button></div>
+          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">&#x1F465; Todos los usuarios</div><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="cargarUsuarios()">&#x21BB; Actualizar</button></div>
           <div class="card" style="margin-bottom:14px;padding:14px;">
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <input class="form-input" style="flex:1;min-width:200px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" placeholder="Buscar usuario...">
-              <select class="form-input form-select" style="width:180px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;">
-                <option>Todos los roles</option><option>Voluntario</option><option>Coord. Municipal</option><option>Coord. Departamental</option><option>Coord. Nacional</option>
+              <input class="form-input" id="usuarios-search" style="flex:1;min-width:200px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" placeholder="Buscar por nombre, c&#233;dula..." oninput="filtrarUsuarios()">
+              <select class="form-input form-select" id="usuarios-filter-rol" style="width:180px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" onchange="filtrarUsuarios()">
+                <option value="">Todos los roles</option><option value="voluntario">Voluntario</option><option value="coord_municipal">Coord. Municipal</option><option value="coord_departamental">Coord. Departamental</option><option value="coord_nacional">Coord. Nacional</option><option value="etica">Comit&#233; &#201;tica</option><option value="super_admin">Super Admin</option>
               </select>
-              <select class="form-input form-select" style="width:180px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;">
-                <option>Todos los dptos.</option><option>Antioquia</option><option>Bogotá D.C.</option><option>Valle del Cauca</option>
+              <select class="form-input form-select" id="usuarios-filter-estado" style="width:160px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" onchange="filtrarUsuarios()">
+                <option value="">Todos los estados</option><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="suspendido">Suspendido</option>
               </select>
             </div>
           </div>
           <div class="card"><div class="table-wrap"><table>
-            <thead><tr><th>Nombre</th><th>Rol</th><th>Departamento</th><th>Situación</th><th>Carrera</th><th>Horas</th><th>Nivel</th><th>Estado</th><th>Acción</th></tr></thead>
-            <tbody>
-              <tr><td class="av-row td-bold"><div class="av-sm">🙋</div>Mariana López</td><td><span class="tag tag-green">Voluntaria</span></td><td>Antioquia</td><td style="font-size:12px;">Universitaria</td><td style="font-size:12px;">Ing. Ambiental</td><td>156h</td><td><span class="tag tag-green">🌿 Brote</span></td><td><span class="tag tag-green">Activo</span></td><td><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="showModal('modal-perfil-usuario')">Ver</button></td></tr>
-              <tr><td class="av-row td-bold"><div class="av-sm">🗂️</div>Carlos Díaz</td><td><span class="tag tag-blue">Coord. Mun.</span></td><td>Bogotá D.C.</td><td style="font-size:12px;">Profesional</td><td style="font-size:12px;">Administración</td><td>312h</td><td><span class="tag tag-green">🌳 Árbol</span></td><td><span class="tag tag-green">Activo</span></td><td><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="showToast('Ver perfil completo')">Ver</button></td></tr>
-              <tr><td class="av-row td-bold"><div class="av-sm">📋</div>Ana Ruiz</td><td><span class="tag tag-purple">Coord. Dpto.</span></td><td>Valle del Cauca</td><td style="font-size:12px;">Profesional</td><td style="font-size:12px;">Biología</td><td>498h</td><td><span class="tag tag-green">🌲 Guardab.</span></td><td><span class="tag tag-green">Activo</span></td><td><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="showToast('Ver perfil completo')">Ver</button></td></tr>
-              <tr><td class="av-row td-bold"><div class="av-sm">🏛️</div>Jorge Medina</td><td><span class="tag tag-amber">Coord. Nac.</span></td><td>Nacional</td><td style="font-size:12px;">Profesional</td><td style="font-size:12px;">Derecho Ambiental</td><td>820h</td><td><span class="tag" style="background:linear-gradient(135deg,rgba(37,129,196,.15),rgba(37,129,196,.1));color:#8a6200;">🏔️ Líder</span></td><td><span class="tag tag-green">Activo</span></td><td><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="showToast('Ver perfil completo')">Ver</button></td></tr>
+            <thead><tr><th>Nombre</th><th>Rol</th><th>Departamento</th><th>C&#233;dula</th><th>Ingreso</th><th>Estado</th><th>Acci&#243;n</th></tr></thead>
+            <tbody id="usuarios-tbody">
+              <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Cargando usuarios...</td></tr>
             </tbody>
           </table></div></div>
         </div>
@@ -2967,6 +3037,8 @@ function navTo(el,sectionId){
   const topbar=shell.querySelector('.topbar-title');
   if(topbar) topbar.textContent=el.textContent.trim().replace(/\d+$/,'').trim();
   if(sectionId==='sec-vol-perfil') renderTimeline(currentRole);
+  if(sectionId==='sec-sa-solicitudes') cargarSolicitudes();
+  if(sectionId==='sec-sa-usuarios') cargarUsuarios();
   setTimeout(()=>initMapsForSection(sectionId),200);
   if(window.innerWidth<=1100) closeSidebar();
 }
@@ -3610,6 +3682,115 @@ async function rechazarSolicitud(id){
     console.error('rechazarSolicitud:',e);
   }
 }
+
+// ══════════════════════════════════════════════════
+//  GESTIÓN DE USUARIOS
+// ══════════════════════════════════════════════════
+window._usuariosData = [];
+
+async function cargarUsuarios(){
+  var tbody = document.getElementById('usuarios-tbody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Cargando...</td></tr>';
+  try{
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/perfiles?select=*&order=created_at.desc',
+      { headers:{ 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } }
+    );
+    if(!resp.ok){ console.error('cargarUsuarios HTTP '+resp.status); if(tbody) tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error al cargar ('+resp.status+')</td></tr>'; return; }
+    window._usuariosData = await resp.json();
+    filtrarUsuarios();
+  }catch(e){ console.error('cargarUsuarios:',e); if(tbody) tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error: '+e.message+'</td></tr>'; }
+}
+
+function filtrarUsuarios(){
+  var search = (document.getElementById('usuarios-search')?.value||'').toLowerCase().trim();
+  var filtroRol = document.getElementById('usuarios-filter-rol')?.value||'';
+  var filtroEstado = document.getElementById('usuarios-filter-estado')?.value||'';
+  var lista = (window._usuariosData||[]).filter(function(u){
+    var nombre = ((u.nombres||'')+' '+(u.apellidos||'')).toLowerCase();
+    var cedula = (u.cedula||'').toLowerCase();
+    if(search && !nombre.includes(search) && !cedula.includes(search)) return false;
+    if(filtroRol && u.rol !== filtroRol) return false;
+    if(filtroEstado && u.estado !== filtroEstado) return false;
+    return true;
+  });
+  renderUsuarios(lista);
+}
+
+function renderUsuarios(lista){
+  var tbody = document.getElementById('usuarios-tbody');
+  if(!tbody) return;
+  if(!lista||lista.length===0){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No hay usuarios que coincidan.</td></tr>';
+    return;
+  }
+  var M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var RL={voluntario:'Voluntario',coord_municipal:'Coord. Municipal',coord_departamental:'Coord. Departamental',coord_nacional:'Coord. Nacional',etica:'Com. Etica',super_admin:'Super Admin'};
+  var EC={activo:'tag-green',inactivo:'tag-gray',suspendido:'tag-red'};
+  tbody.innerHTML=lista.map(function(u){
+    var nom=((u.nombres||'')+' '+(u.apellidos||'')).trim()||'—';
+    var ing='—'; if(u.created_at){var d=new Date(u.created_at);ing=d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();}
+    var est=EC[u.estado]||'tag-gray';
+    return '<tr>'+
+      '<td class="td-bold">'+nom+'</td>'+
+      '<td><span class="tag" style="font-size:11px;">'+(RL[u.rol]||u.rol||'—')+'</span></td>'+
+      '<td>'+(u.departamento||'—')+'</td>'+
+      '<td>'+(u.cedula||'—')+'</td>'+
+      '<td>'+ing+'</td>'+
+      '<td><span class="tag '+est+'" style="font-size:11px;">'+(u.estado||'—')+'</span></td>'+
+      '<td><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);font-size:12px;" onclick="verUsuario(\''+u.id+'\')">&#x270E; Editar</button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function verUsuario(id){
+  var u=(window._usuariosData||[]).find(function(x){return x.id===id;});
+  if(!u){showToast('Usuario no encontrado');return;}
+  document.getElementById('mu-id').value=u.id;
+  document.getElementById('mu-nombre-header').textContent=((u.nombres||'')+' '+(u.apellidos||'')).trim();
+  document.getElementById('mu-nombres').textContent=u.nombres||'—';
+  document.getElementById('mu-apellidos').textContent=u.apellidos||'—';
+  document.getElementById('mu-cedula').textContent=u.cedula||'—';
+  document.getElementById('mu-telefono').textContent=u.telefono||'—';
+  document.getElementById('mu-departamento').textContent=u.departamento||'—';
+  document.getElementById('mu-municipio').textContent=u.municipio||'—';
+  document.getElementById('mu-email').textContent='(ver en Auth)';
+  var ing='—'; if(u.created_at){var d=new Date(u.created_at);var M2=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];ing=d.getDate()+' '+M2[d.getMonth()]+' '+d.getFullYear();}
+  document.getElementById('mu-ingreso').textContent=ing;
+  var rs=document.getElementById('mu-rol'); if(rs) rs.value=u.rol||'voluntario';
+  var es=document.getElementById('mu-estado'); if(es) es.value=u.estado||'activo';
+  openModal('modal-perfil-usuario');
+}
+
+async function guardarUsuario(){
+  var id=document.getElementById('mu-id')?.value;
+  var rol=document.getElementById('mu-rol')?.value;
+  var estado=document.getElementById('mu-estado')?.value;
+  if(!id){showToast('Error: ID no encontrado');return;}
+  var btn=document.getElementById('mu-save-btn');
+  if(btn){btn.textContent='Guardando...';btn.disabled=true;}
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||'';
+    var resp=await fetch(
+      window._SB_URL+'/rest/v1/perfiles?id=eq.'+id,
+      {method:'PATCH',headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({rol:rol,estado:estado})}
+    );
+    if(btn){btn.textContent='&#x1F4BE; Guardar cambios';btn.disabled=false;}
+    if(!resp.ok){showToast('Error al guardar ('+resp.status+')');return;}
+    var idx=(window._usuariosData||[]).findIndex(function(x){return x.id===id;});
+    if(idx>=0){window._usuariosData[idx].rol=rol;window._usuariosData[idx].estado=estado;}
+    closeModal('modal-perfil-usuario');
+    showToast('Perfil actualizado');
+    filtrarUsuarios();
+  }catch(e){
+    if(btn){btn.textContent='&#x1F4BE; Guardar cambios';btn.disabled=false;}
+    showToast('Error: '+e.message);
+    console.error('guardarUsuario:',e);
+  }
+}
 </script>
 
 <!-- ══════════════════════════════════════════
@@ -3755,7 +3936,7 @@ async function loadUserProfile(){
     window.currentProfile = rows[0];
     updateProfileForRole(rows[0].rol);
     loginAs(rows[0].rol);
-    if(rows[0].rol === 'super_admin' || rows[0].rol === 'coord_nacional') cargarSolicitudes();
+    if(rows[0].rol === 'super_admin' || rows[0].rol === 'coord_nacional'){ cargarSolicitudes(); cargarUsuarios(); }
   }catch(e){
     console.error('loadUserProfile error:',e);
     showToast('Error cargando perfil: '+e.message);

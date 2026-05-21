@@ -1,6 +1,7 @@
 -- ══════════════════════════════════════════════════
 --  RNJA NEXUS — Schema de base de datos
 --  Ejecutar en: Supabase → SQL Editor → New query
+--  Seguro para re-ejecutar (idempotente)
 -- ══════════════════════════════════════════════════
 
 -- 1. TABLA DE PERFILES (extiende auth.users)
@@ -85,6 +86,16 @@ create trigger on_solicitudes_updated
 alter table public.perfiles   enable row level security;
 alter table public.solicitudes enable row level security;
 
+-- ── Limpiar políticas anteriores (para re-ejecución segura) ──
+drop policy if exists "perfiles_own_read"    on public.perfiles;
+drop policy if exists "perfiles_admin_read"  on public.perfiles;
+drop policy if exists "perfiles_own_update"  on public.perfiles;
+drop policy if exists "perfiles_admin_update" on public.perfiles;
+
+drop policy if exists "solicitudes_insert"       on public.solicitudes;
+drop policy if exists "solicitudes_coord_read"   on public.solicitudes;
+drop policy if exists "solicitudes_admin_update" on public.solicitudes;
+
 -- Políticas de PERFILES
 -- Cada usuario lee su propio perfil
 create policy "perfiles_own_read" on public.perfiles
@@ -119,7 +130,7 @@ create policy "perfiles_admin_update" on public.perfiles
 create policy "solicitudes_insert" on public.solicitudes
   for insert with check (true);
 
--- Coordinadores y admins leen solicitudes de su área
+-- Coordinadores y admins leen solicitudes
 create policy "solicitudes_coord_read" on public.solicitudes
   for select using (
     exists (
@@ -141,10 +152,10 @@ create policy "solicitudes_admin_update" on public.solicitudes
 
 -- ══════════════════════════════════════════════════
 --  PASO FINAL: Crear el primer super admin
---  1. Ve a Supabase → Authentication → Users → Invite user
---  2. Ingresa tu correo y crea la cuenta
+--  1. Ve a Supabase → Authentication → Users → Create new user
+--  2. Ingresa tu correo, contraseña y marca "Auto Confirm User"
 --  3. Copia el UUID del usuario creado
---  4. Ejecuta este INSERT reemplazando el UUID:
+--  4. Ejecuta este INSERT reemplazando los valores:
 -- ══════════════════════════════════════════════════
 
 -- insert into public.perfiles (id, nombres, apellidos, cedula, rol, estado)
