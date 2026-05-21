@@ -3189,13 +3189,23 @@ async function submitRegistro(){
   var sb=window.supabase;
   if(!sb){resetBtn();showToast('⚠️ Sin conexión a la base de datos');return;}
   try{
-    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Tiempo de espera agotado — verifica tu conexión')),12000));
-    const insert=sb.from('solicitudes').insert([data]);
-    const{error}=await Promise.race([insert,timeout]);
+    const resp = await fetch(
+      (window._SB_URL||'https://vkpwcitnanxloddfbnxb.supabase.co')+'/rest/v1/solicitudes',
+      {
+        method:'POST',
+        headers:{
+          'apikey': window._SB_KEY||'',
+          'Content-Type':'application/json',
+          'Prefer':'return=minimal'
+        },
+        body: JSON.stringify(data)
+      }
+    );
     resetBtn();
-    if(error){
-      console.error('submitRegistro error:',error);
-      showToast('⚠️ '+(error.message||'Error al enviar'));return;
+    if(!resp.ok){
+      const msg = await resp.text();
+      console.error('submitRegistro HTTP '+resp.status+':',msg);
+      showToast('⚠️ Error al enviar ('+ resp.status +')');return;
     }
     closeModal('modal-registro');
     showToast('✅ Solicitud enviada — te contactaremos en 2-5 días hábiles');
@@ -3514,6 +3524,9 @@ async function rechazarSolicitud(id){
 (function(){
   var SB_URL = 'https://vkpwcitnanxloddfbnxb.supabase.co';
   var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcHdjaXRuYW54bG9kZGZibnhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDg1MTksImV4cCI6MjA5NDg4NDUxOX0.ZBt9t2P-us_OIzyJGAVvG0uSg3K49BboXkgZqx0rHDA';
+  // Exponer para uso en funciones (fetch directo)
+  window._SB_URL = SB_URL;
+  window._SB_KEY = SB_KEY;
 
   // Si el CDN no cargó, crear un stub para no romper el resto de la página
   if(typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function'){
