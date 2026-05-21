@@ -2149,14 +2149,14 @@ tr:hover td{background:var(--surface2);}
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">C&#233;dula</label><input class="form-input" id="mu-cedula" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="N&#250;mero de c&#233;dula"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Fecha de nacimiento</label><input class="form-input" id="mu-fecha-nac" type="date" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tel&#233;fono</label><input class="form-input" id="mu-telefono" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Tel&#233;fono"></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Email <span style="font-weight:400;font-style:italic;">(solo lectura)</span></label><div id="mu-email" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted);word-break:break-all;">&#x2014;</div></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Email</label><input class="form-input" id="mu-email" type="email" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Nuevo email (vac&#237;o = sin cambio)"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">G&#233;nero</label><select class="form-input form-select" id="mu-genero" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Sin especificar &#x2014;</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option><option value="No binario">No binario</option><option value="Prefiero no decir">Prefiero no decir</option></select></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Grupo &#233;tnico</label><input class="form-input" id="mu-grupo-etnico" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Ej: Afrocolombiano, Ind&#237;gena..."></div>
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Ubicaci&#243;n</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Departamento</label><input class="form-input" id="mu-departamento" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Departamento"></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Municipio</label><input class="form-input" id="mu-municipio" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Municipio"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Departamento</label><select class="form-input form-select" id="mu-departamento" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" onchange="poblarMunicipios(this.value,true)"><option value="">&#x2014; Selecciona departamento &#x2014;</option></select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Municipio</label><select class="form-input form-select" id="mu-municipio" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Selecciona municipio &#x2014;</option></select></div>
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Rol y estado</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
@@ -3653,6 +3653,59 @@ async function rechazarSolicitud(id){
 // ══════════════════════════════════════════════════
 //  GESTIÓN DE USUARIOS
 // ══════════════════════════════════════════════════
+// ── Colombia: departamentos y municipios (DIVIPOLA) ──
+var COL_DEPTOS = {
+"Amazonas":["Leticia","El Encanto","La Chorrera","La Pedrera","La Victoria","Miriti Parana","Puerto Alegria","Puerto Arica","Puerto Narino","Puerto Santander","Tarapaca"],
+"Antioquia":["Medellin","Abejorral","Abriaqui","Alejandria","Amaga","Amalfi","Andes","Angostura","Anori","Anza","Apartado","Arboletes","Argelia","Armenia","Barbosa","Bello","Betania","Betulia","Briceno","Buritica","Caceres","Caicedo","Caldas","Campamento","Canasgordas","Caracoli","Caramanta","Carepa","Carolina del Principe","Caucasia","Chigorodo","Cisneros","Ciudad Bolivar","Cocorna","Concepcion","Concordia","Copacabana","Dabeiba","Donmatias","Ebeijico","El Bagre","El Carmen de Viboral","El Santuario","Entrerrios","Envigado","Fredonia","Frontino","Giraldo","Girardota","Gomez Plata","Granada","Guadalupe","Guarne","Guatape","Heliconia","Hispania","Itagui","Ituango","Jardin","Jerico","La Ceja","La Estrella","La Pintada","La Union","Liborina","Maceo","Marinilla","Montebello","Murindo","Mutata","Narino","Necocli","Nechi","Olaya","El Penol","Peque","Pueblorrico","Puerto Berrio","Puerto Nare","Puerto Triunfo","Remedios","Retiro","Rionegro","Sabanalarga","Sabaneta","Salgar","San Andres de Cuerquia","San Carlos","San Francisco","San Jeronimo","San Jose de la Montana","San Juan de Uraba","San Luis","San Pedro de los Milagros","San Pedro de Uraba","San Rafael","San Roque","San Vicente Ferrer","Santa Barbara","Santa Rosa de Osos","Santo Domingo","Segovia","Sonson","Sopetran","Taraza","Tarso","Titiribi","Toledo","Turbo","Uramita","Urrao","Valdivia","Valparaiso","Vegachi","Venecia","Vigia del Fuerte","Yali","Yarumal","Yolombo","Yondo","Zaragoza"],
+"Arauca":["Arauca","Arauquita","Cravo Norte","Fortul","Puerto Rondon","Saravena","Tame"],
+"Atlantico":["Barranquilla","Baranoa","Campo de la Cruz","Candelaria","Galapa","Juan de Acosta","Luruaco","Malambo","Manati","Palmar de Varela","Piojo","Polonuevo","Ponedera","Puerto Colombia","Repelon","Sabanagrande","Sabanalarga","Santa Lucia","Santo Tomas","Soledad","Suan","Tubara","Usiacuri"],
+"Bogota D.C.":["Bogota D.C."],
+"Bolivar":["Cartagena","Achi","Altos del Rosario","Arenal","Arjona","Arroyohondo","Barranco de Loba","Calamar","Cantagallo","Cicuco","Clemencia","Cordoba","El Carmen de Bolivar","El Guamo","El Penon","Hatillo de Loba","Magangue","Mahates","Margarita","Maria la Baja","Mompos","Montecristo","Morales","Norosi","Pinillos","Regidor","Rio Viejo","San Cristobal","San Estanislao","San Fernando","San Jacinto","San Jacinto del Cauca","San Juan Nepomuceno","San Martin de Loba","San Pablo","Santa Catalina","Santa Rosa","Santa Rosa del Sur","Simiti","Soplaviento","Talaigua Nuevo","Tiquisio","Turbaco","Turbana","Villanueva","Zambrano"],
+"Boyaca":["Tunja","Almeida","Aquitania","Arcabuco","Belen","Berbeo","Beteitiva","Boavita","Boyaca","Briceno","Buenavista","Busbanza","Caldas","Campohermoso","Cerinza","Chinavita","Chiquinquira","Chiquiza","Chiscas","Chita","Chitaraque","Chivata","Chivor","Cienega","Combita","Coper","Corrales","Covarachi","Cubara","Cucaita","Cuitiva","Duitama","El Cocuy","El Espino","Firavitoba","Floresta","Gachantiva","Gameza","Garagoa","Guacamayas","Guateque","Guayata","Guican","Iza","Jenesano","Jerico","La Capilla","La Uvita","La Victoria","Labranzagrande","Macanal","Maripo","Miraflores","Mongua","Mongui","Moniquira","Motavita","Muzo","Nobsa","Nuevo Colon","Oicata","Otanche","Pachavita","Paez","Paipa","Pajarito","Panqueba","Pauna","Paya","Paz de Rio","Pesca","Pisba","Puerto Boyaca","Quipama","Ramiriqui","Raquira","Rondon","Saboya","Sachica","Samaca","San Eduardo","San Jose de Pare","San Luis de Gaceno","San Mateo","San Miguel de Sema","San Pablo de Borbur","Santa Maria","Santa Rosa de Viterbo","Santa Sofia","Santana","Sativanorte","Sativasur","Siachoque","Soata","Socota","Socha","Sogamoso","Somondoco","Sora","Soraca","Sotaquira","Susacon","Sutamarchan","Sutatenza","Tasco","Tenza","Tibana","Tibasosa","Tinjaca","Tipacoque","Toca","Togui","Topaga","Tota","Turmeque","Tuta","Tutaza","Umbita","Ventaquemada","Villa de Leyva","Viraracha","Zetaquira"],
+"Caldas":["Manizales","Aguadas","Anserma","Aranzazu","Belalcazar","Chinchina","Filadelfia","La Dorada","La Merced","Manzanares","Marmato","Marquetalia","Marulanda","Neira","Norcasia","Pacora","Palestina","Pensilvania","Riosucio","Risaralda","Salamina","Samana","San Jose","Supia","Victoria","Villamaria","Viterbo"],
+"Caqueta":["Florencia","Albania","Belen de los Andaquies","Cartagena del Chaira","Curillo","El Doncello","El Paujil","Milan","La Montanita","Morelia","Puerto Rico","San Jose del Fragua","San Vicente del Caguan","Solano","Solita","Valparaiso"],
+"Casanare":["Yopal","Aguazul","Chameza","Hato Corozal","La Salina","Mani","Monterrey","Nunchia","Orocue","Paz de Ariporo","Pore","Recetor","Sabanalarga","Sacama","San Luis de Palenque","Tamara","Tauramena","Trinidad","Villanueva"],
+"Cauca":["Popayan","Almaguer","Argelia","Balboa","Bolivar","Buenos Aires","Cajibio","Caldono","Caloto","Coconuco","Corinto","El Tambo","Florencia","Guachene","Guapi","Inza","Jambalo","La Sierra","La Vega","Lopez de Micay","Mercaderes","Miranda","Morales","Padilla","Paez","Patia","Piamonte","Piendamo","Puerto Tejada","Purace","Rosas","San Sebastian","Santa Rosa","Santander de Quilichao","Silvia","Sotara","Suarez","Sucre","Timbio","Timbiqui","Toribio","Totoro","Villa Rica"],
+"Cesar":["Valledupar","Aguachica","Agustin Codazzi","Astrea","Becerril","Bosconia","Chimichagua","Chiriguana","Curumani","El Copey","El Paso","Gamarra","Gonzalez","La Gloria","La Jagua de Ibirico","La Paz","Manaure Balcon del Cesar","Pailitas","Pelaya","Pueblo Bello","Rio de Oro","San Alberto","San Diego","San Martin","Tamalameque"],
+"Choco":["Quibdo","Acandi","Alto Baudo","Atrato","Bagado","Bahia Solano","Bajo Baudo","Bojaya","Carmen del Darien","Certegui","Condoto","El Carmen de Atrato","El Litoral del San Juan","Istmina","Jurado","Lloro","Medio Atrato","Medio Baudo","Medio San Juan","Novita","Nuqui","Rio Iro","Rio Quito","Riosucio","San Jose del Palmar","Sipi","Tado","Unguia","Union Panamericana"],
+"Cordoba":["Monteria","Ayapel","Buenavista","Canalete","Cerete","Chima","Chinu","Cienaga de Oro","Cotorra","La Apartada","Lorica","Los Cordobas","Momil","Montelibano","Monitos","Planeta Rica","Pueblo Nuevo","Puerto Escondido","Puerto Libertador","Purisima","Sahagun","San Andres de Sotavento","San Antero","San Bernardo del Viento","San Carlos","San Jose de Ure","San Pelayo","Tierralta","Tuchin","Valencia"],
+"Cundinamarca":["Agua de Dios","Alban","Anapoima","Anolaima","Apulo","Arbelaez","Beltran","Bituima","Bojaca","Cabrera","Cachipay","Cajica","Caparrapi","Caqueza","Carmen de Carupa","Chaguani","Chia","Chipaque","Choachi","Choconta","Cogua","Cota","Cucunuba","El Colegio","El Penon","El Rosal","Facatativa","Fomeque","Fosca","Funza","Fuquene","Fusagasuga","Gachala","Gachancipa","Gacheta","Gama","Girardot","Granada","Guacheta","Guaduas","Guasca","Guataqui","Guatavita","Guayabal de Siquima","Guayabetal","Gutierrez","Jerusalen","Junin","La Calera","La Mesa","La Palma","La Pena","La Vega","Lenguazaque","Macheta","Madrid","Manta","Medina","Mosquera","Narino","Nemocon","Nilo","Nimaima","Nocaima","Pacho","Paime","Pandi","Paratebueno","Pasca","Puerto Salgar","Puli","Quebradanegra","Quetame","Quipile","Ricaurte","San Antonio del Tequendama","San Bernardo","San Cayetano","San Francisco","San Juan de Rioseco","Sasaima","Sesquile","Sibate","Silvania","Simijaca","Soacha","Sopo","Subachoque","Suesca","Supata","Susa","Sutatausa","Tabio","Tausa","Tena","Tibacuy","Tibirita","Tocaima","Tocancipa","Topaipo","Ubala","Ubaque","Une","Utica","Venecia","Vergara","Viani","Villagomez","Villapinzon","Villeta","Viota","Yacopi","Zipakon","Zipaquira"],
+"Guainia":["Inirida","Barranco Minas","Cacahual","La Guadalupe","Mapiripana","Morichal Nuevo","Pana Pana","Puerto Colombia","San Felipe"],
+"Guaviare":["San Jose del Guaviare","Calamar","El Retorno","Miraflores"],
+"Huila":["Neiva","Acevedo","Agrado","Aipe","Algeciras","Altamira","Baraya","Campoalegre","Colombia","Elias","Garzon","Gigante","Guadalupe","Hobo","Iquira","Isnos","La Argentina","La Plata","Nataga","Oporapa","Paicol","Palermo","Palestina","Pital","Pitalito","Rivera","Saladoblanco","San Agustin","Santa Maria","Suaza","Tarqui","Tesalia","Tello","Teruel","Timana","Villavieja","Yaguara"],
+"La Guajira":["Riohacha","Albania","Barrancas","Dibulla","Distraccion","El Molino","Fonseca","Hatonuevo","La Jagua del Pilar","Maicao","Manaure","San Juan del Cesar","Uribia","Urumita","Villanueva"],
+"Magdalena":["Santa Marta","Algarrobo","Aracataca","Ariguani","Cerro de San Antonio","Chivolo","Cienaga","Concordia","El Banco","El Pinon","El Reten","Fundacion","Guamal","Nueva Granada","Pedraza","Pijino del Carmen","Pivijay","Plato","Puebloviejo","Remolino","Sabanas de San Angel","Salamina","San Sebastian de Buenavista","San Zenon","Santa Ana","Santa Barbara de Pinto","Sitionuevo","Tenerife","Zapayan","Zona Bananera"],
+"Meta":["Villavicencio","Acacias","Barranca de Upia","Cabuyaro","Castilla la Nueva","Cubarral","Cumaral","El Calvario","El Castillo","El Dorado","Fuente de Oro","Granada","Guamal","La Macarena","La Uribe","Lejanias","Mapiripan","Mesetas","Puerto Concordia","Puerto Gaitan","Puerto Lleras","Puerto Lopez","Puerto Rico","Restrepo","San Carlos de Guaroa","San Juan de Arama","San Juanito","San Martin","Vistahermosa"],
+"Narino":["Pasto","Alban","Aldana","Ancuya","Arboleda","Barbacoas","Belen","Buesaco","Chachagui","Colon","Consaca","Contadero","Cordoba","Cuaspud Carlosama","Cumbal","Cumbitara","El Charco","El Penol","El Rosario","El Tablon de Gomez","El Tambo","Francisco Pizarro","Funes","Guachucal","Guaitarilla","Gualmatan","Iles","Imues","Ipiales","La Cruz","La Florida","La Llanada","La Tola","La Union","Leiva","Linares","Los Andes","Magui Payan","Mallama","Mosquera","Narino","Olaya Herrera","Ospina","Policarpa","Potosi","Providencia","Puerres","Pupiales","Ricaurte","Roberto Payan","Samaniego","San Bernardo","San Lorenzo","San Pablo","San Pedro de Cartago","Sandona","Santa Barbara","Santacruz","Sapuyes","Taminango","Tangua","Tumaco","Tuquerres","Yacuanquer"],
+"Norte de Santander":["Cucuta","Abrego","Arboledas","Bochalema","Bucarasica","Cacota","Cachira","Chinacota","Chitaga","Convencion","Cucutilla","Durania","El Carmen","El Tarra","El Zulia","Gramalote","Hacari","Herran","La Esperanza","La Playa de Belen","Labateca","Los Patios","Lourdes","Mutiscua","Ocana","Pamplona","Pamplonita","Puerto Santander","Ragonvalia","Salazar","San Calixto","San Cayetano","Santiago","Sardinata","Silos","Teorama","Tibu","Toledo","Villa Caro","Villa del Rosario"],
+"Putumayo":["Mocoa","Colon","Orito","Puerto Asis","Puerto Caicedo","Puerto Guzman","Puerto Leguizamo","San Francisco","San Miguel","Santiago","Sibundoy","Valle del Guamuez","Villagarzon"],
+"Quindio":["Armenia","Buenavista","Calarca","Circasia","Cordoba","Filandia","Genova","La Tebaida","Montenegro","Pijao","Quimbaya","Salento"],
+"Risaralda":["Pereira","Apia","Balboa","Belen de Umbria","Dosquebradas","Guatica","La Celia","La Virginia","Marsella","Mistrato","Pueblo Rico","Quinchia","Santa Rosa de Cabal","Santuario"],
+"San Andres y Providencia":["San Andres","Providencia"],
+"Santander":["Bucaramanga","Aguada","Albania","Aratoca","Barbosa","Barichara","Barrancabermeja","Betulia","Bolivia","Cabrera","California","Capitanejo","Carcasi","Cepita","Cerrito","Charala","Charta","Chima","Chipata","Cimitarra","Concepcion","Confines","Contratacion","Coromoro","Curiti","El Carmen de Chucuri","El Guacamayo","El Penon","El Playon","Encino","Enciso","Florian","Floridablanca","Galan","Gambita","Giron","Guaca","Guadalupe","Guapota","Guavata","Guepsa","Hato","Jesus Maria","Jordan","La Belleza","La Paz","Landazuri","Lebrija","Los Santos","Macaravita","Malaga","Matanza","Mogotes","Molagavita","Ocamonte","Oiba","Onzaga","Palmar","Palmas del Socorro","Paramo","Piedecuesta","Pinchote","Puente Nacional","Puerto Parra","Puerto Wilches","Rionegro","Sabana de Torres","San Andres","San Benito","San Gil","San Joaquin","San Jose de Miranda","San Miguel","San Vicente de Chucuri","Santa Barbara","Santa Helena del Opon","Simacota","Socorro","Suaita","Sucre","Surata","Tona","Valle de San Jose","Velez","Vetas","Villanueva","Zapatoca"],
+"Sucre":["Sincelejo","Buenavista","Caimito","Chalan","Coloso","Corozal","Covenas","El Roble","Galeras","Guaranda","La Union","Los Palmitos","Majagual","Morroa","Ovejas","Palmito","Sampues","San Benito Abad","San Juan de Betulia","San Luis de Since","San Marcos","San Onofre","San Pedro","Santiago de Tolu","Since","Sucre","Toluviejo"],
+"Tolima":["Ibague","Alpujarra","Alvarado","Ambalema","Anzoategui","Armero Guayabal","Ataco","Cajamarca","Carmen de Apicala","Casabianca","Chaparral","Coello","Coyaima","Cunday","Dolores","Espinal","Falan","Flandes","Fresno","Guamo","Herveo","Honda","Icononzo","Lerida","Libano","Mariquita","Melgar","Murillo","Natagaima","Ortega","Palocabildo","Piedras","Planadas","Prado","Purificacion","Rioblanco","Roncesvalles","Rovira","Saldana","San Antonio","San Luis","Santa Isabel","Suarez","Valle de San Juan","Venadillo","Villahermosa","Villarrica"],
+"Valle del Cauca":["Cali","Alcala","Andalucia","Ansermanuevo","Argelia","Bolivar","Buenaventura","Buga","Bugalagrande","Caicedonia","Calima","Candelaria","Cartago","Dagua","El Aguila","El Cairo","El Cerrito","El Dovio","Florida","Ginebra","Guacari","Jamundi","La Cumbre","La Union","La Victoria","Obando","Palmira","Pradera","Restrepo","Riofrio","Roldanillo","San Pedro","Sevilla","Toro","Trujillo","Tulua","Ulloa","Versalles","Vijes","Yotoco","Yumbo","Zarzal"],
+"Vaupes":["Mitu","Caruru","Pacoa","Papunaua","Taraira","Yavarate"],
+"Vichada":["Puerto Carreno","Cumaribo","La Primavera","Santa Rosalia"]
+};
+
+function poblarDeptos(){
+  var sel = document.getElementById('mu-departamento');
+  if(!sel) return;
+  var deptos = Object.keys(COL_DEPTOS).sort();
+  sel.innerHTML = '<option value="">— Selecciona departamento —</option>' +
+    deptos.map(function(d){ return '<option value="'+d+'">'+d+'</option>'; }).join('');
+}
+
+function poblarMunicipios(depto, resetMunicipio){
+  var sel = document.getElementById('mu-municipio');
+  if(!sel) return;
+  var munis = (depto && COL_DEPTOS[depto]) ? COL_DEPTOS[depto].slice().sort() : [];
+  sel.innerHTML = '<option value="">— Selecciona municipio —</option>' +
+    munis.map(function(m){ return '<option value="'+m+'">'+m+'</option>'; }).join('');
+  if(resetMunicipio) sel.value = '';
+}
 window._usuariosData = [];
 
 async function cargarUsuarios(){
@@ -3715,7 +3768,7 @@ function renderUsuarios(lista){
 function verUsuario(id){
   var u=(window._usuariosData||[]).find(function(x){return x.id===id;});
   if(!u){showToast('Usuario no encontrado');return;}
-  var setVal=function(elId,val){ var el=document.getElementById(elId); if(!el) return; if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.tagName==='SELECT') el.value=val||''; else el.textContent=val||'—'; };
+  var setVal=function(elId,val){var el=document.getElementById(elId);if(!el)return;if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=val||'';else if(el.tagName==='SELECT'){el.value=val||';} else el.textContent=val||'—';};
   document.getElementById('mu-id').value=u.id;
   document.getElementById('mu-nombre-header').textContent=((u.nombres||'')+' '+(u.apellidos||'')).trim()||'—';
   setVal('mu-nombres', u.nombres);
@@ -3723,14 +3776,20 @@ function verUsuario(id){
   setVal('mu-cedula', u.cedula);
   setVal('mu-fecha-nac', u.fecha_nacimiento||'');
   setVal('mu-telefono', u.telefono);
-  setVal('mu-departamento', u.departamento);
-  setVal('mu-municipio', u.municipio);
   setVal('mu-genero', u.genero||'');
   setVal('mu-grupo-etnico', u.grupo_etnico);
   setVal('mu-notas', u.notas);
   setVal('mu-rol', u.rol||'voluntario');
   setVal('mu-estado', u.estado||'activo');
-  document.getElementById('mu-email').textContent='(ver en Supabase Auth)';
+  // Email: campo vacío (el email viene de auth.users, no de perfiles)
+  var emailEl = document.getElementById('mu-email'); if(emailEl) emailEl.value = '';
+  // Departamento y municipio: selects dinámicos
+  poblarDeptos();
+  var deptoSel = document.getElementById('mu-departamento');
+  if(deptoSel){ deptoSel.value = u.departamento||''; }
+  poblarMunicipios(u.departamento||'', false);
+  var muniSel = document.getElementById('mu-municipio');
+  if(muniSel){ muniSel.value = u.municipio||''; }
   var ing='—'; if(u.created_at){var d=new Date(u.created_at);var M2=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];ing=d.getDate()+' '+M2[d.getMonth()]+' '+d.getFullYear();}
   document.getElementById('mu-ingreso').textContent=ing;
   openModal('modal-perfil-usuario');
@@ -3739,20 +3798,21 @@ function verUsuario(id){
 async function guardarUsuario(){
   var id=document.getElementById('mu-id')?.value;
   if(!id){showToast('Error: ID no encontrado');return;}
-  var g=function(elId){ var el=document.getElementById(elId); if(!el) return null; var v=(el.value||'').trim(); return v||null; };
+  var g=function(elId){var el=document.getElementById(elId);if(!el)return null;var v=(el.value||'').trim();return v||null;};
+  var newEmail=(document.getElementById('mu-email')?.value||'').trim();
   var payload={
-    nombres:     g('mu-nombres'),
-    apellidos:   g('mu-apellidos'),
-    cedula:      g('mu-cedula'),
+    nombres:      g('mu-nombres'),
+    apellidos:    g('mu-apellidos'),
+    cedula:       g('mu-cedula'),
     fecha_nacimiento: g('mu-fecha-nac')||null,
-    telefono:    g('mu-telefono'),
-    departamento:g('mu-departamento'),
-    municipio:   g('mu-municipio'),
-    genero:      g('mu-genero'),
-    grupo_etnico:g('mu-grupo-etnico'),
-    rol:         g('mu-rol')||'voluntario',
-    estado:      g('mu-estado')||'activo',
-    notas:       g('mu-notas')
+    telefono:     g('mu-telefono'),
+    departamento: g('mu-departamento'),
+    municipio:    g('mu-municipio'),
+    genero:       g('mu-genero'),
+    grupo_etnico: g('mu-grupo-etnico'),
+    rol:          g('mu-rol')||'voluntario',
+    estado:       g('mu-estado')||'activo',
+    notas:        g('mu-notas')
   };
   if(!payload.nombres||!payload.apellidos){showToast('⚠️ Nombres y apellidos son obligatorios');return;}
   var btn=document.getElementById('mu-save-btn');
@@ -3760,23 +3820,38 @@ async function guardarUsuario(){
   try{
     var sess=await window.supabase.auth.getSession();
     var token=sess.data?.session?.access_token||'';
+    // 1. Actualizar perfiles
     var resp=await fetch(
       window._SB_URL+'/rest/v1/perfiles?id=eq.'+id,
       {method:'PATCH',headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)}
     );
-    if(btn){btn.textContent='&#x1F4BE; Guardar cambios';btn.disabled=false;}
-    if(!resp.ok){showToast('⚠️ Error al guardar ('+resp.status+')');return;}
+    if(!resp.ok){
+      if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
+      showToast('⚠️ Error al guardar perfil ('+resp.status+')');return;
+    }
+    // 2. Actualizar email si se ingresó uno
+    if(newEmail && newEmail.includes('@')){
+      var respEmail=await fetch(
+        window._SB_URL+'/functions/v1/actualizar-email',
+        {method:'POST',headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+         body:JSON.stringify({user_id:id,email:newEmail})}
+      );
+      var resEmail=await respEmail.json();
+      if(!respEmail.ok||resEmail.error){
+        if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
+        showToast('✅ Perfil guardado, pero error actualizando email: '+(resEmail.error||respEmail.status));
+        filtrarUsuarios();return;
+      }
+    }
+    if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
     // Actualizar cache local
     var idx=(window._usuariosData||[]).findIndex(function(x){return x.id===id;});
-    if(idx>=0){ Object.assign(window._usuariosData[idx], payload); }
-    // Actualizar header del modal
-    var newNombre=((payload.nombres||'')+' '+(payload.apellidos||'')).trim();
-    document.getElementById('mu-nombre-header').textContent=newNombre;
+    if(idx>=0){Object.assign(window._usuariosData[idx],payload);}
     closeModal('modal-perfil-usuario');
-    showToast('✅ Perfil actualizado');
+    showToast(newEmail && newEmail.includes('@') ? '✅ Perfil y email actualizados' : '✅ Perfil actualizado');
     filtrarUsuarios();
   }catch(e){
-    if(btn){btn.textContent='&#x1F4BE; Guardar cambios';btn.disabled=false;}
+    if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
     showToast('⚠️ Error: '+e.message);
     console.error('guardarUsuario:',e);
   }
