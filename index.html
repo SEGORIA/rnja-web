@@ -995,8 +995,8 @@ tr:hover td{background:var(--surface2);}
       <div class="sidebar-user">
         <div class="user-av lv-brote">🙋</div>
         <div class="sidebar-user-info">
-          <strong>Mariana López</strong>
-          <small>Antioquia · Medellín</small>
+          <strong class="sb-nombre">Mariana López</strong>
+          <small class="sb-subloc">Antioquia · Medellín</small>
           <div class="level-badge">🌿 Nivel Brote</div>
         </div>
       </div>
@@ -1038,8 +1038,8 @@ tr:hover td{background:var(--surface2);}
             <div class="profile-av-big">🙋</div>
             <div style="flex:1;">
               <div class="profile-meta">
-                <strong>¡Bienvenida, Mariana! 👋</strong>
-                <div class="loc">📍 Antioquia · Medellín · Voluntaria desde 2024</div>
+                <strong id="vol-bienvenida">¡Bienvenido/a! 👋</strong>
+                <div class="loc" id="vol-bienvenida-loc">📍 —</div>
               </div>
               <div class="profile-badges">
                 <span class="p-badge level">🌿 Nivel Brote</span>
@@ -1131,18 +1131,18 @@ tr:hover td{background:var(--surface2);}
               <div class="card mb-5">
                 <div class="card-title mb-4">Información personal</div>
                 <div class="info-grid">
-                  <div class="info-item"><div class="lbl">Nombre completo</div><div class="val" id="p-nombre">Mariana López Torres</div></div>
-                  <div class="info-item"><div class="lbl">Cédula</div><div class="val">1.234.567.890</div></div>
-                  <div class="info-item"><div class="lbl">Correo</div><div class="val">mariana@email.com</div></div>
-                  <div class="info-item"><div class="lbl">Teléfono</div><div class="val">+57 300 123 4567</div></div>
-                  <div class="info-item"><div class="lbl">Departamento</div><div class="val">Antioquia</div></div>
-                  <div class="info-item"><div class="lbl">Municipio</div><div class="val">Medellín</div></div>
-                  <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" style="color:var(--g600);">Enero 2022</div></div>
-                  <div class="info-item"><div class="lbl">Rol actual</div><div class="val"><span class="tag tag-green" id="p-rol-tag">Voluntaria</span></div></div>
-                  <div class="info-item"><div class="lbl">Situación académica</div><div class="val">Universitaria</div></div>
-                  <div class="info-item"><div class="lbl">Carrera</div><div class="val">Ing. Ambiental — UdeA</div></div>
-                  <div class="info-item"><div class="lbl">Semestre</div><div class="val">7mo semestre</div></div>
-                  <div class="info-item"><div class="lbl">Área de interés</div><div class="val">Ciencias ambientales</div></div>
+                  <div class="info-item"><div class="lbl">Nombre completo</div><div class="val" id="p-nombre">—</div></div>
+                  <div class="info-item"><div class="lbl">Cédula</div><div class="val" id="p-cedula">—</div></div>
+                  <div class="info-item"><div class="lbl">Correo</div><div class="val" id="p-email">—</div></div>
+                  <div class="info-item"><div class="lbl">Teléfono</div><div class="val" id="p-telefono">—</div></div>
+                  <div class="info-item"><div class="lbl">Departamento</div><div class="val" id="p-departamento">—</div></div>
+                  <div class="info-item"><div class="lbl">Municipio</div><div class="val" id="p-municipio">—</div></div>
+                  <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" id="p-ingreso-date" style="color:var(--g600);">—</div></div>
+                  <div class="info-item"><div class="lbl">Rol actual</div><div class="val"><span class="tag tag-green" id="p-rol-tag">—</span></div></div>
+                  <div class="info-item"><div class="lbl">Situación académica</div><div class="val" id="p-situacion">—</div></div>
+                  <div class="info-item"><div class="lbl">Carrera</div><div class="val" id="p-carrera">—</div></div>
+                  <div class="info-item"><div class="lbl">Semestre</div><div class="val" id="p-semestre">—</div></div>
+                  <div class="info-item"><div class="lbl">Área de interés</div><div class="val" id="p-area">—</div></div>
                 </div>
               </div>
             </div>
@@ -1377,7 +1377,7 @@ tr:hover td{background:var(--surface2);}
       </div>
       <div class="sidebar-user">
         <div class="user-av" style="background:linear-gradient(135deg,#4a90d9,#2970c0)">🗂️</div>
-        <div class="sidebar-user-info"><strong>Carlos Díaz</strong><small>Coord. Municipal</small><div class="level-badge" style="background:rgba(74,144,217,.15);color:#4a90d9;">📍 Bogotá D.C.</div></div>
+        <div class="sidebar-user-info"><strong class="sb-nombre">Carlos Díaz</strong><small class="sb-subloc">Coord. Municipal</small><div class="level-badge" style="background:rgba(74,144,217,.15);color:#4a90d9;">📍 Bogotá D.C.</div></div>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section">&#x1F4CD; Mi municipio</div>
@@ -1590,7 +1590,7 @@ tr:hover td{background:var(--surface2);}
       <div class="sidebar-logo"><a href="#" class="logo-wrap" onclick="showView('v-landing')"><div class="logo-icon" style="background:transparent;box-shadow:none;width:38px;height:38px;border-radius:0;padding:0;"><img src="logo-rnja.png" alt="RNJA" style="width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));"></div><div class="logo-text"><strong style="font-size:14px;">RNJA</strong></div></a></div>
       <div class="sidebar-user">
         <div class="user-av" style="background:linear-gradient(135deg,#8b5cf6,#6d3fd4)">📋</div>
-        <div class="sidebar-user-info"><strong>Ana Ruiz</strong><small>Coord. Departamental</small><div class="level-badge" style="background:rgba(139,92,246,.15);color:#8b5cf6;">🏛️ Valle del Cauca</div></div>
+        <div class="sidebar-user-info"><strong class="sb-nombre">Ana Ruiz</strong><small class="sb-subloc">Coord. Departamental</small><div class="level-badge" style="background:rgba(139,92,246,.15);color:#8b5cf6;">🏛️ Valle del Cauca</div></div>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section">Mi departamento</div>
@@ -1815,7 +1815,7 @@ tr:hover td{background:var(--surface2);}
       <div class="sidebar-logo"><a href="#" class="logo-wrap" onclick="showView('v-landing')"><div class="logo-icon" style="background:transparent;box-shadow:none;width:38px;height:38px;border-radius:0;padding:0;"><img src="logo-rnja.png" alt="RNJA" style="width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));"></div><div class="logo-text"><strong style="font-size:14px;">RNJA</strong></div></a></div>
       <div class="sidebar-user">
         <div class="user-av" style="background:linear-gradient(135deg,var(--amber),#d48a0a)">🏛️</div>
-        <div class="sidebar-user-info"><strong>Jorge Medina</strong><small>Coordinación Nacional</small><div class="level-badge" style="background:rgba(37,129,196,.15);color:var(--amber);">🇨🇴 Nacional</div></div>
+        <div class="sidebar-user-info"><strong class="sb-nombre">Jorge Medina</strong><small class="sb-subloc">Coordinación Nacional</small><div class="level-badge" style="background:rgba(37,129,196,.15);color:var(--amber);">🇨🇴 Nacional</div></div>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section">Nacional</div>
@@ -2337,7 +2337,7 @@ tr:hover td{background:var(--surface2);}
       </div>
       <div class="sidebar-user">
         <div class="user-av" style="background:linear-gradient(135deg,#ee5a24,#c0392b)">🔑</div>
-        <div class="sidebar-user-info"><strong>Admin RNJA</strong><small>Super Administrador</small><div class="level-badge" style="background:rgba(232,81,81,.2);color:var(--red);">🔑 SuperAdmin</div></div>
+        <div class="sidebar-user-info"><strong class="sb-nombre">Admin RNJA</strong><small class="sb-subloc">Super Administrador</small><div class="level-badge" style="background:rgba(232,81,81,.2);color:var(--red);">🔑 SuperAdmin</div></div>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section">Administración</div>
@@ -2838,19 +2838,55 @@ async function logout(){
 /* ══════════════════ PROFILE SYNC ══════════════════ */
 function updateProfileForRole(role){
   const m = ROLE_META[role]||{};
-  // Update profile elements (shared across dashboards)
-  const setEl = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
-  const names = {voluntario:'Mariana López Torres',coord_municipal:'Carlos Díaz Mora',coord_departamental:'Ana Ruiz Castaño',coord_nacional:'Jorge Medina Peña',etica:'Laura Montoya Ríos',super_admin:'Admin RNJA'};
-  const locs = {voluntario:'Antioquia · Medellín',coord_municipal:'Bogotá D.C.',coord_departamental:'Valle del Cauca · Cali',coord_nacional:'Nacional · Bogotá',etica:'Bogotá D.C.',super_admin:'Nacional'};
-  const ccs = {voluntario:'1.234.567.890',coord_municipal:'1.020.345.678',coord_departamental:'1.098.765.432',coord_nacional:'79.234.567',etica:'1.045.678.901',super_admin:'—'};
-  setEl('dash-perfil-nombre', names[role]||'Usuario');
-  setEl('dash-perfil-loc', locs[role]||'');
-  setEl('dash-perfil-cc', ccs[role]||'');
+  const p = window.currentProfile||{};
+  const u = window.currentUser||{};
+  const setEl = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val||'—'; };
+
+  // Datos básicos reales
+  const nombreCompleto = [p.nombres, p.apellidos].filter(Boolean).join(' ') || 'Usuario';
+  const locParts = [p.departamento, p.municipio].filter(Boolean);
+  const loc = locParts.length ? locParts.join(' · ') : (role==='super_admin'?'Nacional':'—');
+  const cc = p.cedula || '—';
+
+  // Fecha de ingreso (formato: Enero 2024)
+  let ingreso = '—';
+  if(p.created_at){
+    const d = new Date(p.created_at);
+    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    ingreso = meses[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  // ── Tarjeta de perfil principal ──
+  setEl('dash-perfil-nombre', nombreCompleto);
+  setEl('dash-perfil-loc', loc);
+  setEl('dash-perfil-cc', cc);
   setEl('dash-perfil-nivel', m.nivel||'');
-  setEl('dash-perfil-ingreso', m.ingreso||'—');
+  setEl('dash-perfil-ingreso', ingreso);
   setEl('dash-perfil-rol-badge', m.label||'');
-  setEl('p-nombre', names[role]||'');
+
+  // ── Sidebar (todos los dashboards) ──
+  document.querySelectorAll('.sb-nombre').forEach(el => el.textContent = nombreCompleto);
+  document.querySelectorAll('.sb-subloc').forEach(el => el.textContent = m.label||role);
+
+  // ── Sección "Mi Perfil" detallada ──
+  setEl('p-nombre', nombreCompleto);
+  setEl('p-cedula', cc);
+  setEl('p-email', u.email || p.email || '—');
+  setEl('p-telefono', p.telefono || '—');
+  setEl('p-departamento', p.departamento || '—');
+  setEl('p-municipio', p.municipio || '—');
+  setEl('p-ingreso-date', ingreso);
   setEl('p-rol-tag', m.label||'');
+  setEl('p-situacion', p.situacion || '—');
+  setEl('p-carrera', p.carrera || '—');
+  setEl('p-semestre', p.semestre || '—');
+  setEl('p-area', p.area_conocimiento || '—');
+
+  // ── Bienvenida voluntario ──
+  const primerNombre = p.nombres ? p.nombres.split(' ')[0] : 'Usuario';
+  setEl('vol-bienvenida', '¡Bienvenido/a, ' + primerNombre + '! 👋');
+  setEl('vol-bienvenida-loc', '📍 ' + (loc !== '—' ? loc + ' · ' : '') + (m.label||''));
+
   // Render timeline
   renderTimeline(role);
 }
@@ -3044,10 +3080,9 @@ function initMapsForSection(sectionId){
 let _certData={};
 function downloadCert(evento,fecha,codigo,horas,esGeneral){
   _certData={evento,fecha,codigo,horas,esGeneral};
-  const nameMap={voluntario:'Mariana López Torres',coord_municipal:'Carlos Díaz Mora',coord_departamental:'Ana Ruiz Castaño',coord_nacional:'Jorge Medina Peña',etica:'Laura Montoya Ríos',super_admin:'Admin RNJA'};
-  const ccMap={voluntario:'1.234.567.890',coord_municipal:'1.020.345.678',coord_departamental:'1.098.765.432',coord_nacional:'79.234.567',etica:'1.045.678.901',super_admin:'—'};
-  const name=nameMap[currentRole]||'Usuario';
-  const cc=ccMap[currentRole]||'—';
+  const p=window.currentProfile||{};
+  const name=[p.nombres,p.apellidos].filter(Boolean).join(' ')||'Usuario';
+  const cc=p.cedula||'—';
   document.getElementById('cert-name').textContent=name;
   document.getElementById('cert-cc').textContent='C.C. '+cc;
   document.getElementById('cert-titulo-modal').textContent=esGeneral?'CERTIFICADO DE VOLUNTARIADO':'CERTIFICADO DE PARTICIPACIÓN';
