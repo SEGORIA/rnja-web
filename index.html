@@ -3460,9 +3460,16 @@ document.addEventListener('click', function(e){
 
 /* ══════════════════ GESTIÓN DE SOLICITUDES (ADMIN) ══════════════════ */
 async function cargarSolicitudes(){
-  const{data,error}=await supabase.from('solicitudes').select('*').order('created_at',{ascending:false});
-  if(error){console.error('cargarSolicitudes:',error);return;}
-  renderSolicitudes(data||[]);
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||'';
+    var resp=await fetch(
+      window._SB_URL+'/rest/v1/solicitudes?select=*&order=created_at.desc',
+      {headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Accept':'application/json'}}
+    );
+    if(!resp.ok){console.error('cargarSolicitudes HTTP '+resp.status);return;}
+    renderSolicitudes(await resp.json());
+  }catch(e){console.error('cargarSolicitudes:',e);}
 }
 
 function renderSolicitudes(list){
@@ -3494,23 +3501,61 @@ function renderSolicitudes(list){
 
 async function aprobarSolicitud(id){
   if(!confirm('¿Aprobar esta solicitud? Se enviará un email de invitación al usuario.')) return;
-  showToast('⏳ Procesando...');
-  var sb=window.supabase; if(!sb){showToast('Sin conexion a BD');return;}
-  const{data,error}=await sb.functions.invoke('aprobar-solicitud',{body:{solicitud_id:id,notas:''}});
-  if(error||data?.error){showToast('⚠️ '+(error?.message||data?.error));return;}
-  showToast('✅ Aprobada — invitación enviada por email');
-  cargarSolicitudes();
+  showToast('⏳ Procesando aprobación...');
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||'';
+    var resp=await fetch(
+      window._SB_URL+'/functions/v1/aprobar-solicitud',
+      {
+        method:'POST',
+        headers:{
+          'apikey':window._SB_KEY,
+          'Authorization':'Bearer '+token,
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({solicitud_id:id,notas:''})
+      }
+    );
+    var result=await resp.json();
+    if(!resp.ok||result.error){
+      showToast('⚠️ '+(result.error||'Error al aprobar (código '+resp.status+')'));return;
+    }
+    showToast('✅ Aprobada — invitación enviada a '+result.email);
+    cargarSolicitudes();
+  }catch(e){
+    showToast('⚠️ Error: '+e.message);
+    console.error('aprobarSolicitud:',e);
+  }
 }
 
 async function rechazarSolicitud(id){
   const motivo=prompt('Motivo del rechazo (opcional):');
   if(motivo===null) return;
-  const{error}=await supabase.from('solicitudes')
-    .update({estado:'rechazada',notas_revision:motivo||'',revisado_por:currentUser?.id})
-    .eq('id',id);
-  if(error){showToast('⚠️ '+error.message);return;}
-  showToast('Solicitud rechazada');
-  cargarSolicitudes();
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||'';
+    var uid=window.currentUser?.id||'';
+    var resp=await fetch(
+      window._SB_URL+'/rest/v1/solicitudes?id=eq.'+id,
+      {
+        method:'PATCH',
+        headers:{
+          'apikey':window._SB_KEY,
+          'Authorization':'Bearer '+token,
+          'Content-Type':'application/json',
+          'Prefer':'return=minimal'
+        },
+        body:JSON.stringify({estado:'rechazada',notas_revision:motivo||'',revisado_por:uid})
+      }
+    );
+    if(!resp.ok){showToast('⚠️ Error al rechazar ('+resp.status+')');return;}
+    showToast('✅ Solicitud rechazada');
+    cargarSolicitudes();
+  }catch(e){
+    showToast('⚠️ Error: '+e.message);
+    console.error('rechazarSolicitud:',e);
+  }
 }
 </script>
 
