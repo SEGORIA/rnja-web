@@ -3166,10 +3166,10 @@ function toggleAcademico(){ const v=document.getElementById('reg-situacion').val
 async function submitRegistro(){
   const cb=document.getElementById('reg-acepto');
   if(!cb||!cb.checked){showToast('⚠️ Acepta los términos y condiciones');return;}
-  const g=id=>document.getElementById(id)?.value||null;
+  const g=id=>{ const v=document.getElementById(id)?.value; return(v&&v.trim())?v.trim():null; };
   const data={
     nombres:g('reg-nombres'),apellidos:g('reg-apellidos'),cedula:g('reg-cedula'),
-    fecha_nacimiento:g('reg-fecha-nac'),email:g('reg-email'),telefono:g('reg-telefono'),
+    fecha_nacimiento:g('reg-fecha-nac')||null,email:g('reg-email'),telefono:g('reg-telefono'),
     departamento:g('reg-departamento'),municipio:g('reg-municipio'),
     genero:g('reg-genero'),grupo_etnico:g('reg-etnico'),
     situacion:g('reg-situacion'),institucion:g('reg-institucion'),
@@ -3184,13 +3184,24 @@ async function submitRegistro(){
     showToast('⚠️ Completa nombre, apellido, cédula y correo (Paso 1)');return;
   }
   const btn=document.getElementById('reg-btn-submit');
+  const resetBtn=()=>{ if(btn){btn.textContent='✉ Enviar solicitud';btn.disabled=false;} };
   if(btn){btn.textContent='Enviando...';btn.disabled=true;}
-  var sb=window.supabase; if(!sb){showToast('Sin conexion a la base de datos');return;}
-  var{error}=await sb.from('solicitudes').insert(data);
-  if(btn){btn.textContent='✉ Enviar solicitud';btn.disabled=false;}
-  if(error){showToast('⚠️ Error: '+error.message);return;}
-  closeModal('modal-registro');
-  showToast('✅ Solicitud enviada — te contactaremos en 2-5 días hábiles');
+  var sb=window.supabase;
+  if(!sb){resetBtn();showToast('⚠️ Sin conexión a la base de datos');return;}
+  try{
+    const{error}=await sb.from('solicitudes').insert([data]);
+    resetBtn();
+    if(error){
+      console.error('submitRegistro error:',error);
+      showToast('⚠️ '+(error.message||'Error al enviar'));return;
+    }
+    closeModal('modal-registro');
+    showToast('✅ Solicitud enviada — te contactaremos en 2-5 días hábiles');
+  }catch(e){
+    resetBtn();
+    console.error('submitRegistro excepcion:',e);
+    showToast('⚠️ Error inesperado: '+e.message);
+  }
 }
 
 /* ══════════════════ PERFIL TABS ══════════════════ */
