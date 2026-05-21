@@ -3660,8 +3660,10 @@ async function rechazarSolicitud(id){
         }
       }
       if(event === 'PASSWORD_RECOVERY'){
-        showView('v-login');
-        showToast('Ingresa tu nueva contrasena en el campo de abajo');
+        history.replaceState(null,'',window.location.pathname);
+        var elSet2 = document.getElementById('set-pass-welcome');
+        if(elSet2) elSet2.textContent = 'Establece tu contraseña para acceder al sistema RNJA.';
+        showView('v-set-password');
       }
     } else {
       window.currentUser = null;

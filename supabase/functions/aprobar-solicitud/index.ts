@@ -20,6 +20,8 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const siteUrl = Deno.env.get('SITE_URL') ?? 'https://rnja-web.vercel.app'
+
     // Cliente admin (service role — solo disponible server-side)
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -70,63 +72,87 @@ Deno.serve(async (req) => {
       .update({ estado: 'revisando', revisado_por: user.id })
       .eq('id', solicitud_id)
 
-    // Invitar al usuario por email (crea registro en auth.users + envía email)
+    const redirectTo = `${siteUrl}/index.html`
+    let userId: string | null = null
+    let isReenvio = false
+
+    // Intentar invitar (nuevo usuario)
     const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
       solicitud.email,
-      {
-        redirectTo: `${Deno.env.get('SITE_URL') ?? 'http://localhost:3456'}/index.html`,
-        data: { solicitud_id, nombres: solicitud.nombres }
-      }
+      { redirectTo, data: { solicitud_id, nombres: solicitud.nombres } }
     )
 
     if (inviteError) {
-      // Revertir estado si falla el invite
-      await supabaseAdmin
-        .from('solicitudes')
-        .update({ estado: 'pendiente' })
-        .eq('id', solicitud_id)
-      throw new Error(`Error al invitar: ${inviteError.message}`)
-    }
+      const yaExiste = inviteError.message.toLowerCase().includes('already been registered')
+                    || inviteError.message.toLowerCase().includes('already registered')
 
-    // Crear perfil del nuevo usuario
-    const { error: profileError } = await supabaseAdmin
-      .from('perfiles')
-      .insert({
-        id: inviteData.user.id,
-        nombres: solicitud.nombres,
-        apellidos: solicitud.apellidos,
-        cedula: solicitud.cedula,
-        fecha_nacimiento: solicitud.fecha_nacimiento || null,
-        telefono: solicitud.telefono || null,
-        departamento: solicitud.departamento || null,
-        municipio: solicitud.municipio || null,
-        genero: solicitud.genero || null,
-        grupo_etnico: solicitud.grupo_etnico || null,
-        rol: 'voluntario',
-        estado: 'activo',
-      })
+      if (!yaExiste) {
+        // Error distinto — revertir y lanzar
+        await supabaseAdmin.from('solicitudes').update({ estado: 'pendiente' }).eq('id', solicitud_id)
+        throw new Error(`Error al invitar: ${inviteError.message}`)
+      }
 
-    if (profileError) {
-      console.error('Error creando perfil:', profileError)
-      // El usuario fue creado, pero el perfil falló — loguear para revisión manual
+      // Usuario ya existe — enviar email de recuperación para que establezca contraseña
+      isReenvio = true
+      const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
+        solicitud.email,
+        { redirectTo }
+      )
+
+      if (resetError) {
+        await supabaseAdmin.from('solicitudes').update({ estado: 'pendiente' }).eq('id', solicitud_id)
+        throw new Error(`Error al reenviar acceso: ${resetError.message}`)
+      }
+
+      // Buscar el perfil existente para obtener el user_id
+      const { data: perfilExistente } = await supabaseAdmin
+        .from('perfiles')
+        .select('id')
+        .eq('cedula', solicitud.cedula)
+        .single()
+      userId = perfilExistente?.id ?? null
+
+    } else {
+      userId = inviteData.user.id
+
+      // Crear perfil del nuevo usuario
+      const { error: profileError } = await supabaseAdmin
+        .from('perfiles')
+        .insert({
+          id: userId,
+          nombres: solicitud.nombres,
+          apellidos: solicitud.apellidos,
+          cedula: solicitud.cedula,
+          fecha_nacimiento: solicitud.fecha_nacimiento || null,
+          telefono: solicitud.telefono || null,
+          departamento: solicitud.departamento || null,
+          municipio: solicitud.municipio || null,
+          genero: solicitud.genero || null,
+          grupo_etnico: solicitud.grupo_etnico || null,
+          rol: 'voluntario',
+          estado: 'activo',
+        })
+
+      if (profileError) {
+        console.error('Error creando perfil:', profileError)
+      }
     }
 
     // Marcar solicitud como aprobada
     await supabaseAdmin
       .from('solicitudes')
-      .update({
-        estado: 'aprobada',
-        notas_revision: notas,
-        revisado_por: user.id,
-      })
+      .update({ estado: 'aprobada', notas_revision: notas, revisado_por: user.id })
       .eq('id', solicitud_id)
 
     return new Response(
       JSON.stringify({
         success: true,
-        user_id: inviteData.user.id,
+        user_id: userId,
         email: solicitud.email,
-        message: `Invitación enviada a ${solicitud.email}`
+        reenvio: isReenvio,
+        message: isReenvio
+          ? `Email de acceso reenviado a ${solicitud.email}`
+          : `Invitación enviada a ${solicitud.email}`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
