@@ -3731,7 +3731,7 @@ function verUsuario(id){
   setVal('mu-rol', u.rol||'voluntario');
   setVal('mu-estado', u.estado||'activo');
   document.getElementById('mu-email').textContent='(ver en Supabase Auth)';
-  var ing='—'; if(u.created_at){var d=new Date(u.created_at);var M2=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];ing=d.getDate()+'' '+M2[d.getMonth()]+'' '+d.getFullYear();}
+  var ing='—'; if(u.created_at){var d=new Date(u.created_at);var M2=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];ing=d.getDate()+' '+M2[d.getMonth()]+' '+d.getFullYear();}
   document.getElementById('mu-ingreso').textContent=ing;
   openModal('modal-perfil-usuario');
 }
