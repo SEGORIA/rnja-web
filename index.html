@@ -3768,7 +3768,7 @@ function renderUsuarios(lista){
 function verUsuario(id){
   var u=(window._usuariosData||[]).find(function(x){return x.id===id;});
   if(!u){showToast('Usuario no encontrado');return;}
-  var setVal=function(elId,val){var el=document.getElementById(elId);if(!el)return;if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=val||'';else if(el.tagName==='SELECT'){el.value=val||';} else el.textContent=val||'—';};
+  var setVal=function(elId,val){var el=document.getElementById(elId);if(!el)return;if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=val||'';else if(el.tagName==='SELECT')el.value=val||'';else el.textContent=val||'—';};
   document.getElementById('mu-id').value=u.id;
   document.getElementById('mu-nombre-header').textContent=((u.nombres||'')+' '+(u.apellidos||'')).trim()||'—';
   setVal('mu-nombres', u.nombres);
