@@ -3189,7 +3189,9 @@ async function submitRegistro(){
   var sb=window.supabase;
   if(!sb){resetBtn();showToast('⚠️ Sin conexión a la base de datos');return;}
   try{
-    const{error}=await sb.from('solicitudes').insert([data]);
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Tiempo de espera agotado — verifica tu conexión')),12000));
+    const insert=sb.from('solicitudes').insert([data]);
+    const{error}=await Promise.race([insert,timeout]);
     resetBtn();
     if(error){
       console.error('submitRegistro error:',error);
@@ -3200,7 +3202,7 @@ async function submitRegistro(){
   }catch(e){
     resetBtn();
     console.error('submitRegistro excepcion:',e);
-    showToast('⚠️ Error inesperado: '+e.message);
+    showToast('⚠️ '+e.message);
   }
 }
 
