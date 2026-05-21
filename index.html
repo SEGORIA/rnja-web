@@ -3560,7 +3560,21 @@ async function aprobarSolicitud(id){
     if(!resp.ok||result.error){
       showToast('⚠️ '+(result.error||'Error al aprobar (código '+resp.status+')'));return;
     }
-    showToast('✅ Aprobada — invitación enviada a '+result.email);
+    if(result.reenvio && result.action_link){
+      // Usuario ya existía — mostrar link para compartir manualmente
+      showToast('✅ Aprobada — copia el link de acceso para enviárselo al usuario');
+      setTimeout(function(){
+        var link = result.action_link;
+        var msg = '🔗 Link de acceso para '+result.email+':\n\n'+link+'\n\nCópialo y envíaselo directamente.';
+        if(window.prompt){
+          window.prompt(msg, link);
+        } else {
+          alert(msg);
+        }
+      }, 600);
+    } else {
+      showToast('✅ Aprobada — invitación enviada a '+result.email);
+    }
     cargarSolicitudes();
   }catch(e){
     showToast('⚠️ Error: '+e.message);

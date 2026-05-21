@@ -92,17 +92,22 @@ Deno.serve(async (req) => {
         throw new Error(`Error al invitar: ${inviteError.message}`)
       }
 
-      // Usuario ya existe — enviar email de recuperación para que establezca contraseña
+      // Usuario ya existe — generar link de recuperación sin enviar email
+      // (evita rate limit de Supabase en plan gratuito)
       isReenvio = true
-      const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
-        solicitud.email,
-        { redirectTo }
-      )
+      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+        type: 'recovery',
+        email: solicitud.email,
+        options: { redirectTo }
+      })
 
-      if (resetError) {
+      if (linkError) {
         await supabaseAdmin.from('solicitudes').update({ estado: 'pendiente' }).eq('id', solicitud_id)
-        throw new Error(`Error al reenviar acceso: ${resetError.message}`)
+        throw new Error(`Error generando link de acceso: ${linkError.message}`)
       }
+
+      // Guardar el link generado para retornarlo al admin
+      const actionLink = linkData?.properties?.action_link ?? null
 
       // Buscar el perfil existente para obtener el user_id
       const { data: perfilExistente } = await supabaseAdmin
@@ -111,6 +116,24 @@ Deno.serve(async (req) => {
         .eq('cedula', solicitud.cedula)
         .single()
       userId = perfilExistente?.id ?? null
+
+      // Marcar solicitud como aprobada
+      await supabaseAdmin
+        .from('solicitudes')
+        .update({ estado: 'aprobada', notas_revision: notas, revisado_por: user.id })
+        .eq('id', solicitud_id)
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          user_id: userId,
+          email: solicitud.email,
+          reenvio: true,
+          action_link: actionLink,
+          message: `Usuario ya registrado — link de acceso generado para ${solicitud.email}`
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
 
     } else {
       userId = inviteData.user.id
