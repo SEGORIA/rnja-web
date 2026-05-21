@@ -980,6 +980,45 @@ tr:hover td{background:var(--surface2);}
 </div>
 
 <!-- ════════════════════════════════════════
+  VIEW: ESTABLECER CONTRASEÑA (invitados)
+════════════════════════════════════════ -->
+<div class="view" id="v-set-password">
+  <div style="position:fixed;inset:0;background:var(--g900);z-index:-1;"></div>
+  <div style="position:fixed;inset:0;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(76,175,120,.12) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;">
+    <div style="width:100%;max-width:440px;">
+      <div class="login-card">
+        <div class="login-logo">
+          <div style="margin:0 auto 14px;width:72px;height:72px;display:flex;align-items:center;justify-content:center;">
+            <img src="logo-rnja.png" alt="Logo RNJA" style="width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 3px 10px rgba(0,0,0,.25));">
+          </div>
+          <strong>¡Bienvenido/a a la RNJA! 🌿</strong>
+          <small id="set-pass-welcome" style="display:block;margin-top:6px;color:var(--muted);font-size:13px;">Tu solicitud fue aprobada. Crea tu contraseña para ingresar.</small>
+        </div>
+
+        <div style="background:rgba(76,175,120,.08);border:1px solid rgba(76,175,120,.2);border-radius:var(--r);padding:12px;margin-bottom:20px;font-size:13px;color:var(--g400);line-height:1.5;">
+          🔐 Elige una contraseña segura de al menos 8 caracteres. La usarás cada vez que ingreses al sistema.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nueva contraseña</label>
+          <input class="form-input" type="password" placeholder="Mínimo 8 caracteres" id="set-pass-1"
+            onkeydown="if(event.key==='Enter')document.getElementById('set-pass-2').focus()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar contraseña</label>
+          <input class="form-input" type="password" placeholder="Repite tu contraseña" id="set-pass-2"
+            onkeydown="if(event.key==='Enter')setPassword()">
+        </div>
+        <button class="btn btn-neon w-full" id="set-pass-btn" style="width:100%;justify-content:center;padding:14px;" onclick="setPassword()">
+          Establecer contraseña y entrar →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
   VIEW: DASHBOARD VOLUNTARIO
 ════════════════════════════════════════ -->
 <div class="view" id="v-voluntario">
@@ -3572,6 +3611,9 @@ async function rechazarSolicitud(id){
   // Exponer para uso en funciones (fetch directo)
   window._SB_URL = SB_URL;
   window._SB_KEY = SB_KEY;
+  // Detectar flujo de invitación ANTES de que createClient procese el hash
+  var _hashParams = new URLSearchParams(window.location.hash.substring(1));
+  window._isInviteFlow = _hashParams.get('type') === 'invite';
 
   // Si el CDN no cargó, crear un stub para no romper el resto de la página
   if(typeof window.supabase === 'undefined' || typeof window.supabase.createClient !== 'function'){
@@ -3591,8 +3633,18 @@ async function rechazarSolicitud(id){
     if(session && session.user){
       window.currentUser = session.user;
       if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
-        // Sin await — evita bloquear el cliente Supabase internamente
-        loadUserProfile().catch(console.error);
+        if(window._isInviteFlow){
+          // Primera vez del invitado — mostrar pantalla de contraseña
+          window._isInviteFlow = false;
+          history.replaceState(null,'',window.location.pathname); // limpiar hash de URL
+          var nombreInvitado = session.user.user_metadata?.nombres || session.user.email || '';
+          var elSet = document.getElementById('set-pass-welcome');
+          if(elSet && nombreInvitado) elSet.textContent = '¡Hola, '+nombreInvitado+'! Tu solicitud fue aprobada. Crea tu contraseña para ingresar.';
+          showView('v-set-password');
+        } else {
+          // Sin await — evita bloquear el cliente Supabase internamente
+          loadUserProfile().catch(console.error);
+        }
       }
       if(event === 'PASSWORD_RECOVERY'){
         showView('v-login');
@@ -3604,6 +3656,42 @@ async function rechazarSolicitud(id){
     }
   });
 })();
+
+// Establece contraseña para usuarios que llegan por link de invitación
+async function setPassword(){
+  var pwd = (document.getElementById('set-pass-1')?.value||'').trim();
+  var pwd2 = (document.getElementById('set-pass-2')?.value||'').trim();
+  if(!pwd || pwd.length < 8){ showToast('⚠️ Mínimo 8 caracteres'); return; }
+  if(pwd !== pwd2){ showToast('⚠️ Las contraseñas no coinciden'); return; }
+  var btn = document.getElementById('set-pass-btn');
+  if(btn){ btn.textContent='Guardando...'; btn.disabled=true; }
+  try{
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(window._SB_URL+'/auth/v1/user',{
+      method:'PUT',
+      headers:{
+        'apikey':window._SB_KEY,
+        'Authorization':'Bearer '+token,
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify({password:pwd})
+    });
+    if(btn){ btn.textContent='Establecer contraseña y entrar →'; btn.disabled=false; }
+    if(!resp.ok){
+      var err = await resp.text();
+      console.error('setPassword:', err);
+      showToast('⚠️ Error al guardar la contraseña');
+      return;
+    }
+    showToast('✅ ¡Contraseña creada! Bienvenido/a a la RNJA 🌿');
+    await loadUserProfile();
+  }catch(e){
+    if(btn){ btn.textContent='Establecer contraseña y entrar →'; btn.disabled=false; }
+    showToast('⚠️ Error: '+e.message);
+    console.error('setPassword excepcion:',e);
+  }
+}
 
 // Carga el perfil del usuario autenticado desde la tabla perfiles
 // Usa fetch directo para evitar bug del cliente Supabase JS CDN con Promises
