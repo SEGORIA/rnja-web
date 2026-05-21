@@ -2825,13 +2825,13 @@ async function doLogin(){
     const msg=error.message.includes('Invalid login')?'Correo o contraseña incorrectos':error.message;
     showToast('⚠️ '+msg);return;
   }
-  currentUser=data.user;
+  window.currentUser=data.user;
   await loadUserProfile();
 }
 
 async function logout(){
-  await supabase.auth.signOut();
-  currentUser=null;currentProfile=null;currentRole=null;
+  if(window.supabase) await window.supabase.auth.signOut();
+  window.currentUser=null;window.currentProfile=null;currentRole=null;
   showView('v-landing');
 }
 
