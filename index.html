@@ -1210,8 +1210,36 @@ tr:hover td{background:var(--surface2);}
         <div class="page-section" id="sec-vol-certs">
           <div class="card-header mb-5">
             <div class="card-title" style="font-size:20px;">&#x1F4DC; Mis Certificados</div>
-            <span class="tag tag-green" id="vol-certs-count">0 disponibles</span>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="tag tag-green" id="vol-certs-count">0 disponibles</span>
+              <button class="btn btn-neon btn-sm" onclick="toggleSolicitudCertForm()">&#x2709; Solicitar certificado</button>
+            </div>
           </div>
+          <!-- Formulario de solicitud -->
+          <div id="vol-cert-request-form" class="card mb-5" style="display:none;">
+            <div class="card-title mb-4">&#x2709; Solicitar un certificado</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">La coordinaci&#243;n revisar&#225; tu solicitud y emitir&#225; el certificado cuando sea aprobada. Te llegar&#225; un correo cuando est&#233; listo.</p>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Tipo de certificado</label>
+                <select id="sol-cert-tipo" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="participacion">Participaci&#243;n en actividad</option>
+                  <option value="pertenencia">Pertenencia a la Red</option>
+                  <option value="trayectoria">Trayectoria y servicio</option>
+                  <option value="reconocimiento">Reconocimiento y m&#233;rito</option>
+                  <option value="coordinacion">Rol de coordinaci&#243;n</option>
+                  <option value="formacion">Formaci&#243;n y capacitaci&#243;n</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Descripci&#243;n</label>
+                <textarea id="sol-cert-desc" class="form-input" rows="3" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;resize:vertical;" placeholder="Describe brevemente: actividad, fecha aproximada, horas participadas..."></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px;">
+              <button id="sol-cert-btn" class="btn btn-neon" style="flex:1;" onclick="enviarSolicitudCert()">&#x2709; Enviar solicitud</button>
+              <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 16px;" onclick="toggleSolicitudCertForm()">Cancelar</button>
+            </div>
+          </div>
+          <!-- Solicitudes enviadas -->
+          <div id="vol-cert-solicitudes" style="margin-bottom:8px;"></div>
+          <!-- Lista de certificados -->
           <div id="vol-certs-list" style="display:flex;flex-direction:column;gap:12px;">
             <div style="text-align:center;color:var(--muted);padding:40px;">Cargando certificados...</div>
           </div>
@@ -2777,6 +2805,14 @@ tr:hover td{background:var(--surface2);}
               <button class="btn btn-neon" style="flex:1;" onclick="emitirCertificado('sa')">&#x1F4DC; Emitir y descargar certificado</button>
               <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 16px;" onclick="toggleEmitirForm('sa')">Cancelar</button>
             </div>
+          </div>
+          <!-- Solicitudes pendientes -->
+          <div class="card mb-5">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div class="card-title">&#x1F4EC; Solicitudes pendientes <span id="cert-sa-solicitudes-badge" style="display:none;background:var(--red);color:white;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;vertical-align:middle;"></span></div>
+              <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="cargarSolicitudesCertAdmin()">&#x21BB;</button>
+            </div>
+            <div id="cert-sa-solicitudes"><div style="text-align:center;color:var(--muted);padding:16px;font-size:13px;">Sin solicitudes pendientes</div></div>
           </div>
           <!-- Filtros + tabla -->
           <div class="card" style="margin-bottom:12px;padding:14px;">
@@ -4876,6 +4912,16 @@ async function cargarCertDepForm() {
   if (!window._usuariosData || window._usuariosData.length === 0) await cargarUsuarios();
   var fechaEl = document.getElementById('cert-dep-fecha');
   if (fechaEl && !fechaEl.value) fechaEl.value = new Date().toISOString().slice(0, 10);
+  // Filtrar tipos disponibles según rol
+  var rolActual = (window.currentProfile || {}).rol;
+  var tipoSel = document.getElementById('cert-dep-tipo');
+  if (tipoSel && (rolActual === 'coord_departamental' || rolActual === 'coord_municipal')) {
+    var soloActividades = ['participacion', 'formacion'];
+    Array.from(tipoSel.options).forEach(function(opt) {
+      opt.style.display = soloActividades.includes(opt.value) ? '' : 'none';
+    });
+    if (!soloActividades.includes(tipoSel.value)) tipoSel.value = 'participacion';
+  }
   cargarCertDepRecientes();
 }
 
@@ -4966,6 +5012,8 @@ async function cargarMisCertificados() {
     list.innerHTML = '<div style="text-align:center;color:var(--red);padding:40px;">Error: '+e.message+'</div>';
     console.error('cargarMisCertificados:', e);
   }
+  // También cargar solicitudes propias
+  cargarMisSolicitudesCert();
 }
 
 // ── Admin: cargar todos los certificados ──
@@ -4987,6 +5035,8 @@ async function cargarCertificadosAdmin() {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error: '+e.message+'</td></tr>';
     console.error('cargarCertificadosAdmin:', e);
   }
+  // También cargar solicitudes pendientes
+  cargarSolicitudesCertAdmin();
 }
 
 function filtrarCertificadosAdmin() {
@@ -5039,12 +5089,27 @@ async function emitirCertificado(scope) {
   var horas = parseInt(document.getElementById(px+'-horas')?.value || '0', 10) || null;
   var fecha = document.getElementById(px+'-fecha')?.value || '';
   var notas = scope === 'sa' ? (document.getElementById('cert-sa-notas')?.value || '').trim() : '';
+  var btnLabel = scope === 'sa' ? '📜 Emitir y descargar certificado' : '📜 Emitir y descargar';
 
   if (!perfilId) { showToast('⚠️ Selecciona un voluntario'); return; }
   if (!titulo) { showToast('⚠️ Escribe el título de la actividad'); return; }
   if (!fecha) { showToast('⚠️ Selecciona la fecha'); return; }
 
-  // Botón de submit
+  // ── Validación de permisos por rol ──
+  var rolActual = (window.currentProfile || {}).rol;
+  var tiposRestringidos = { coord_departamental: ['participacion','formacion'], coord_municipal: ['participacion','formacion'] };
+  var tiposPermitidos = tiposRestringidos[rolActual];
+  if (tiposPermitidos && !tiposPermitidos.includes(tipo)) {
+    showToast('⚠️ Tu rol solo puede emitir certificados de Participación y Formación'); return;
+  }
+  if (rolActual === 'coord_municipal') {
+    var candidato = (window._usuariosData || []).find(function(u) { return u.id === perfilId; });
+    var miMun = (window.currentProfile || {}).municipio;
+    if (candidato && miMun && candidato.municipio && candidato.municipio !== miMun) {
+      showToast('⚠️ Solo puedes emitir certificados para voluntarios de ' + miMun); return;
+    }
+  }
+
   var btn = null;
   if (scope === 'sa') btn = document.querySelector('#cert-emit-form-sa button.btn-neon');
   else btn = document.querySelector('#sec-dep-certs .btn-neon');
@@ -5055,13 +5120,8 @@ async function emitirCertificado(scope) {
     var token = sess.data?.session?.access_token || '';
     var emisorId = (window.currentProfile || {}).id;
     var payload = {
-      perfil_id: perfilId,
-      tipo: tipo,
-      titulo: titulo,
-      horas: horas,
-      fecha_actividad: fecha || null,
-      notas: notas || null,
-      emitido_por: emisorId || null
+      perfil_id: perfilId, tipo: tipo, titulo: titulo,
+      horas: horas, fecha_actividad: fecha || null, notas: notas || null, emitido_por: emisorId || null
     };
     var resp = await fetch(
       window._SB_URL + '/rest/v1/certificados',
@@ -5075,26 +5135,38 @@ async function emitirCertificado(scope) {
     var nuevo = Array.isArray(rj) ? rj[0] : rj;
 
     showToast('✅ Certificado emitido — ' + (nuevo.codigo || ''));
-
-    // Restaurar botón
-    var btnLabel = scope === 'sa' ? '📜 Emitir y descargar certificado' : '📜 Emitir y descargar';
     if (btn) { btn.textContent = btnLabel; btn.disabled = false; }
 
     // Limpiar formulario
-    ['perfil','titulo','horas','fecha','notas'].forEach(function(f) {
+    ['perfil','perfil-search','titulo','horas','fecha','notas'].forEach(function(f) {
       var el = document.getElementById(px+'-'+f);
       if (el) el.value = '';
     });
 
-    // Descargar — buscar datos del destinatario
+    // Descargar — con datos del destinatario
     var recipiente = (window._usuariosData || []).find(function(u) { return u.id === perfilId; }) || {};
     var fechaLabel = fecha ? new Date(fecha+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-    window._certTipo = tipo; // tipo-specific text in downloadCert
+    window._certTipo = tipo;
     downloadCert(titulo, fechaLabel, nuevo.codigo || '', horas ? String(horas) : '—', false, recipiente);
+
+    // Marcar solicitud como aprobada si viene de una solicitud
+    if (window._pendingSolCertId) {
+      var solId = window._pendingSolCertId;
+      window._pendingSolCertId = null;
+      fetch(window._SB_URL + '/rest/v1/cert_solicitudes?id=eq.'+solId, {
+        method: 'PATCH',
+        headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token,
+                   'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ estado: 'aprobada', revisado_por: emisorId || null, cert_id: nuevo.id })
+      }).catch(function(){});
+    }
+
+    // Notificar por correo al voluntario (en segundo plano)
+    notificarCertPorEmail(nuevo.id, token);
 
     // Actualizar vistas
     if (scope === 'sa') {
-      cargarCertificadosAdmin();
+      cargarCertificadosAdmin(); // también recarga solicitudes
       var form = document.getElementById('cert-emit-form-sa');
       if (form) form.style.display = 'none';
     } else {
@@ -5103,7 +5175,7 @@ async function emitirCertificado(scope) {
   } catch(e) {
     showToast('⚠️ Error al emitir: '+e.message);
     console.error('emitirCertificado:', e);
-    if (btn) { btn.textContent = scope === 'sa' ? '📜 Emitir y descargar certificado' : '📜 Emitir y descargar'; btn.disabled = false; }
+    if (btn) { btn.textContent = btnLabel; btn.disabled = false; }
   }
 }
 
@@ -5153,6 +5225,175 @@ function hideCertPerfilList(scope) {
     var listEl = document.getElementById('cert-'+scope+'-perfil-list');
     if (listEl) listEl.style.display = 'none';
   }, 200);
+}
+
+/* ══════════════════════════════════════════════════
+   SOLICITUDES DE CERTIFICADOS
+══════════════════════════════════════════════════ */
+
+// ── Mostrar/ocultar formulario de solicitud (voluntario) ──
+function toggleSolicitudCertForm() {
+  var form = document.getElementById('vol-cert-request-form');
+  if (!form) return;
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── Enviar solicitud de certificado ──
+async function enviarSolicitudCert() {
+  var tipo = document.getElementById('sol-cert-tipo')?.value || 'participacion';
+  var desc = (document.getElementById('sol-cert-desc')?.value || '').trim();
+  if (!desc) { showToast('⚠️ Describe qué certificado necesitas'); return; }
+  var btn = document.getElementById('sol-cert-btn');
+  if (btn) { btn.textContent = 'Enviando...'; btn.disabled = true; }
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var pid = (window.currentProfile || {}).id;
+    if (!pid) throw new Error('Sin perfil');
+    var resp = await fetch(window._SB_URL + '/rest/v1/cert_solicitudes', {
+      method: 'POST',
+      headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token,
+                 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ perfil_id: pid, tipo: tipo, descripcion: desc })
+    });
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    showToast('✅ Solicitud enviada — la coordinación la revisará pronto 📬');
+    document.getElementById('sol-cert-desc').value = '';
+    toggleSolicitudCertForm();
+    cargarMisSolicitudesCert();
+  } catch(e) {
+    showToast('⚠️ Error: '+e.message);
+    if (btn) { btn.textContent = '✉ Enviar solicitud'; btn.disabled = false; }
+  }
+  if (btn) { btn.textContent = '✉ Enviar solicitud'; btn.disabled = false; }
+}
+
+// ── Mis solicitudes (vista voluntario) ──
+async function cargarMisSolicitudesCert() {
+  var wrap = document.getElementById('vol-cert-solicitudes');
+  if (!wrap) return;
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var pid = (window.currentProfile || {}).id;
+    if (!pid) return;
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/cert_solicitudes?perfil_id=eq.'+pid+'&order=created_at.desc',
+      { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
+    );
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    var sols = await resp.json();
+    if (sols.length === 0) { wrap.innerHTML = ''; return; }
+    var tipoL = { participacion:'Participación', pertenencia:'Pertenencia', trayectoria:'Trayectoria', reconocimiento:'Reconocimiento', coordinacion:'Coordinación', formacion:'Formación' };
+    var estadoTag = { pendiente:'tag-amber', aprobada:'tag-green', rechazada:'tag-red' };
+    wrap.innerHTML = '<div class="card" style="padding:14px;margin-bottom:12px;"><div class="card-title mb-3" style="font-size:14px;">Mis solicitudes</div>' +
+      sols.map(function(s) {
+        var fecha = new Date(s.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">' +
+          '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">'+(tipoL[s.tipo]||s.tipo)+'</div>' +
+          '<div style="font-size:12px;color:var(--muted);margin-top:2px;">'+s.descripcion.substring(0,70)+(s.descripcion.length>70?'...':'')+'</div>' +
+          '<div style="font-size:11px;color:var(--muted);">'+fecha+'</div></div>' +
+          '<span class="tag '+(estadoTag[s.estado]||'tag-gray')+'" style="flex-shrink:0;">'+s.estado+'</span></div>';
+      }).join('') + '</div>';
+  } catch(e) { console.error('cargarMisSolicitudesCert:', e); }
+}
+
+// ── Admin: solicitudes pendientes de certificados ──
+async function cargarSolicitudesCertAdmin() {
+  var wrap = document.getElementById('cert-sa-solicitudes');
+  if (!wrap) return;
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/cert_solicitudes?estado=eq.pendiente&select=*,perfil:perfiles!perfil_id(id,nombres,apellidos,email,departamento,municipio)&order=created_at.asc',
+      { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
+    );
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    var sols = await resp.json();
+    var badge = document.getElementById('cert-sa-solicitudes-badge');
+    if (badge) { badge.textContent = sols.length; badge.style.display = sols.length > 0 ? 'inline-flex' : 'none'; }
+    if (sols.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center;color:var(--muted);padding:16px;font-size:13px;">Sin solicitudes pendientes ✅</div>';
+      return;
+    }
+    var tipoL = { participacion:'Participación', pertenencia:'Pertenencia', trayectoria:'Trayectoria', reconocimiento:'Reconocimiento', coordinacion:'Coordinación', formacion:'Formación' };
+    wrap.innerHTML = sols.map(function(s) {
+      var nom = s.perfil ? [(s.perfil.nombres||''),(s.perfil.apellidos||'')].filter(Boolean).join(' ') : '—';
+      var loc = [s.perfil?.departamento, s.perfil?.municipio].filter(Boolean).join(' · ');
+      var pid = (s.perfil?.id||'').replace(/'/g,'&#39;');
+      var nomEsc = nom.replace(/'/g,'&#39;');
+      var titEsc = (s.descripcion||'').replace(/'/g,'&#39;').replace(/"/g,'').substring(0,80);
+      var idEsc = s.id.replace(/'/g,'&#39;');
+      return '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px;background:var(--surface2);border-radius:var(--r);margin-bottom:8px;gap:12px;">' +
+        '<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--ink);">'+nom+'</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+loc+' · '+(tipoL[s.tipo]||s.tipo)+'</div>' +
+        '<div style="font-size:12px;color:var(--ink);margin-top:4px;">'+s.descripcion+'</div></div>' +
+        '<div style="display:flex;gap:6px;flex-shrink:0;">' +
+        '<button class="btn btn-sm" style="background:var(--neon);color:var(--g800);border:none;" ' +
+        'onclick="abrirEmitirDesdeSolicitud(\''+idEsc+'\',\''+pid+'\',\''+nomEsc+'\',\''+s.tipo+'\',\''+titEsc+'\')">✔ Aprobar</button>' +
+        '<button class="btn btn-sm" style="background:rgba(232,81,81,.1);color:var(--red);border:1px solid rgba(232,81,81,.2);" ' +
+        'onclick="rechazarSolicitudCert(\''+idEsc+'\')">✕</button></div></div>';
+    }).join('');
+  } catch(e) { console.error('cargarSolicitudesCertAdmin:', e); }
+}
+
+async function rechazarSolicitudCert(solId) {
+  if (!confirm('¿Rechazar esta solicitud?')) return;
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(window._SB_URL + '/rest/v1/cert_solicitudes?id=eq.'+solId, {
+      method: 'PATCH',
+      headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token,
+                 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ estado: 'rechazada', revisado_por: (window.currentProfile||{}).id || null })
+    });
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    showToast('Solicitud rechazada');
+    cargarSolicitudesCertAdmin();
+  } catch(e) { showToast('⚠️ Error: '+e.message); }
+}
+
+// Abre el formulario SA pre-llenado desde una solicitud
+function abrirEmitirDesdeSolicitud(solId, perfilId, nombre, tipo, desc) {
+  var form = document.getElementById('cert-emit-form-sa');
+  if (form) form.style.display = 'block';
+  var searchEl = document.getElementById('cert-sa-perfil-search');
+  if (searchEl) searchEl.value = nombre;
+  var hiddenEl = document.getElementById('cert-sa-perfil');
+  if (hiddenEl) hiddenEl.value = perfilId;
+  var tipoEl = document.getElementById('cert-sa-tipo');
+  if (tipoEl) tipoEl.value = tipo;
+  var tituloEl = document.getElementById('cert-sa-titulo');
+  if (tituloEl) tituloEl.value = desc;
+  var fechaEl = document.getElementById('cert-sa-fecha');
+  if (fechaEl && !fechaEl.value) fechaEl.value = new Date().toISOString().slice(0,10);
+  window._pendingSolCertId = solId;
+  if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('📋 Formulario llenado — revisa y emite');
+}
+
+/* ══════════════════════════════════════════════════
+   NOTIFICACIÓN POR EMAIL AL EMITIR CERTIFICADO
+══════════════════════════════════════════════════ */
+async function notificarCertPorEmail(certId, token) {
+  try {
+    var tk = token;
+    if (!tk) {
+      var sess = await window.supabase.auth.getSession();
+      tk = sess.data?.session?.access_token || '';
+    }
+    var resp = await fetch(window._SB_URL + '/functions/v1/notificar-certificado', {
+      method: 'POST',
+      headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+tk, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cert_id: certId })
+    });
+    var rj = await resp.json();
+    if (rj.skipped) console.log('notificarCertPorEmail: sin email registrado');
+    else if (rj.error) console.warn('notificarCertPorEmail error:', rj.error);
+    else console.log('notificarCertPorEmail OK → '+rj.email);
+  } catch(e) { console.warn('notificarCertPorEmail (no-crítico):', e.message); }
 }
 </script></body>
 </html>
