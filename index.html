@@ -4226,7 +4226,7 @@ async function confirmarImport(){
     for(var i=0;i<profiles.length;i+=BATCH){
       var batch=profiles.slice(i,i+BATCH);
       var resp=await fetch(
-        window._SB_URL+"/rest/v1/perfiles",
+        window._SB_URL+"/rest/v1/perfiles?on_conflict=cedula",
         {method:"POST",
          headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token,
                   "Content-Type":"application/json",
