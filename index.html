@@ -4205,10 +4205,19 @@ async function confirmarImport(){
   try{
     var sess=await window.supabase.auth.getSession();
     var token=sess.data?.session?.access_token||"";
+    // PostgREST PGRST102: todos los objetos deben tener exactamente las mismas claves.
+    // Definimos el set fijo de campos y usamos null para los vacíos.
+    var PERFILES_FIELDS=["nombres","apellidos","tipo_doc","cedula","anio_nacimiento","genero",
+      "nodo","departamento","municipio","rol","cargo","telefono","tipo_sangre","eps",
+      "direccion","profesion","ocupacion","fecha_ingreso_rnja","contacto_emergencia",
+      "indigena","afrocolombian","desplazado","discapacidad","lgtbiq","victima_conflicto",
+      "estado","notas"];
     var profiles=rows.map(function(r){
-      var p=Object.assign({},r);
-      delete p._email;
-      Object.keys(p).forEach(function(k){if(p[k]===null||p[k]==="")delete p[k];});
+      var p={};
+      PERFILES_FIELDS.forEach(function(k){
+        var v=r[k];
+        p[k]=(v===undefined||v==="")?null:v;
+      });
       return p;
     });
     var BATCH=50;
