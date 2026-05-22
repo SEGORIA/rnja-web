@@ -1208,33 +1208,12 @@ tr:hover td{background:var(--surface2);}
 
         <!-- CERTIFICADOS -->
         <div class="page-section" id="sec-vol-certs">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">📜 Mis Certificados</div><span class="tag tag-green">8 disponibles</span></div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <div class="cert-card">
-              <div class="cert-icon-wrap">📜</div>
-              <div class="cert-info"><strong>Jornada de Reforestación RNJA</strong><small>Medellín, Antioquia · 25 Mayo 2026 · 8 horas</small><div class="cert-code">RNJA-2026-000123</div></div>
-              <button class="btn btn-sm btn-neon" onclick="downloadCert('Jornada de Reforestación RNJA','25 Mayo 2026','RNJA-2026-000123','8')">⬇ Descargar PDF</button>
-            </div>
-            <div class="cert-card">
-              <div class="cert-icon-wrap">📜</div>
-              <div class="cert-info"><strong>Taller Cambio Climático y Juventud</strong><small>Virtual · 12 Abril 2026 · 4 horas</small><div class="cert-code">RNJA-2026-000089</div></div>
-              <button class="btn btn-sm btn-neon" onclick="downloadCert('Taller Cambio Climático y Juventud','12 Abril 2026','RNJA-2026-000089','4')">⬇ Descargar PDF</button>
-            </div>
-            <div class="cert-card">
-              <div class="cert-icon-wrap">📜</div>
-              <div class="cert-info"><strong>Limpieza Quebrada La Iguaná</strong><small>Medellín, Antioquia · 18 Mar 2026 · 6 horas</small><div class="cert-code">RNJA-2026-000054</div></div>
-              <button class="btn btn-sm btn-neon" onclick="downloadCert('Limpieza Quebrada La Iguaná','18 Marzo 2026','RNJA-2026-000054','6')">⬇ Descargar PDF</button>
-            </div>
-            <div class="cert-card">
-              <div class="cert-icon-wrap">📜</div>
-              <div class="cert-info"><strong>Semana Ambiental Antioquia 2025</strong><small>Medellín, Antioquia · 05 Oct 2025 · 16 horas</small><div class="cert-code">RNJA-2025-000411</div></div>
-              <button class="btn btn-sm btn-neon" onclick="downloadCert('Semana Ambiental Antioquia 2025','05 Octubre 2025','RNJA-2025-000411','16')">⬇ Descargar PDF</button>
-            </div>
-            <div class="cert-card">
-              <div class="cert-icon-wrap">📜</div>
-              <div class="cert-info"><strong>Campaña Biodiversidad Urbana</strong><small>Medellín · 22 Jul 2025 · 8 horas</small><div class="cert-code">RNJA-2025-000298</div></div>
-              <button class="btn btn-sm btn-neon" onclick="downloadCert('Campaña Biodiversidad Urbana','22 Julio 2025','RNJA-2025-000298','8')">⬇ Descargar PDF</button>
-            </div>
+          <div class="card-header mb-5">
+            <div class="card-title" style="font-size:20px;">&#x1F4DC; Mis Certificados</div>
+            <span class="tag tag-green" id="vol-certs-count">0 disponibles</span>
+          </div>
+          <div id="vol-certs-list" style="display:flex;flex-direction:column;gap:12px;">
+            <div style="text-align:center;color:var(--muted);padding:40px;">Cargando certificados...</div>
           </div>
         </div>
 
@@ -1748,12 +1727,38 @@ tr:hover td{background:var(--surface2);}
         </div>
 
         <div class="page-section" id="sec-dep-certs">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">📜 Emitir Certificados</div></div>
-          <div class="card" style="max-width:500px;">
-            <p class="text-muted mb-5">Emite un certificado de participación para un voluntario de tu departamento.</p>
-            <div class="form-group"><label class="form-label" style="color:var(--muted);">Voluntario</label><select class="form-input form-select" style="background:var(--surface2);color:var(--ink);border-color:var(--border);"><option>Sandra Mosquera — Cali</option><option>Jhon Cabal — Cali</option><option>Paola Rengifo — Palmira</option></select></div>
-            <div class="form-group"><label class="form-label" style="color:var(--muted);">Evento</label><select class="form-input form-select" style="background:var(--surface2);color:var(--ink);border-color:var(--border);"><option>Jornada Reforestación Valle — 8h</option><option>Taller Biodiversidad — 4h</option></select></div>
-            <button class="btn btn-neon" onclick="downloadCert('Jornada Reforestación Valle del Cauca','18 Mayo 2026','RNJA-2026-000201','8')">📜 Generar y descargar certificado</button>
+          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">&#x1F4DC; Emitir Certificados</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+            <!-- Formulario -->
+            <div class="card">
+              <div class="card-title mb-4">Nuevo certificado</div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Voluntario</label>
+                  <select id="cert-dep-perfil" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;"><option value="">— Selecciona —</option></select></div>
+                <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Tipo</label>
+                  <select id="cert-dep-tipo" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                    <option value="participacion">Participaci&#243;n en actividad</option>
+                    <option value="voluntariado">Voluntariado general</option>
+                    <option value="coordinacion">Rol de coordinaci&#243;n</option>
+                  </select></div>
+                <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">T&#237;tulo / Actividad</label>
+                  <input type="text" id="cert-dep-titulo" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Jornada de Reforestaci&#243;n"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Horas</label>
+                    <input type="number" id="cert-dep-horas" class="form-input" min="1" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="8"></div>
+                  <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Fecha</label>
+                    <input type="date" id="cert-dep-fecha" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;"></div>
+                </div>
+                <button class="btn btn-neon" style="margin-top:4px;" onclick="emitirCertificado('dep')">&#x1F4DC; Emitir y descargar</button>
+              </div>
+            </div>
+            <!-- Últimos emitidos -->
+            <div class="card">
+              <div class="card-title mb-4">&#xDA;ltimos emitidos</div>
+              <div id="cert-dep-recientes" style="display:flex;flex-direction:column;gap:8px;">
+                <div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Sin certificados emitidos a&#xFA;n</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2549,6 +2554,7 @@ tr:hover td{background:var(--surface2);}
         <div class="nav-item" onclick="navTo(this,'sec-sa-roles')"><span class="nav-ic">🎭</span>Gestión de roles</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-usuarios')"><span class="nav-ic">👥</span>Todos los usuarios</div>
         <div class="nav-section">Coordinaciones</div>
+        <div class="nav-item" onclick="navTo(this,'sec-sa-certificados')"><span class="nav-ic">📜</span>Certificados</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-periodos')"><span class="nav-ic">📅</span>Períodos y elecciones</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-historial-org')"><span class="nav-ic">📖</span>Historial organizacional</div>
         <div class="nav-section">Sistema</div>
@@ -2723,6 +2729,56 @@ tr:hover td{background:var(--surface2);}
             <tbody id="usuarios-tbody">
               <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Cargando usuarios...</td></tr>
             </tbody>
+          </table></div></div>
+        </div>
+
+        <!-- CERTIFICADOS -->
+        <div class="page-section" id="sec-sa-certificados">
+          <div class="card-header mb-5">
+            <div class="card-title" style="font-size:20px;">&#x1F4DC; Certificados</div>
+            <button class="btn btn-neon btn-sm" onclick="toggleEmitirForm('sa')">&#x2795; Emitir certificado</button>
+          </div>
+          <!-- Formulario emitir -->
+          <div id="cert-emit-form-sa" style="display:none;" class="card mb-5">
+            <div class="card-title mb-4">Nuevo certificado</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Voluntario</label>
+                <select id="cert-sa-perfil" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;"><option value="">— Selecciona usuario —</option></select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Tipo</label>
+                <select id="cert-sa-tipo" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="participacion">Participaci&#243;n en actividad</option>
+                  <option value="voluntariado">Voluntariado general</option>
+                  <option value="coordinacion">Rol de coordinaci&#243;n</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Horas</label>
+                <input type="number" id="cert-sa-horas" class="form-input" min="1" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: 8"></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">T&#237;tulo / Actividad</label>
+                <input type="text" id="cert-sa-titulo" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Jornada de Reforestaci&#243;n RNJA"></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Fecha actividad</label>
+                <input type="date" id="cert-sa-fecha" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;"></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Notas internas</label>
+                <input type="text" id="cert-sa-notas" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Opcional"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px;">
+              <button class="btn btn-neon" style="flex:1;" onclick="emitirCertificado('sa')">&#x1F4DC; Emitir y descargar certificado</button>
+              <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 16px;" onclick="toggleEmitirForm('sa')">Cancelar</button>
+            </div>
+          </div>
+          <!-- Filtros + tabla -->
+          <div class="card" style="margin-bottom:12px;padding:14px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <input class="form-input" id="cert-sa-search" style="flex:1;min-width:180px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" placeholder="Buscar por nombre o código..." oninput="filtrarCertificadosAdmin()">
+              <select class="form-input form-select" id="cert-sa-filter-tipo" style="width:180px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" onchange="filtrarCertificadosAdmin()">
+                <option value="">Todos los tipos</option>
+                <option value="participacion">Participaci&#243;n</option>
+                <option value="voluntariado">Voluntariado</option>
+                <option value="coordinacion">Coordinaci&#243;n</option>
+              </select>
+            </div>
+          </div>
+          <div class="card"><div class="table-wrap"><table>
+            <thead><tr><th>Voluntario</th><th>T&#237;tulo</th><th>Tipo</th><th>Horas</th><th>Fecha</th><th>C&#243;digo</th><th>Acci&#243;n</th></tr></thead>
+            <tbody id="cert-sa-tbody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Cargando...</td></tr></tbody>
           </table></div></div>
         </div>
 
@@ -3140,6 +3196,9 @@ function navTo(el,sectionId){
   if(sectionId==='sec-vol-perfil') renderTimeline(currentRole);
   if(sectionId==='sec-sa-solicitudes') cargarSolicitudes();
   if(sectionId==='sec-sa-usuarios') cargarUsuarios();
+  if(sectionId==='sec-sa-certificados') cargarCertificadosAdmin();
+  if(sectionId==='sec-vol-certs') cargarMisCertificados();
+  if(sectionId==='sec-dep-certs') cargarCertDepForm();
   setTimeout(()=>initMapsForSection(sectionId),200);
   if(window.innerWidth<=1100) closeSidebar();
 }
@@ -3290,9 +3349,9 @@ function initMapsForSection(sectionId){
 
 /* ══════════════════ CERT DOWNLOAD ══════════════════ */
 let _certData={};
-function downloadCert(evento,fecha,codigo,horas,esGeneral){
+function downloadCert(evento,fecha,codigo,horas,esGeneral,perfilOverride){
   _certData={evento,fecha,codigo,horas,esGeneral};
-  const p=window.currentProfile||{};
+  const p=perfilOverride||window.currentProfile||{};
   const name=[p.nombres,p.apellidos].filter(Boolean).join(' ')||'Usuario';
   const cc=p.cedula||'—';
   document.getElementById('cert-name').textContent=name;
@@ -4749,6 +4808,291 @@ async function invitarUsuario(){
   }catch(e){
     showToast("Error: "+e.message);
     if(btn){btn.textContent="Invitar";btn.disabled=false;}
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   MÓDULO DE CERTIFICADOS
+══════════════════════════════════════════════════ */
+window._certsData = [];
+
+// ── Toggle formulario de emisión (solo scope 'sa') ──
+function toggleEmitirForm(scope) {
+  var formId = 'cert-emit-form-' + scope;
+  var form = document.getElementById(formId);
+  if (!form) return;
+  var showing = form.style.display !== 'none';
+  form.style.display = showing ? 'none' : 'block';
+  if (!showing) {
+    // Poblar selector de usuario
+    var sel = document.getElementById('cert-' + scope + '-perfil');
+    if (sel) {
+      sel.innerHTML = '<option value="">— Selecciona usuario —</option>';
+      var lista = (window._usuariosData || []).slice().sort(function(a, b) {
+        return ((a.nombres||'')+(a.apellidos||'')).localeCompare((b.nombres||'')+(b.apellidos||''));
+      });
+      lista.forEach(function(u) {
+        var opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = [(u.nombres||''),(u.apellidos||'')].filter(Boolean).join(' ') + (u.cedula ? ' · '+u.cedula : '');
+        sel.appendChild(opt);
+      });
+    }
+    // Fecha por defecto: hoy
+    var fechaEl = document.getElementById('cert-' + scope + '-fecha');
+    if (fechaEl && !fechaEl.value) fechaEl.value = new Date().toISOString().slice(0, 10);
+  }
+}
+
+// ── Inicializar formulario DEP al entrar a la sección ──
+async function cargarCertDepForm() {
+  // Asegurar que _usuariosData esté cargado
+  if (!window._usuariosData || window._usuariosData.length === 0) await cargarUsuarios();
+  var sel = document.getElementById('cert-dep-perfil');
+  if (sel) {
+    var deptActual = (window.currentProfile || {}).departamento;
+    sel.innerHTML = '<option value="">— Selecciona —</option>';
+    var lista = (window._usuariosData || []).filter(function(u) {
+      return !deptActual || u.departamento === deptActual;
+    }).sort(function(a, b) {
+      return ((a.nombres||'')+(a.apellidos||'')).localeCompare((b.nombres||'')+(b.apellidos||''));
+    });
+    lista.forEach(function(u) {
+      var opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = [(u.nombres||''),(u.apellidos||'')].filter(Boolean).join(' ') + (u.cedula ? ' · '+u.cedula : '');
+      sel.appendChild(opt);
+    });
+  }
+  var fechaEl = document.getElementById('cert-dep-fecha');
+  if (fechaEl && !fechaEl.value) fechaEl.value = new Date().toISOString().slice(0, 10);
+  cargarCertDepRecientes();
+}
+
+// ── Últimos certificados del departamento ──
+async function cargarCertDepRecientes() {
+  var wrap = document.getElementById('cert-dep-recientes');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Cargando...</div>';
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/certificados?select=*,perfil:perfiles!perfil_id(nombres,apellidos,departamento)&order=created_at.desc&limit=20',
+      { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
+    );
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    var certs = await resp.json();
+    var deptActual = (window.currentProfile || {}).departamento;
+    if (deptActual) certs = certs.filter(function(c) { return c.perfil && c.perfil.departamento === deptActual; });
+    if (certs.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">Sin certificados emitidos aún</div>';
+      return;
+    }
+    wrap.innerHTML = certs.map(function(c) {
+      var nom = c.perfil ? [(c.perfil.nombres||''),(c.perfil.apellidos||'')].filter(Boolean).join(' ') : '—';
+      var fecha = c.fecha_actividad ? new Date(c.fecha_actividad+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      var tit = (c.titulo||'—').replace(/'/g,'&#39;');
+      var cod = (c.codigo||'—').replace(/'/g,'&#39;');
+      var h = c.horas ? String(c.horas) : '—';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">' +
+        '<div><div style="font-size:13px;font-weight:600;color:var(--ink);">'+nom+'</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+(c.titulo||'—')+' · '+fecha+'</div>' +
+        '<div style="font-size:11px;color:var(--g500);margin-top:2px;font-family:monospace;">'+(c.codigo||'—')+'</div></div>' +
+        '<button class="btn btn-sm" style="background:var(--g50);color:var(--g600);border:1px solid var(--border);flex-shrink:0;" ' +
+        'onclick="downloadCert(\''+tit+'\',\''+fecha+'\',\''+cod+'\',\''+h+'\',false)">⬇</button></div>';
+    }).join('');
+  } catch(e) {
+    wrap.innerHTML = '<div style="text-align:center;color:var(--red);padding:20px;font-size:13px;">Error al cargar</div>';
+    console.error('cargarCertDepRecientes:', e);
+  }
+}
+
+// ── Mis certificados (vista voluntario) ──
+async function cargarMisCertificados() {
+  var list = document.getElementById('vol-certs-list');
+  var countEl = document.getElementById('vol-certs-count');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">Cargando...</div>';
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var pid = (window.currentProfile || {}).id;
+    if (!pid) { list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">Sin perfil cargado</div>'; return; }
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/certificados?select=*&perfil_id=eq.'+pid+'&order=created_at.desc',
+      { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
+    );
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    var certs = await resp.json();
+    if (countEl) countEl.textContent = certs.length + ' disponible'+(certs.length !== 1 ? 's' : '');
+    // Actualizar badge del nav
+    document.querySelectorAll('.nav-item').forEach(function(ni) {
+      var oc = ni.getAttribute('onclick') || '';
+      if (oc.includes('sec-vol-certs')) {
+        var b = ni.querySelector('.nbadge');
+        if (b) b.textContent = certs.length;
+      }
+    });
+    if (certs.length === 0) {
+      list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">No tienes certificados todavía 🌱</div>';
+      return;
+    }
+    var tipoL = { participacion:'Participación', voluntariado:'Voluntariado', coordinacion:'Coordinación' };
+    list.innerHTML = certs.map(function(c) {
+      var fecha = c.fecha_actividad ? new Date(c.fecha_actividad+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      var tit = (c.titulo||'—').replace(/'/g,'&#39;');
+      var cod = (c.codigo||'—').replace(/'/g,'&#39;');
+      var h = c.horas ? String(c.horas) : '—';
+      return '<div class="cert-card">' +
+        '<div class="cert-icon-wrap">📜</div>' +
+        '<div class="cert-info"><strong>'+(c.titulo||'—')+'</strong>' +
+        '<small>'+(tipoL[c.tipo]||c.tipo||'—')+' · '+(c.horas ? c.horas+' horas' : '—')+' · '+fecha+'</small>' +
+        '<div class="cert-code">'+(c.codigo||'—')+'</div></div>' +
+        '<button class="btn btn-sm btn-neon" onclick="downloadCert(\''+tit+'\',\''+fecha+'\',\''+cod+'\',\''+h+'\',false)">⬇ PDF</button>' +
+        '</div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;color:var(--red);padding:40px;">Error: '+e.message+'</div>';
+    console.error('cargarMisCertificados:', e);
+  }
+}
+
+// ── Admin: cargar todos los certificados ──
+async function cargarCertificadosAdmin() {
+  var tbody = document.getElementById('cert-sa-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Cargando...</td></tr>';
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/certificados?select=*,perfil:perfiles!perfil_id(nombres,apellidos,cedula)&order=created_at.desc',
+      { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
+    );
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    window._certsData = await resp.json();
+    renderCertificadosAdmin(window._certsData);
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error: '+e.message+'</td></tr>';
+    console.error('cargarCertificadosAdmin:', e);
+  }
+}
+
+function filtrarCertificadosAdmin() {
+  var q = (document.getElementById('cert-sa-search')?.value || '').toLowerCase();
+  var tipo = document.getElementById('cert-sa-filter-tipo')?.value || '';
+  var filtered = (window._certsData || []).filter(function(c) {
+    var nom = c.perfil ? [(c.perfil.nombres||''),(c.perfil.apellidos||'')].filter(Boolean).join(' ').toLowerCase() : '';
+    var cod = (c.codigo || '').toLowerCase();
+    var matchQ = !q || nom.includes(q) || cod.includes(q) || (c.titulo||'').toLowerCase().includes(q);
+    var matchT = !tipo || c.tipo === tipo;
+    return matchQ && matchT;
+  });
+  renderCertificadosAdmin(filtered);
+}
+
+function renderCertificadosAdmin(list) {
+  var tbody = document.getElementById('cert-sa-tbody');
+  if (!tbody) return;
+  if (!list || list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Sin certificados registrados</td></tr>';
+    return;
+  }
+  var tipoL = { participacion:'Participación', voluntariado:'Voluntariado', coordinacion:'Coordinación' };
+  var tipoTag = { participacion:'tag-amber', voluntariado:'tag-green', coordinacion:'tag-blue' };
+  tbody.innerHTML = list.map(function(c) {
+    var nom = c.perfil ? [(c.perfil.nombres||''),(c.perfil.apellidos||'')].filter(Boolean).join(' ') : '—';
+    var fecha = c.fecha_actividad ? new Date(c.fecha_actividad+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    var tit = (c.titulo||'—').replace(/'/g,'&#39;');
+    var cod = (c.codigo||'—').replace(/'/g,'&#39;');
+    var h = c.horas ? String(c.horas) : '—';
+    return '<tr>' +
+      '<td class="td-bold">'+nom+'</td>' +
+      '<td>'+(c.titulo||'—')+'</td>' +
+      '<td><span class="tag '+(tipoTag[c.tipo]||'tag-gray')+'">'+(tipoL[c.tipo]||c.tipo||'—')+'</span></td>' +
+      '<td>'+(c.horas ? c.horas+' h' : '—')+'</td>' +
+      '<td>'+fecha+'</td>' +
+      '<td style="font-family:monospace;font-size:12px;">'+(c.codigo||'—')+'</td>' +
+      '<td><button class="btn btn-sm" style="background:var(--g50);color:var(--g600);border:1px solid var(--border);" ' +
+      'onclick="downloadCert(\''+tit+'\',\''+fecha+'\',\''+cod+'\',\''+h+'\',false)">⬇ PDF</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+// ── Emitir certificado (scope: 'sa' o 'dep') ──
+async function emitirCertificado(scope) {
+  var px = 'cert-' + scope;
+  var perfilId = (document.getElementById(px+'-perfil')?.value || '').trim();
+  var tipo = document.getElementById(px+'-tipo')?.value || 'participacion';
+  var titulo = (document.getElementById(px+'-titulo')?.value || '').trim();
+  var horas = parseInt(document.getElementById(px+'-horas')?.value || '0', 10) || null;
+  var fecha = document.getElementById(px+'-fecha')?.value || '';
+  var notas = scope === 'sa' ? (document.getElementById('cert-sa-notas')?.value || '').trim() : '';
+
+  if (!perfilId) { showToast('⚠️ Selecciona un voluntario'); return; }
+  if (!titulo) { showToast('⚠️ Escribe el título de la actividad'); return; }
+  if (!fecha) { showToast('⚠️ Selecciona la fecha'); return; }
+
+  // Botón de submit
+  var btn = null;
+  if (scope === 'sa') btn = document.querySelector('#cert-emit-form-sa button.btn-neon');
+  else btn = document.querySelector('#sec-dep-certs .btn-neon');
+  if (btn) { btn.textContent = 'Guardando...'; btn.disabled = true; }
+
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var emisorId = (window.currentProfile || {}).id;
+    var payload = {
+      perfil_id: perfilId,
+      tipo: tipo,
+      titulo: titulo,
+      horas: horas,
+      fecha_actividad: fecha || null,
+      notas: notas || null,
+      emitido_por: emisorId || null
+    };
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/certificados',
+      { method: 'POST',
+        headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token,
+                   'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify(payload) }
+    );
+    var rj = await resp.json();
+    if (!resp.ok) throw new Error((Array.isArray(rj) ? rj[0]?.message : rj?.message) || rj?.error || 'Error '+resp.status);
+    var nuevo = Array.isArray(rj) ? rj[0] : rj;
+
+    showToast('✅ Certificado emitido — ' + (nuevo.codigo || ''));
+
+    // Restaurar botón
+    var btnLabel = scope === 'sa' ? '📜 Emitir y descargar certificado' : '📜 Emitir y descargar';
+    if (btn) { btn.textContent = btnLabel; btn.disabled = false; }
+
+    // Limpiar formulario
+    ['perfil','titulo','horas','fecha','notas'].forEach(function(f) {
+      var el = document.getElementById(px+'-'+f);
+      if (el) el.value = '';
+    });
+
+    // Descargar — buscar datos del destinatario
+    var recipiente = (window._usuariosData || []).find(function(u) { return u.id === perfilId; }) || {};
+    var fechaLabel = fecha ? new Date(fecha+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+    downloadCert(titulo, fechaLabel, nuevo.codigo || '', horas ? String(horas) : '—', false, recipiente);
+
+    // Actualizar vistas
+    if (scope === 'sa') {
+      cargarCertificadosAdmin();
+      var form = document.getElementById('cert-emit-form-sa');
+      if (form) form.style.display = 'none';
+    } else {
+      cargarCertDepRecientes();
+    }
+  } catch(e) {
+    showToast('⚠️ Error al emitir: '+e.message);
+    console.error('emitirCertificado:', e);
+    if (btn) { btn.textContent = scope === 'sa' ? '📜 Emitir y descargar certificado' : '📜 Emitir y descargar'; btn.disabled = false; }
   }
 }
 </script></body>
