@@ -1235,41 +1235,33 @@ tr:hover td{background:var(--surface2);}
 
         <!-- NIVELES -->
         <div class="page-section" id="sec-vol-niveles">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">🏅 Sistema de Niveles</div></div>
-          <div class="two-col">
-            <div>
-              <div class="card mb-5">
-                <div class="card-title mb-5">Tu progreso actual</div>
-                <div style="text-align:center;padding:20px 0;">
-                  <div style="font-size:56px;margin-bottom:8px;">🌿</div>
-                  <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;color:var(--g600);">Nivel Brote</div>
-                  <div style="color:var(--muted);font-size:14px;margin-top:6px;">156 horas acumuladas</div>
-                  <div class="mt-5" style="text-align:left;">
-                    <div class="flex justify-between mb-4"><span class="text-sm">Progreso al nivel Árbol</span><span class="text-sm fw-600 color-green">156/200 h</span></div>
-                    <div class="progress-wrap"><div class="progress-bar" style="width:78%"></div></div>
-                    <p class="text-muted mt-4" style="font-size:12px;">¡Solo 44 horas más para el siguiente nivel!</p>
+          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">🏅 Sistema de Niveles RNJA</div></div>
+          <div id="vol-niveles-content">
+            <div class="two-col">
+              <div>
+                <div class="card mb-5">
+                  <div class="card-title mb-5">Tu progreso actual</div>
+                  <div style="text-align:center;padding:20px 0;">
+                    <div style="font-size:56px;margin-bottom:8px;" id="vol-niv-emoji">🌿</div>
+                    <div style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;color:var(--g600);" id="vol-niv-nombre">Nivel Brote</div>
+                    <div style="color:var(--muted);font-size:14px;margin-top:6px;" id="vol-niv-horas">— horas acumuladas</div>
+                    <div class="mt-5" style="text-align:left;" id="vol-niv-prox-wrap">
+                      <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span class="text-sm" id="vol-niv-prox-label">Progreso al siguiente nivel</span><span class="text-sm fw-600 color-green" id="vol-niv-prox-num">—</span></div>
+                      <div class="progress-wrap"><div class="progress-bar" id="vol-niv-bar-pg" style="width:0%"></div></div>
+                      <p class="text-muted mt-4" style="font-size:12px;" id="vol-niv-msg2">Cargando...</p>
+                    </div>
                   </div>
+                </div>
+                <div class="card" id="vol-niv-beneficios">
+                  <div class="card-title mb-4">Beneficios de tu nivel actual</div>
+                  <p style="color:var(--muted);font-size:13px;">Cargando...</p>
                 </div>
               </div>
               <div class="card">
-                <div class="card-title mb-4">Beneficios de tu nivel actual</div>
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                  <div class="av-row"><span style="color:var(--neon)">✓</span><span class="text-sm">Acceso a eventos departamentales</span></div>
-                  <div class="av-row"><span style="color:var(--neon)">✓</span><span class="text-sm">Certificados descargables ilimitados</span></div>
-                  <div class="av-row"><span style="color:var(--neon)">✓</span><span class="text-sm">Insignia visible en perfil público</span></div>
-                  <div class="av-row"><span style="color:var(--muted2)">○</span><span class="text-sm text-muted">Mentoría con coordinadores (nivel Árbol)</span></div>
-                  <div class="av-row"><span style="color:var(--muted2)">○</span><span class="text-sm text-muted">Carta de recomendación RNJA (nivel Guardabosque)</span></div>
+                <div class="card-title mb-5">Todos los niveles</div>
+                <div class="level-system" id="vol-nivel-list">
+                  <p style="color:var(--muted);font-size:13px;">Cargando niveles...</p>
                 </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title mb-5">Todos los niveles</div>
-              <div class="level-system">
-                <div class="level-row"><div class="lv-icon">🌱</div><div class="lv-info"><strong>Semilla</strong><small>0 – 30 horas</small></div><span class="lv-badge">Completado</span></div>
-                <div class="level-row current"><div class="lv-icon">🌿</div><div class="lv-info"><strong>Brote</strong><small>31 – 200 horas</small></div><span class="lv-badge active">Nivel actual</span></div>
-                <div class="level-row"><div class="lv-icon">🌳</div><div class="lv-info"><strong>Árbol</strong><small>201 – 500 horas</small></div><span class="lv-badge" style="background:var(--surface3);color:var(--muted)">Bloqueado</span></div>
-                <div class="level-row"><div class="lv-icon">🌲</div><div class="lv-info"><strong>Guardabosque</strong><small>501 – 1000 horas</small></div><span class="lv-badge" style="background:var(--surface3);color:var(--muted)">Bloqueado</span></div>
-                <div class="level-row"><div class="lv-icon">🏔️</div><div class="lv-info"><strong>Líder Ambiental</strong><small>1001+ horas</small></div><span class="lv-badge" style="background:linear-gradient(135deg,var(--amber),#2581C4);color:var(--g900)">Élite</span></div>
               </div>
             </div>
           </div>
@@ -1429,7 +1421,7 @@ tr:hover td{background:var(--surface2);}
         <div class="nav-section">&#x1F4CD; Mi municipio</div>
         <div class="nav-item active" onclick="navTo(this,'sec-mun-home')"><span class="nav-ic">&#x1F3E0;</span>Dashboard Municipal</div>
         <div class="nav-item" onclick="navTo(this,'sec-mun-voluntarios')"><span class="nav-ic">&#x1F465;</span>Mis Voluntarios</div>
-        <div class="nav-item" onclick="navTo(this,'sec-mun-validar')"><span class="nav-ic">&#x2705;</span>Validar Participaciones<span class="nbadge">5</span></div>
+        <div class="nav-item" onclick="navTo(this,'sec-mun-validar')"><span class="nav-ic">&#x2705;</span>Validar Participaciones<span class="nbadge" id="mun-validar-nav-badge" style="display:none;"></span></div>
         <div class="nav-item" onclick="navTo(this,'sec-mun-eventos')"><span class="nav-ic">&#x1F4C5;</span>Eventos</div>
         <div class="nav-item" onclick="navTo(this,'sec-mun-mapa')"><span class="nav-ic">&#x1F5FA;&#xFE0F;</span>Mapa Municipal</div>
         <div class="nav-section">&#x1F4D3; Mi perfil de voluntario</div>
@@ -1488,18 +1480,28 @@ tr:hover td{background:var(--surface2);}
 
         <!-- VOLUNTARIOS -->
         <div class="page-section" id="sec-mun-voluntarios">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">👥 Voluntarios en Bogotá D.C.</div><span class="tag tag-blue">287 registrados</span></div>
+          <div class="card-header mb-5">
+            <div><div class="card-title" style="font-size:20px;">👥 Voluntarios de mi municipio</div><div style="font-size:12px;color:var(--muted);margin-top:2px;" id="mun-vol-subtitle">—</div></div>
+            <span class="tag tag-blue" id="mun-vol-count-badge">—</span>
+          </div>
+          <div class="card mb-4" style="padding:12px 16px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <input class="form-input" id="mun-vol-search" style="flex:1;min-width:200px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 14px;font-size:13px;" placeholder="Buscar por nombre..." oninput="filtrarVoluntarios('mun')">
+              <select class="form-input form-select" id="mun-vol-filter-nivel" style="width:170px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:13px;" onchange="filtrarVoluntarios('mun')">
+                <option value="">Todos los niveles</option>
+                <option value="Semilla">🌱 Semilla</option>
+                <option value="Brote">🌿 Brote</option>
+                <option value="Árbol">🌳 Árbol</option>
+                <option value="Guardabosque">🌲 Guardabosque</option>
+                <option value="Líder Ambiental">🏔️ Líder Ambiental</option>
+              </select>
+            </div>
+          </div>
           <div class="card">
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Nombre</th><th>Nivel</th><th>Horas</th><th>Eventos</th><th>Localidad</th><th>Estado</th></tr></thead>
-                <tbody>
-                  <tr><td class="av-row td-bold"><div class="av-sm">🙋</div>Laura Pérez</td><td><span class="tag tag-green">🌿 Brote</span></td><td>89 h</td><td>12</td><td>Usaquén</td><td><span class="tag tag-green">Activo</span></td></tr>
-                  <tr><td class="av-row td-bold"><div class="av-sm">👦</div>Mario Gómez</td><td><span class="tag tag-gray">🌱 Semilla</span></td><td>22 h</td><td>4</td><td>Chapinero</td><td><span class="tag tag-green">Activo</span></td></tr>
-                  <tr><td class="av-row td-bold"><div class="av-sm">👩</div>Sara Medina</td><td><span class="tag tag-green">🌳 Árbol</span></td><td>245 h</td><td>31</td><td>Kennedy</td><td><span class="tag tag-green">Activo</span></td></tr>
-                  <tr><td class="av-row td-bold"><div class="av-sm">👨</div>Diego Torres</td><td><span class="tag tag-green">🌿 Brote</span></td><td>67 h</td><td>9</td><td>Suba</td><td><span class="tag tag-amber">Inactivo</span></td></tr>
-                  <tr><td class="av-row td-bold"><div class="av-sm">👩</div>Camila Vargas</td><td><span class="tag tag-green">🌿 Brote</span></td><td>105 h</td><td>14</td><td>Usaquén</td><td><span class="tag tag-green">Activo</span></td></tr>
-                </tbody>
+                <thead><tr><th>Nombre</th><th>Nivel</th><th>Horas acum.</th><th>Cédula</th><th>Registrado</th></tr></thead>
+                <tbody id="mun-vol-tbody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px;">Cargando voluntarios...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -1517,12 +1519,16 @@ tr:hover td{background:var(--surface2);}
         </div>
 
         <div class="page-section" id="sec-mun-validar">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">✅ Validar Participaciones</div><span class="tag tag-amber">5 pendientes</span></div>
-          <div class="val-item"><div class="av-sm">🙋</div><div class="val-info"><strong>Laura Pérez · Jornada Reforestación</strong><small>04 May 2026 · 8 horas</small></div><div class="val-actions"><button class="btn-approve" onclick="showToast('✅ Participación validada')">✓ Aprobar</button><button class="btn-reject">✕ Rechazar</button></div></div>
-          <div class="val-item"><div class="av-sm">👦</div><div class="val-info"><strong>Mario Gómez · Taller Biodiversidad</strong><small>10 May 2026 · 4 horas</small></div><div class="val-actions"><button class="btn-approve" onclick="showToast('✅ Participación validada')">✓ Aprobar</button><button class="btn-reject">✕ Rechazar</button></div></div>
-          <div class="val-item"><div class="av-sm">👩</div><div class="val-info"><strong>Sara Medina · Limpieza Río Bogotá</strong><small>15 May 2026 · 6 horas</small></div><div class="val-actions"><button class="btn-approve" onclick="showToast('✅ Participación validada')">✓ Aprobar</button><button class="btn-reject">✕ Rechazar</button></div></div>
-          <div class="val-item"><div class="av-sm">👨</div><div class="val-info"><strong>Diego Torres · Campaña Reciclaje</strong><small>20 May 2026 · 5 horas</small></div><div class="val-actions"><button class="btn-approve" onclick="showToast('✅ Participación validada')">✓ Aprobar</button><button class="btn-reject">✕ Rechazar</button></div></div>
-          <div class="val-item"><div class="av-sm">👩</div><div class="val-info"><strong>Camila Vargas · Monitoreo Calidad Aire</strong><small>22 May 2026 · 8 horas</small></div><div class="val-actions"><button class="btn-approve" onclick="showToast('✅ Participación validada')">✓ Aprobar</button><button class="btn-reject">✕ Rechazar</button></div></div>
+          <div class="card-header mb-5">
+            <div>
+              <div class="card-title" style="font-size:20px;">✅ Validar Participaciones</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px;">Inscripciones a eventos de tu municipio pendientes de confirmar</div>
+            </div>
+            <span class="tag tag-amber" id="mun-validar-badge">—</span>
+          </div>
+          <div id="mun-validar-list">
+            <p style="color:var(--muted);font-size:13px;padding:12px 0;">Cargando inscripciones...</p>
+          </div>
         </div>
         <div class="page-section" id="sec-mun-eventos">
           <div class="card-header mb-5">
@@ -1645,25 +1651,27 @@ tr:hover td{background:var(--surface2);}
         </div>
 
         <div class="page-section" id="sec-mun-vol-niveles">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:18px;">&#x1F3C5; Sistema de Niveles</div></div>
+          <div class="card-header mb-5"><div class="card-title" style="font-size:18px;">&#x1F3C5; Mis Niveles RNJA</div></div>
           <div class="two-col">
-            <div class="card">
-              <div class="card-title mb-4">Tu nivel actual</div>
-              <div style="text-align:center;padding:20px 0;">
-                <div style="font-size:52px;margin-bottom:8px;">&#x1F333;</div>
-                <div style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:var(--g600);">🌳 Árbol</div>
-                <div style="color:var(--muted);font-size:14px;margin-top:6px;">312 horas acumuladas</div>
+            <div>
+              <div class="card mb-5">
+                <div class="card-title mb-4">Tu progreso actual</div>
+                <div style="text-align:center;padding:16px 0;">
+                  <div style="font-size:52px;margin-bottom:8px;" id="mun-niv-emoji">—</div>
+                  <div style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:var(--g600);" id="mun-niv-nombre">Cargando...</div>
+                  <div style="color:var(--muted);font-size:13px;margin-top:5px;" id="mun-niv-horas">—</div>
+                  <div class="mt-5" style="text-align:left;" id="mun-niv-prox-wrap">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span class="text-sm" id="mun-niv-prox-label">Progreso</span><span class="text-sm fw-600 color-green" id="mun-niv-prox-num">—</span></div>
+                    <div class="progress-wrap"><div class="progress-bar" id="mun-niv-bar-pg" style="width:0%"></div></div>
+                    <p class="text-muted mt-4" style="font-size:12px;" id="mun-niv-msg2">—</p>
+                  </div>
+                </div>
               </div>
+              <div class="card" id="mun-niv-beneficios"><p style="color:var(--muted);font-size:13px;">Cargando...</p></div>
             </div>
             <div class="card">
               <div class="card-title mb-4">Todos los niveles</div>
-              <div class="level-system">
-                <div class="level-row"><div class="lv-icon">&#x1F331;</div><div class="lv-info"><strong>Semilla</strong><small>0-30 horas</small></div><span class="lv-badge">Completado</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F33F;</div><div class="lv-info"><strong>Brote</strong><small>31-200 horas</small></div><span class="lv-badge">Completado</span></div>
-                <div class="level-row current"><div class="lv-icon">&#x1F333;</div><div class="lv-info"><strong>Árbol</strong><small>201-500 horas</small></div><span class="lv-badge active">Nivel actual</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F332;</div><div class="lv-info"><strong>Guardabosque</strong><small>501-1000 horas</small></div><span class="lv-badge" style="background:var(--surface3);color:var(--muted);">Siguiente</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F3D4;&#xFE0F;</div><div class="lv-info"><strong>Líder Ambiental</strong><small>1001+ horas</small></div><span class="lv-badge" style="background:linear-gradient(135deg,rgba(37,129,196,.15),rgba(37,129,196,.1));color:#8a6200;">Elite</span></div>
-              </div>
+              <div class="level-system" id="mun-nivel-list"><p style="color:var(--muted);font-size:13px;">Cargando...</p></div>
             </div>
           </div>
         </div>
@@ -1759,24 +1767,49 @@ tr:hover td{background:var(--surface2);}
         </div>
 
         <div class="page-section" id="sec-dep-municipios">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">🏘️ Municipios — Valle del Cauca</div></div>
-          <div class="card"><div class="table-wrap"><table><thead><tr><th>Municipio</th><th>Voluntarios</th><th>Eventos</th><th>Horas</th><th>Coord. Municipal</th><th>Estado</th></tr></thead><tbody>
-            <tr><td class="td-bold">Cali</td><td>198</td><td>24</td><td>1.240</td><td>Pedro Salcedo</td><td><span class="tag tag-green">Activo</span></td></tr>
-            <tr><td class="td-bold">Palmira</td><td>89</td><td>11</td><td>560</td><td>Luz Marina Ossa</td><td><span class="tag tag-green">Activo</span></td></tr>
-            <tr><td class="td-bold">Buenaventura</td><td>74</td><td>9</td><td>480</td><td>Henry Mina</td><td><span class="tag tag-amber">Inactivo</span></td></tr>
-            <tr><td class="td-bold">Tuluá</td><td>55</td><td>7</td><td>340</td><td>Clara Ospina</td><td><span class="tag tag-green">Activo</span></td></tr>
-            <tr><td class="td-bold">Buga</td><td>42</td><td>5</td><td>290</td><td>Sin asignar</td><td><span class="tag tag-red">Sin coord.</span></td></tr>
-          </tbody></table></div></div>
+          <div class="card-header mb-5">
+            <div><div class="card-title" style="font-size:20px;">🏘️ Municipios de mi departamento</div><div style="font-size:12px;color:var(--muted);margin-top:2px;" id="dep-munis-subtitle">—</div></div>
+            <button class="btn btn-sm" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);" onclick="cargarMunicipiosDep()">🔄 Actualizar</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Municipio</th><th>Voluntarios</th><th>Horas acum.</th><th>Coord. Municipal</th><th>Estado</th></tr></thead>
+                <tbody id="dep-municipios-tbody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:28px;">Cargando municipios...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <div class="page-section" id="sec-dep-voluntarios">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">👥 Voluntarios — Valle del Cauca</div><span class="tag tag-purple">498 registrados</span></div>
-          <div class="card"><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Municipio</th><th>Nivel</th><th>Horas</th><th>Eventos</th><th>Estado</th></tr></thead><tbody>
-            <tr><td class="td-bold">Sandra Mosquera</td><td>Cali</td><td><span class="tag tag-green">🌳 Árbol</span></td><td>312 h</td><td>38</td><td><span class="tag tag-green">Activo</span></td></tr>
-            <tr><td class="td-bold">Jhon Cabal</td><td>Cali</td><td><span class="tag tag-green">🌿 Brote</span></td><td>88 h</td><td>11</td><td><span class="tag tag-green">Activo</span></td></tr>
-            <tr><td class="td-bold">Paola Rengifo</td><td>Palmira</td><td><span class="tag tag-green">🌿 Brote</span></td><td>145 h</td><td>18</td><td><span class="tag tag-green">Activo</span></td></tr>
-            <tr><td class="td-bold">Luis Angulo</td><td>Buenaventura</td><td><span class="tag tag-gray">🌱 Semilla</span></td><td>18 h</td><td>3</td><td><span class="tag tag-amber">Inactivo</span></td></tr>
-          </tbody></table></div></div>
+          <div class="card-header mb-5">
+            <div><div class="card-title" style="font-size:20px;">👥 Voluntarios de mi departamento</div><div style="font-size:12px;color:var(--muted);margin-top:2px;" id="dep-vol-subtitle">—</div></div>
+            <span class="tag tag-purple" id="dep-vol-count-badge">—</span>
+          </div>
+          <div class="card mb-4" style="padding:12px 16px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <input class="form-input" id="dep-vol-search" style="flex:1;min-width:200px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 14px;font-size:13px;" placeholder="Buscar por nombre o municipio..." oninput="filtrarVoluntarios('dep')">
+              <select class="form-input form-select" id="dep-vol-filter-nivel" style="width:170px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:13px;" onchange="filtrarVoluntarios('dep')">
+                <option value="">Todos los niveles</option>
+                <option value="Semilla">🌱 Semilla</option>
+                <option value="Brote">🌿 Brote</option>
+                <option value="Árbol">🌳 Árbol</option>
+                <option value="Guardabosque">🌲 Guardabosque</option>
+                <option value="Líder Ambiental">🏔️ Líder Ambiental</option>
+              </select>
+              <select class="form-input form-select" id="dep-vol-filter-muni" style="width:160px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:13px;" onchange="filtrarVoluntarios('dep')">
+                <option value="">Todos los municipios</option>
+              </select>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Nombre</th><th>Municipio</th><th>Nivel</th><th>Horas acum.</th><th>Cédula</th><th>Registrado</th></tr></thead>
+                <tbody id="dep-vol-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px;">Cargando voluntarios...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <!-- EVENTOS DEP -->
@@ -1944,25 +1977,27 @@ tr:hover td{background:var(--surface2);}
         </div>
 
         <div class="page-section" id="sec-dep-vol-niveles">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:18px;">&#x1F3C5; Sistema de Niveles</div></div>
+          <div class="card-header mb-5"><div class="card-title" style="font-size:18px;">&#x1F3C5; Mis Niveles RNJA</div></div>
           <div class="two-col">
-            <div class="card">
-              <div class="card-title mb-4">Tu nivel actual</div>
-              <div style="text-align:center;padding:20px 0;">
-                <div style="font-size:52px;margin-bottom:8px;">&#x1F333;</div>
-                <div style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:var(--g600);">🌲 Guardabosque</div>
-                <div style="color:var(--muted);font-size:14px;margin-top:6px;">498 horas acumuladas</div>
+            <div>
+              <div class="card mb-5">
+                <div class="card-title mb-4">Tu progreso actual</div>
+                <div style="text-align:center;padding:16px 0;">
+                  <div style="font-size:52px;margin-bottom:8px;" id="dep-niv-emoji">—</div>
+                  <div style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:var(--g600);" id="dep-niv-nombre">Cargando...</div>
+                  <div style="color:var(--muted);font-size:13px;margin-top:5px;" id="dep-niv-horas">—</div>
+                  <div class="mt-5" style="text-align:left;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span class="text-sm" id="dep-niv-prox-label">Progreso</span><span class="text-sm fw-600 color-green" id="dep-niv-prox-num">—</span></div>
+                    <div class="progress-wrap"><div class="progress-bar" id="dep-niv-bar-pg" style="width:0%"></div></div>
+                    <p class="text-muted mt-4" style="font-size:12px;" id="dep-niv-msg2">—</p>
+                  </div>
+                </div>
               </div>
+              <div class="card" id="dep-niv-beneficios"><p style="color:var(--muted);font-size:13px;">Cargando...</p></div>
             </div>
             <div class="card">
               <div class="card-title mb-4">Todos los niveles</div>
-              <div class="level-system">
-                <div class="level-row"><div class="lv-icon">&#x1F331;</div><div class="lv-info"><strong>Semilla</strong><small>0-30 horas</small></div><span class="lv-badge">Completado</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F33F;</div><div class="lv-info"><strong>Brote</strong><small>31-200 horas</small></div><span class="lv-badge">Completado</span></div>
-                <div class="level-row current"><div class="lv-icon">&#x1F333;</div><div class="lv-info"><strong>Árbol</strong><small>201-500 horas</small></div><span class="lv-badge active">Nivel actual</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F332;</div><div class="lv-info"><strong>Guardabosque</strong><small>501-1000 horas</small></div><span class="lv-badge" style="background:var(--surface3);color:var(--muted);">Siguiente</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F3D4;&#xFE0F;</div><div class="lv-info"><strong>Líder Ambiental</strong><small>1001+ horas</small></div><span class="lv-badge" style="background:linear-gradient(135deg,rgba(37,129,196,.15),rgba(37,129,196,.1));color:#8a6200;">Elite</span></div>
-              </div>
+              <div class="level-system" id="dep-nivel-list"><p style="color:var(--muted);font-size:13px;">Cargando...</p></div>
             </div>
           </div>
         </div>
@@ -2624,25 +2659,27 @@ tr:hover td{background:var(--surface2);}
         </div>
 
         <div class="page-section" id="sec-nac-vol-niveles">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:18px;">&#x1F3C5; Sistema de Niveles</div></div>
+          <div class="card-header mb-5"><div class="card-title" style="font-size:18px;">&#x1F3C5; Mis Niveles RNJA</div></div>
           <div class="two-col">
-            <div class="card">
-              <div class="card-title mb-4">Tu nivel actual</div>
-              <div style="text-align:center;padding:20px 0;">
-                <div style="font-size:52px;margin-bottom:8px;">&#x1F333;</div>
-                <div style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:var(--g600);">🏔️ Líder Ambiental</div>
-                <div style="color:var(--muted);font-size:14px;margin-top:6px;">820 horas acumuladas</div>
+            <div>
+              <div class="card mb-5">
+                <div class="card-title mb-4">Tu progreso actual</div>
+                <div style="text-align:center;padding:16px 0;">
+                  <div style="font-size:52px;margin-bottom:8px;" id="nac-niv-emoji">—</div>
+                  <div style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:var(--g600);" id="nac-niv-nombre">Cargando...</div>
+                  <div style="color:var(--muted);font-size:13px;margin-top:5px;" id="nac-niv-horas">—</div>
+                  <div class="mt-5" style="text-align:left;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span class="text-sm" id="nac-niv-prox-label">Progreso</span><span class="text-sm fw-600 color-green" id="nac-niv-prox-num">—</span></div>
+                    <div class="progress-wrap"><div class="progress-bar" id="nac-niv-bar-pg" style="width:0%"></div></div>
+                    <p class="text-muted mt-4" style="font-size:12px;" id="nac-niv-msg2">—</p>
+                  </div>
+                </div>
               </div>
+              <div class="card" id="nac-niv-beneficios"><p style="color:var(--muted);font-size:13px;">Cargando...</p></div>
             </div>
             <div class="card">
               <div class="card-title mb-4">Todos los niveles</div>
-              <div class="level-system">
-                <div class="level-row"><div class="lv-icon">&#x1F331;</div><div class="lv-info"><strong>Semilla</strong><small>0-30 horas</small></div><span class="lv-badge">Completado</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F33F;</div><div class="lv-info"><strong>Brote</strong><small>31-200 horas</small></div><span class="lv-badge">Completado</span></div>
-                <div class="level-row current"><div class="lv-icon">&#x1F333;</div><div class="lv-info"><strong>Árbol</strong><small>201-500 horas</small></div><span class="lv-badge active">Nivel actual</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F332;</div><div class="lv-info"><strong>Guardabosque</strong><small>501-1000 horas</small></div><span class="lv-badge" style="background:var(--surface3);color:var(--muted);">Siguiente</span></div>
-                <div class="level-row"><div class="lv-icon">&#x1F3D4;&#xFE0F;</div><div class="lv-info"><strong>Líder Ambiental</strong><small>1001+ horas</small></div><span class="lv-badge" style="background:linear-gradient(135deg,rgba(37,129,196,.15),rgba(37,129,196,.1));color:#8a6200;">Elite</span></div>
-              </div>
+              <div class="level-system" id="nac-nivel-list"><p style="color:var(--muted);font-size:13px;">Cargando...</p></div>
             </div>
           </div>
         </div>
@@ -3425,7 +3462,7 @@ function loginAs(role){
     if(role==='super_admin') cargarEstadisticasSA();
     else if(role==='coord_nacional') cargarEstadisticasNAC();
     else if(role==='coord_departamental') cargarEstadisticasDep();
-    else if(role==='coord_municipal') cargarEstadisticasMun();
+    else if(role==='coord_municipal') { cargarEstadisticasMun(); cargarValidacionesMun(); }
     else if(role==='voluntario') cargarEstadisticasVol();
   }, 300);
 }
@@ -3567,6 +3604,14 @@ function navTo(el,sectionId){
   if(sectionId==='sec-dep-home') cargarEstadisticasDep();
   if(sectionId==='sec-mun-home') cargarEstadisticasMun();
   if(sectionId==='sec-vol-home') cargarEstadisticasVol();
+  if(sectionId==='sec-dep-voluntarios') cargarVoluntariosDep();
+  if(sectionId==='sec-mun-voluntarios') cargarVoluntariosMun();
+  if(sectionId==='sec-dep-municipios') cargarMunicipiosDep();
+  if(sectionId==='sec-mun-validar') cargarValidacionesMun();
+  if(sectionId==='sec-vol-niveles') cargarNivelesVol('vol');
+  if(sectionId==='sec-mun-vol-niveles') cargarNivelesVol('mun');
+  if(sectionId==='sec-dep-vol-niveles') cargarNivelesVol('dep');
+  if(sectionId==='sec-nac-vol-niveles') cargarNivelesVol('nac');
   if(sectionId==='sec-vol-historial') cargarHistorialVol('vol');
   if(sectionId==='sec-mun-vol-historial') cargarHistorialVol('mun');
   if(sectionId==='sec-dep-vol-historial') cargarHistorialVol('dep');
@@ -6186,6 +6231,358 @@ async function cargarHistorialVol(scope) {
     var tbody2 = document.getElementById(tbodyId);
     if (tbody2) tbody2.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">Error al cargar historial.</td></tr>';
   }
+}
+
+/* ══════════════════════════════════════════════════
+   VOLUNTARIOS DEP / MUN
+══════════════════════════════════════════════════ */
+window._volsDepData = [];
+window._volsMunData = [];
+
+async function cargarVoluntariosDep() {
+  var p = window.currentProfile || {};
+  var depto = p.departamento || '';
+  var tbody = document.getElementById('dep-vol-tbody');
+  var subtitle = document.getElementById('dep-vol-subtitle');
+  var badge = document.getElementById('dep-vol-count-badge');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Cargando voluntarios...</td></tr>';
+
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+    var depFlt = encodeURIComponent(depto);
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/perfiles?departamento=eq.'+depFlt+'&rol=eq.voluntario&select=id,nombres,apellidos,cedula,municipio,total_horas,created_at&order=nombres.asc',
+      { headers: h }
+    );
+    var data = resp.ok ? await resp.json() : [];
+    window._volsDepData = data;
+
+    if (subtitle) subtitle.textContent = depto || '—';
+    if (badge) badge.textContent = data.length + ' voluntarios';
+
+    // Llenar filtro de municipios
+    var muniSel = document.getElementById('dep-vol-filter-muni');
+    if (muniSel && muniSel.options.length <= 1) {
+      var munis = [...new Set(data.map(function(v) { return v.municipio || ''; }).filter(Boolean))].sort();
+      munis.forEach(function(m) {
+        var opt = document.createElement('option');
+        opt.value = m; opt.textContent = m;
+        muniSel.appendChild(opt);
+      });
+    }
+
+    renderVoluntarios(data, 'dep');
+  } catch(e) { console.error('cargarVoluntariosDep:', e); }
+}
+
+async function cargarVoluntariosMun() {
+  var p = window.currentProfile || {};
+  var muni = p.municipio || '';
+  var tbody = document.getElementById('mun-vol-tbody');
+  var subtitle = document.getElementById('mun-vol-subtitle');
+  var badge = document.getElementById('mun-vol-count-badge');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">Cargando voluntarios...</td></tr>';
+
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+    var munFlt = encodeURIComponent(muni);
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/perfiles?municipio=eq.'+munFlt+'&rol=eq.voluntario&select=id,nombres,apellidos,cedula,municipio,total_horas,created_at&order=nombres.asc',
+      { headers: h }
+    );
+    var data = resp.ok ? await resp.json() : [];
+    window._volsMunData = data;
+
+    if (subtitle) subtitle.textContent = muni || '—';
+    if (badge) badge.textContent = data.length + ' voluntarios';
+    renderVoluntarios(data, 'mun');
+  } catch(e) { console.error('cargarVoluntariosMun:', e); }
+}
+
+function filtrarVoluntarios(scope) {
+  var src = scope === 'dep' ? window._volsDepData : window._volsMunData;
+  var q = (document.getElementById(scope+'-vol-search')?.value || '').toLowerCase();
+  var filtNivel = document.getElementById(scope+'-vol-filter-nivel')?.value || '';
+  var filtMuni = scope === 'dep' ? (document.getElementById('dep-vol-filter-muni')?.value || '') : '';
+
+  var filtered = src.filter(function(v) {
+    var nom = [(v.nombres||''),(v.apellidos||'')].join(' ').toLowerCase();
+    var mun = (v.municipio || '').toLowerCase();
+    var nv = getNivel(Number(v.total_horas) || 0);
+    var matchQ = !q || nom.includes(q) || mun.includes(q);
+    var matchNivel = !filtNivel || (nv && nv.nombre === filtNivel);
+    var matchMuni = !filtMuni || (v.municipio === filtMuni);
+    return matchQ && matchNivel && matchMuni;
+  });
+  renderVoluntarios(filtered, scope);
+}
+
+function renderVoluntarios(list, scope) {
+  var cols = scope === 'dep' ? 6 : 5;
+  var tbody = document.getElementById(scope+'-vol-tbody');
+  if (!tbody) return;
+  if (!list || list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="'+cols+'" style="text-align:center;color:var(--muted);padding:28px;">Sin voluntarios que coincidan con los filtros.</td></tr>';
+    return;
+  }
+  var NIVEL_TAG = { Semilla:'tag-gray', Brote:'tag-green', 'Árbol':'tag-green', Guardabosque:'tag-green', 'Líder Ambiental':'tag-amber' };
+  tbody.innerHTML = list.map(function(v) {
+    var nom = [(v.nombres||''),(v.apellidos||'')].filter(Boolean).join(' ') || '(sin nombre)';
+    var horas = Number(v.total_horas) || 0;
+    var nv = getNivel(horas);
+    var nvLabel = nv ? nv.emoji+' '+nv.nombre : '🌱 Semilla';
+    var nvTag = nv ? (NIVEL_TAG[nv.nombre] || 'tag-gray') : 'tag-gray';
+    var cedula = v.cedula || '—';
+    var fecha = v.created_at ? new Date(v.created_at).toLocaleDateString('es-CO', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+    var munCell = scope === 'dep' ? '<td style="font-size:13px;">'+(v.municipio||'—')+'</td>' : '';
+    return '<tr>' +
+      '<td class="td-bold av-row"><div class="av-sm" style="width:28px;height:28px;font-size:13px;">🙋</div>'+nom+'</td>' +
+      munCell +
+      '<td><span class="tag '+nvTag+'">'+nvLabel+'</span></td>' +
+      '<td>'+horas.toLocaleString('es-CO')+' h</td>' +
+      '<td style="font-size:12px;color:var(--muted);">'+cedula+'</td>' +
+      '<td style="font-size:12px;color:var(--muted);">'+fecha+'</td>' +
+      '</tr>';
+  }).join('');
+}
+
+/* ── Municipios del departamento ── */
+async function cargarMunicipiosDep() {
+  var p = window.currentProfile || {};
+  var depto = p.departamento || '';
+  var tbody = document.getElementById('dep-municipios-tbody');
+  var subtitle = document.getElementById('dep-munis-subtitle');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">Cargando municipios...</td></tr>';
+  if (subtitle) subtitle.textContent = depto || '—';
+
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+    var depFlt = encodeURIComponent(depto);
+
+    // Voluntarios del depto + coords municipales en paralelo
+    var [rVols, rCoords] = await Promise.all([
+      fetch(window._SB_URL + '/rest/v1/perfiles?departamento=eq.'+depFlt+'&rol=eq.voluntario&select=municipio,total_horas', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/perfiles?departamento=eq.'+depFlt+'&rol=eq.coord_municipal&select=nombres,apellidos,municipio', { headers: h })
+    ]);
+
+    var vols = rVols.ok ? await rVols.json() : [];
+    var coords = rCoords.ok ? await rCoords.json() : [];
+
+    // Agrupar por municipio
+    var muniMap = {};
+    vols.forEach(function(v) {
+      var m = v.municipio || '(sin municipio)';
+      if (!muniMap[m]) muniMap[m] = { vols: 0, horas: 0 };
+      muniMap[m].vols++;
+      muniMap[m].horas += Number(v.total_horas) || 0;
+    });
+
+    // Asociar coord municipal
+    var coordMap = {};
+    coords.forEach(function(c) {
+      var m = c.municipio || '';
+      if (m) coordMap[m] = [(c.nombres||''),(c.apellidos||'')].filter(Boolean).join(' ');
+    });
+
+    var muniArr = Object.keys(muniMap).sort();
+    if (muniArr.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">Sin municipios con voluntarios registrados.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = muniArr.map(function(m) {
+      var info = muniMap[m];
+      var coord = coordMap[m] || '—';
+      var hasCoord = !!coordMap[m];
+      return '<tr>' +
+        '<td class="td-bold">'+m+'</td>' +
+        '<td>'+info.vols+'</td>' +
+        '<td>'+(Math.round(info.horas)).toLocaleString('es-CO')+' h</td>' +
+        '<td>'+coord+'</td>' +
+        '<td><span class="tag '+(hasCoord?'tag-green':'tag-red')+'">'+(hasCoord?'Con coord.':'Sin coord.')+'</span></td>' +
+        '</tr>';
+    }).join('');
+  } catch(e) {
+    console.error('cargarMunicipiosDep:', e);
+    var tbody2 = document.getElementById('dep-municipios-tbody');
+    if (tbody2) tbody2.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);padding:24px;">Error al cargar.</td></tr>';
+  }
+}
+
+/* ── Validaciones pendientes (coord municipal) ── */
+async function cargarValidacionesMun() {
+  var p = window.currentProfile || {};
+  var depto = p.departamento || '';
+  var listEl = document.getElementById('mun-validar-list');
+  var badge = document.getElementById('mun-validar-badge');
+  if (!listEl) return;
+  listEl.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:12px 0;">Cargando inscripciones...</p>';
+
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+    var depFlt = encodeURIComponent(depto);
+
+    // Inscripciones pendientes a eventos de este departamento
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/evento_inscripciones?estado=eq.pendiente&select=id,perfil_id,estado,created_at,perfiles(nombres,apellidos),eventos!inner(titulo,fecha,horas,departamento)&eventos.departamento=eq.'+depFlt+'&order=created_at.desc&limit=30',
+      { headers: h }
+    );
+
+    var data = resp.ok ? await resp.json() : [];
+
+    // Filtrar solo los que tengan el evento del depto correcto (inner join puede fallar en algunos supabase)
+    var filtered = data.filter(function(ins) {
+      return ins.eventos && ins.eventos.departamento === depto;
+    });
+
+    if (badge) badge.textContent = filtered.length > 0 ? filtered.length+' pendientes' : 'Al día ✅';
+
+    // Actualizar badge de la barra lateral
+    var navBadge = document.getElementById('mun-validar-nav-badge');
+    if (navBadge) {
+      if (filtered.length > 0) { navBadge.textContent = filtered.length; navBadge.style.display = ''; }
+      else navBadge.style.display = 'none';
+    }
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div style="background:var(--g50);border:1px solid var(--border2);border-radius:var(--r);padding:24px;text-align:center;color:var(--g600);">✅ Sin participaciones pendientes de validar.</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(function(ins) {
+      var nom = ins.perfiles ? [(ins.perfiles.nombres||''),(ins.perfiles.apellidos||'')].filter(Boolean).join(' ') : '(desconocido)';
+      var ev = ins.eventos || {};
+      var titulo = ev.titulo || '—';
+      var fecha = ev.fecha ? new Date(ev.fecha).toLocaleDateString('es-CO', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+      var horas = ev.horas ? ev.horas+' h' : '';
+      return '<div class="val-item">' +
+        '<div class="av-sm">🙋</div>' +
+        '<div class="val-info"><strong>'+nom+' · '+titulo+'</strong><small>'+fecha+(horas?' · '+horas:'')+'</small></div>' +
+        '<div class="val-actions">' +
+        '<button class="btn-approve" onclick="validarInscripcion(\''+ins.id+'\',true)">✓ Confirmar</button>' +
+        '<button class="btn-reject" onclick="validarInscripcion(\''+ins.id+'\',false)">✕</button>' +
+        '</div></div>';
+    }).join('');
+  } catch(e) {
+    console.error('cargarValidacionesMun:', e);
+    listEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Error al cargar validaciones.</p>';
+  }
+}
+
+async function validarInscripcion(inscripcionId, aprobar) {
+  var nuevoEstado = aprobar ? 'confirmada' : 'cancelada';
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/evento_inscripciones?id=eq.'+inscripcionId,
+      { method: 'PATCH',
+        headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token,
+          'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ estado: nuevoEstado })
+      }
+    );
+    if (resp.ok) {
+      showToast(aprobar ? '✅ Participación confirmada' : '❌ Participación rechazada');
+      cargarValidacionesMun();
+    } else {
+      showToast('⚠️ Error al actualizar');
+    }
+  } catch(e) { showToast('⚠️ Error: '+e.message); }
+}
+
+/* ── Niveles dinámicos (todos los roles) ── */
+var NIVEL_BENEFICIOS = {
+  Semilla: ['Acceso a eventos locales','Certificados de participación','Perfil en la red RNJA'],
+  Brote: ['Acceso a eventos departamentales','Certificados descargables ilimitados','Insignia visible en perfil'],
+  'Árbol': ['Mentoría con coordinadores','Acceso a eventos nacionales','Carta de reconocimiento RNJA'],
+  Guardabosque: ['Carta de recomendación institucional','Prioridad en eventos especiales','Historial verificado exportable'],
+  'Líder Ambiental': ['Reconocimiento oficial RNJA','Participación en asambleas','Mención en medios y publicaciones RNJA']
+};
+var NIVEL_BLOQ_MSG = { Semilla:'Ya superado ✓', Brote:'Ya superado ✓', 'Árbol':'Ya superado ✓', Guardabosque:'Ya superado ✓', 'Líder Ambiental':'Nivel máximo 🏆' };
+
+async function cargarNivelesVol(scope) {
+  scope = scope || 'vol';
+  var prefix = scope; // vol, mun, dep, nac
+  try {
+    var pid = (window.currentProfile || {}).id;
+    if (!pid) return;
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+    var rCerts = await fetch(window._SB_URL + '/rest/v1/certificados?perfil_id=eq.'+pid+'&select=horas', { headers: h });
+    var certs = rCerts.ok ? await rCerts.json() : [];
+    var totalHoras = certs.reduce(function(s, c) { return s + (Number(c.horas)||0); }, 0);
+
+    var nv = getNivel(totalHoras);
+    var proxNv = getProxNivel(totalHoras);
+
+    var setEl = function(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; };
+    var setTxt = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+
+    setTxt(prefix+'-niv-emoji', nv ? nv.emoji : '—');
+    setTxt(prefix+'-niv-nombre', nv ? 'Nivel '+nv.nombre : '—');
+    setTxt(prefix+'-niv-horas', totalHoras.toLocaleString('es-CO')+' horas acumuladas');
+
+    // Barra de progreso al siguiente nivel
+    if (proxNv) {
+      var pct = Math.min(100, ((totalHoras - nv.min) / (proxNv.min - nv.min)) * 100).toFixed(0);
+      var falta = proxNv.min - totalHoras;
+      setTxt(prefix+'-niv-prox-label', 'Progreso al nivel '+proxNv.nombre);
+      setTxt(prefix+'-niv-prox-num', totalHoras+'/'+proxNv.min+' h');
+      var barEl = document.getElementById(prefix+'-niv-bar-pg');
+      if (barEl) barEl.style.width = pct+'%';
+      setTxt(prefix+'-niv-msg2', '¡Solo '+falta+' horas más para '+proxNv.emoji+' '+proxNv.nombre+'!');
+    } else {
+      setTxt(prefix+'-niv-prox-label', '🏆 Nivel máximo alcanzado');
+      setTxt(prefix+'-niv-prox-num', '');
+      var barEl2 = document.getElementById(prefix+'-niv-bar-pg');
+      if (barEl2) barEl2.style.width = '100%';
+      setTxt(prefix+'-niv-msg2', '¡Felicitaciones! Eres '+nv.emoji+' '+nv.nombre+'.');
+    }
+
+    // Beneficios del nivel actual
+    var bens = nv ? (NIVEL_BENEFICIOS[nv.nombre] || []) : [];
+    var allBens = [];
+    NIVELES.forEach(function(n) { (NIVEL_BENEFICIOS[n.nombre]||[]).forEach(function(b) { allBens.push({ b: b, unlocked: nv && NIVELES.indexOf(n) <= NIVELES.indexOf(nv) }); }); });
+    var benHtml = '<div class="card-title mb-4">Beneficios de tu nivel actual</div><div style="display:flex;flex-direction:column;gap:7px;">';
+    bens.forEach(function(b) { benHtml += '<div class="av-row"><span style="color:var(--neon)">✓</span><span class="text-sm">'+b+'</span></div>'; });
+    var nextBens = proxNv ? (NIVEL_BENEFICIOS[proxNv.nombre] || []) : [];
+    nextBens.forEach(function(b) { benHtml += '<div class="av-row"><span style="color:var(--muted2)">○</span><span class="text-sm text-muted">'+b+' ('+proxNv.nombre+')</span></div>'; });
+    benHtml += '</div>';
+    setEl(prefix+'-niv-beneficios', benHtml);
+
+    // Lista de todos los niveles
+    var listHtml = '';
+    NIVELES.forEach(function(n) {
+      var idx = NIVELES.indexOf(n);
+      var nvIdx = nv ? NIVELES.indexOf(nv) : -1;
+      var isCurrent = nv && n.nombre === nv.nombre;
+      var isPast = nvIdx > idx;
+      var isNext = proxNv && n.nombre === proxNv.nombre;
+      var cls = isCurrent ? 'level-row current' : 'level-row';
+      var rangoMax = n.max === Infinity ? n.min+'+ horas' : n.min+' – '+n.max+' horas';
+      var badgeHtml;
+      if (isCurrent) badgeHtml = '<span class="lv-badge active">Nivel actual</span>';
+      else if (isPast) badgeHtml = '<span class="lv-badge">Completado ✓</span>';
+      else if (isNext) badgeHtml = '<span class="lv-badge" style="background:var(--blue-soft);color:var(--blue);">Siguiente 🎯</span>';
+      else badgeHtml = '<span class="lv-badge" style="background:var(--surface3);color:var(--muted);">Bloqueado</span>';
+      listHtml += '<div class="'+cls+'"><div class="lv-icon">'+n.emoji+'</div><div class="lv-info"><strong>'+n.nombre+'</strong><small>'+rangoMax+'</small></div>'+badgeHtml+'</div>';
+    });
+    setEl(prefix+'-nivel-list', listHtml);
+
+  } catch(e) { console.error('cargarNivelesVol:', e); }
 }
 
 /* ══════════════════════════════════════════════════
