@@ -3977,6 +3977,14 @@ async function guardarUsuario(){
       var rj=await re.json();
       if(!re.ok||rj.error){
         if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
+        if(rj.error==="SIN_CUENTA_ACTIVA"){
+          // Perfil guardado OK, solo no tiene auth user aún
+          var idx2=(window._usuariosData||[]).findIndex(function(x){return x.id===id;});
+          if(idx2>=0)Object.assign(window._usuariosData[idx2],payload);
+          closeModal("modal-perfil-usuario");
+          showToast("✅ Perfil guardado. ⚠️ Sin cuenta activa — invita al usuario primero para cambiar credenciales");
+          filtrarUsuarios();return;
+        }
         showToast("Perfil guardado. Error credenciales: "+(rj.error||re.status));
         filtrarUsuarios();return;
       }

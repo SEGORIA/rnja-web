@@ -65,7 +65,16 @@ Deno.serve(async (req) => {
       updatePayload
     )
 
-    if (updateError) throw new Error(`Error actualizando credenciales: ${updateError.message}`)
+    if (updateError) {
+      // Usuario sin cuenta auth (ej: importado por Excel, aún no invitado)
+      if (updateError.message?.toLowerCase().includes('user not found')) {
+        return new Response(
+          JSON.stringify({ error: 'SIN_CUENTA_ACTIVA' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      throw new Error(`Error actualizando credenciales: ${updateError.message}`)
+    }
 
     return new Response(
       JSON.stringify({
