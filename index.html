@@ -2199,9 +2199,53 @@ tr:hover td{background:var(--surface2);}
       </div>
 
       <!-- ── Trayectoria RNJA ── -->
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;margin-top:4px;">&#x1F4DC; Trayectoria RNJA</div>
-      <div id="mu-historial-wrap" style="margin-bottom:16px;min-height:36px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;margin-top:4px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">&#x1F4DC; Trayectoria RNJA</div>
+        <button onclick="toggleFormHistorial()" id="btn-add-historial" style="background:var(--g700);color:white;border:none;border-radius:7px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">&#x2795; Agregar per&#237;odo</button>
+      </div>
+      <div id="mu-historial-wrap" style="margin-bottom:10px;min-height:36px;">
         <span style="color:var(--muted);font-size:12px;">&#x2014;</span>
+      </div>
+      <!-- Formulario agregar período (oculto por defecto) -->
+      <div id="historial-form-wrap" style="display:none;background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px;border:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:10px;">Nuevo per&#237;odo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Rol</label>
+            <select id="hf-rol" class="form-input form-select" style="width:100%;background:var(--surface);color:var(--ink);border-color:var(--border);padding:7px 10px;font-size:13px;">
+              <option value="voluntario">Voluntario / Miembro</option>
+              <option value="coord_municipal">Coord. Municipal</option>
+              <option value="coord_departamental">Coord. Departamental</option>
+              <option value="coord_nacional">Coord. Nacional</option>
+              <option value="etica">Comit&#233; &#201;tica</option>
+            </select></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Cargo</label>
+            <select id="hf-cargo" class="form-input form-select" style="width:100%;background:var(--surface);color:var(--ink);border-color:var(--border);padding:7px 10px;font-size:13px;">
+              <option value="">&#x2014; Sin cargo &#x2014;</option>
+              <option value="Coordinacion General">Coordinaci&#243;n General</option>
+              <option value="Coordinacion Territorial">Coordinaci&#243;n Territorial</option>
+              <option value="Coordinacion Tematica">Coordinaci&#243;n Tem&#225;tica</option>
+              <option value="Coordinacion Institucional">Coordinaci&#243;n Institucional</option>
+              <option value="Coordinacion Comunicaciones">Coordinaci&#243;n Comunicaciones</option>
+            </select></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Departamento</label>
+            <select id="hf-departamento" class="form-input form-select" style="width:100%;background:var(--surface);color:var(--ink);border-color:var(--border);padding:7px 10px;font-size:13px;" onchange="poblarMunicipiosHF(this.value)">
+              <option value="">&#x2014; Selecciona &#x2014;</option>
+            </select></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Municipio</label>
+            <select id="hf-municipio" class="form-input form-select" style="width:100%;background:var(--surface);color:var(--ink);border-color:var(--border);padding:7px 10px;font-size:13px;">
+              <option value="">&#x2014; Selecciona &#x2014;</option>
+            </select></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Fecha inicio</label>
+            <input type="date" id="hf-inicio" class="form-input" style="width:100%;background:var(--surface);color:var(--ink);border-color:var(--border);padding:7px 10px;font-size:13px;"></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Fecha fin <span style="font-weight:400;">(vac&#237;o = presente)</span></label>
+            <input type="date" id="hf-fin" class="form-input" style="width:100%;background:var(--surface);color:var(--ink);border-color:var(--border);padding:7px 10px;font-size:13px;"></div>
+          <div style="grid-column:1/-1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Notas</label>
+            <input type="text" id="hf-notas" class="form-input" style="width:100%;background:var(--surface);color:var(--ink);border-color:var(--border);padding:7px 10px;font-size:13px;" placeholder="Opcional..."></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button onclick="guardarNuevoHistorial()" class="btn btn-neon" style="flex:1;padding:8px;">&#x2714; Guardar per&#237;odo</button>
+          <button onclick="toggleFormHistorial()" class="btn" style="background:var(--surface);border:1px solid var(--border);color:var(--ink);padding:8px 14px;">Cancelar</button>
+        </div>
       </div>
 
       <!-- Ingreso + botones -->
@@ -4301,8 +4345,9 @@ async function cargarHistorialPerfil(perfilId){
       var hasta=r.fecha_fin?fmtFecha(r.fecha_fin):null;
       var isActive=!r.fecha_fin;
       html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 11px;background:var(--surface2);border-radius:8px;border-left:3px solid '+(isActive?"var(--g600)":"var(--border)")+';">';
-      html+='<span style="font-size:12px;color:var(--ink);">'+ico+" "+label+"</span>";
-      html+='<span style="font-size:11px;color:var(--muted);white-space:nowrap;margin-left:10px;">'+desde+" → "+(isActive?'<strong style="color:var(--g600)">presente</strong>':hasta)+"</span>";
+      html+='<span style="font-size:12px;color:var(--ink);flex:1;">'+ico+" "+label+"</span>";
+      html+='<span style="font-size:11px;color:var(--muted);white-space:nowrap;margin:0 10px;">'+desde+" → "+(isActive?'<strong style="color:var(--g600)">presente</strong>':hasta)+"</span>";
+      html+='<button onclick="eliminarHistorial(\''+r.id+'\',\'"+perfilId+"\')" title="Eliminar" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 2px;line-height:1;" onmouseover="this.style.color=\'#e05\'" onmouseout="this.style.color=\'var(--muted)\'">&#x1F5D1;</button>';
       html+="</div>";
     });
     html+="</div>";
@@ -4316,6 +4361,84 @@ async function cargarHistorialPerfil(perfilId){
 
 <!-- ══════════════════════════════════════════
   SUPABASE — Inicialización (script independiente)
+function toggleFormHistorial(){
+  var fw=document.getElementById("historial-form-wrap");
+  if(!fw) return;
+  var visible=fw.style.display!=="none";
+  fw.style.display=visible?"none":"block";
+  if(!visible){
+    // Poblar select de departamentos del formulario historial
+    var sd=document.getElementById("hf-departamento");
+    if(sd&&sd.options.length<=1){
+      var deptos=Object.keys(COL_DEPTOS).sort();
+      deptos.forEach(function(d){var o=document.createElement("option");o.value=d;o.textContent=d;sd.appendChild(o);});
+    }
+    document.getElementById("hf-rol").value="voluntario";
+    document.getElementById("hf-cargo").value="";
+    document.getElementById("hf-departamento").value="";
+    document.getElementById("hf-municipio").innerHTML="<option value=''>— Selecciona —</option>";
+    document.getElementById("hf-inicio").value="";
+    document.getElementById("hf-fin").value="";
+    document.getElementById("hf-notas").value="";
+  }
+}
+
+function poblarMunicipiosHF(depto){
+  var sel=document.getElementById("hf-municipio");
+  if(!sel) return;
+  var munis=(depto&&COL_DEPTOS[depto])?COL_DEPTOS[depto].slice().sort():[];
+  sel.innerHTML="<option value=''>— Selecciona —</option>"+munis.map(function(m){return "<option value='"+m+"'>"+m+"</option>";}).join("");
+}
+
+async function guardarNuevoHistorial(){
+  var perfilId=document.getElementById("mu-id")?.value;
+  if(!perfilId){showToast("Error: abre el perfil de un usuario primero");return;}
+  var g=function(id){var el=document.getElementById(id);return el?(el.value||"").trim()||null:null;};
+  var payload={
+    perfil_id: perfilId,
+    rol:       g("hf-rol")||"voluntario",
+    cargo:     g("hf-cargo"),
+    departamento: g("hf-departamento"),
+    municipio:    g("hf-municipio"),
+    fecha_inicio: g("hf-inicio")||new Date().toISOString().split("T")[0],
+    fecha_fin:    g("hf-fin")||null,
+    notas:        g("hf-notas")
+  };
+  var btn=document.querySelector("#historial-form-wrap button.btn-neon");
+  if(btn){btn.textContent="Guardando...";btn.disabled=true;}
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||"";
+    var resp=await fetch(
+      window._SB_URL+"/rest/v1/historial_roles",
+      {method:"POST",
+       headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token,
+                "Content-Type":"application/json","Prefer":"return=minimal"},
+       body:JSON.stringify(payload)}
+    );
+    if(!resp.ok){var et=await resp.text();showToast("Error al guardar: "+et.substring(0,80));return;}
+    toggleFormHistorial();
+    showToast("Periodo guardado");
+    cargarHistorialPerfil(perfilId);
+  }catch(e){showToast("Error: "+e.message);}
+  finally{if(btn){btn.textContent="✔ Guardar período";btn.disabled=false;}}
+}
+
+async function eliminarHistorial(histId, perfilId){
+  if(!confirm("¿Eliminar este período de la trayectoria?")) return;
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||"";
+    var resp=await fetch(
+      window._SB_URL+"/rest/v1/historial_roles?id=eq."+histId,
+      {method:"DELETE",
+       headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token}}
+    );
+    if(!resp.ok){showToast("Error al eliminar ("+resp.status+")");return;}
+    showToast("Período eliminado");
+    cargarHistorialPerfil(perfilId);
+  }catch(e){showToast("Error: "+e.message);}
+}
   Se ejecuta al final del body para garantizar que:
   1. El CDN ya cargó (está en <head> como blocking script)
   2. Las funciones del juego principal ya están definidas
