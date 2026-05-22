@@ -2141,9 +2141,18 @@ tr:hover td{background:var(--surface2);}
       <button onclick="closeModal('modal-perfil-usuario')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;color:white;font-size:15px;cursor:pointer;">&#x2715;</button>
       <div style="font-family:Montserrat,sans-serif;font-size:17px;font-weight:700;color:white;">&#x1F464; Editar perfil de usuario</div>
       <div id="mu-nombre-header" style="color:rgba(255,255,255,.65);font-size:13px;margin-top:4px;">&#x2014;</div>
+      <!-- Banda de invitación: visible solo cuando user_id es null -->
+      <div id="mu-invite-band" style="display:none;margin-top:12px;background:rgba(255,193,7,.15);border:1px solid rgba(255,193,7,.4);border-radius:9px;padding:10px 14px;">
+        <div style="font-size:12px;color:#ffe082;font-weight:600;margin-bottom:8px;">&#x26A0;&#xFE0F; Sin cuenta activa &mdash; este usuario no puede iniciar sesi&#243;n todav&#237;a</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="email" id="mu-invite-email" class="form-input" style="flex:1;background:rgba(255,255,255,.1);border-color:rgba(255,193,7,.5);color:white;padding:7px 11px;font-size:13px;" placeholder="Email para la invitaci&#243;n">
+          <button id="mu-invite-btn" onclick="invitarUsuario()" style="background:#f0b429;color:#1a1a1a;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">&#x1F4E7; Invitar</button>
+        </div>
+      </div>
     </div>
     <div style="padding:22px 28px;display:flex;flex-direction:column;gap:0;max-height:75vh;overflow-y:auto;">
       <input type="hidden" id="mu-id">
+      <input type="hidden" id="mu-user-id">
 
       <!-- ── Datos personales ── -->
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Datos personales</div>
@@ -2155,7 +2164,7 @@ tr:hover td{background:var(--surface2);}
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">A&#241;o de nacimiento</label><input class="form-input" id="mu-anio-nac" type="number" min="1960" max="2015" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Ej: 2001"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">G&#233;nero</label><select class="form-input form-select" id="mu-genero" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Sin especificar &#x2014;</option><option value="M">M &#x2014; Masculino</option><option value="F">F &#x2014; Femenino</option><option value="Otro">Otro</option></select></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tel&#233;fono</label><input class="form-input" id="mu-telefono" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Tel&#233;fono"></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Email</label><input class="form-input" id="mu-email" type="email" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Nuevo email (vac&#237;o = sin cambio)"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Email <span id="mu-email-hint" style="font-weight:400;color:var(--muted);"></span></label><input class="form-input" id="mu-email" type="email" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Email (vac&#237;o = sin cambio)"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Nueva contrase&#241;a <span style="font-weight:400;color:var(--muted);">(vac&#237;o = sin cambio)</span></label><input class="form-input" id="mu-password" type="password" autocomplete="new-password" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="M&#237;n. 8 caracteres"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tipo sangre</label><select class="form-input form-select" id="mu-tipo-sangre" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014;</option><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">EPS</label><input class="form-input" id="mu-eps" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="EPS o aseguradora"></div>
@@ -3901,12 +3910,17 @@ function verUsuario(id){
     else el.textContent=val||"—";
   };
   sv("mu-id",u.id);
+  // Guardar user_id en campo oculto para invitación
+  var uidField=document.getElementById("mu-user-id"); if(uidField) uidField.value=u.user_id||"";
   document.getElementById("mu-nombre-header").textContent=((u.nombres||"")+" "+(u.apellidos||"")).trim()||"—";
   sv("mu-nombres",u.nombres); sv("mu-apellidos",u.apellidos);
   sv("mu-tipo-doc",u.tipo_doc||"C.C."); sv("mu-cedula",u.cedula);
   sv("mu-anio-nac",u.anio_nacimiento); sv("mu-genero",u.genero||"");
   sv("mu-telefono",u.telefono);
-  var emailEl=document.getElementById("mu-email"); if(emailEl)emailEl.value="";
+  // Email: mostrar email guardado en perfil como referencia, vacío = sin cambio de auth email
+  var emailEl=document.getElementById("mu-email"); if(emailEl) emailEl.value="";
+  var emailHint=document.getElementById("mu-email-hint");
+  if(emailHint) emailHint.textContent=u.email?"(actual: "+u.email+")":"";
   sv("mu-tipo-sangre",u.tipo_sangre||""); sv("mu-eps",u.eps);
   sv("mu-direccion",u.direccion); sv("mu-profesion",u.profesion); sv("mu-ocupacion",u.ocupacion);
   poblarDeptos();
@@ -3922,6 +3936,16 @@ function verUsuario(id){
   var ing="—";
   if(u.created_at){var d=new Date(u.created_at);var M=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];ing=d.getDate()+" "+M[d.getMonth()]+" "+d.getFullYear();}
   document.getElementById("mu-ingreso").textContent=ing;
+  // Mostrar banda de invitación solo si no tiene cuenta activa
+  var invBand=document.getElementById("mu-invite-band");
+  var invEmail=document.getElementById("mu-invite-email");
+  if(invBand){
+    var sinCuenta=!u.user_id;
+    invBand.style.display=sinCuenta?"block":"none";
+    if(sinCuenta&&invEmail) invEmail.value=u.email||"";
+  }
+  // Limpiar campo contraseña
+  var pwEl=document.getElementById("mu-password"); if(pwEl) pwEl.value="";
   openModal("modal-perfil-usuario");
   cargarHistorialPerfil(u.id);
 }
@@ -3944,7 +3968,7 @@ async function guardarUsuario(){
     nodo:g("mu-nodo"), cargo:g("mu-cargo"),
     fecha_ingreso_rnja:g("mu-fecha-ingreso")||null,
     contacto_emergencia:g("mu-contacto-emerg"),
-    rol:g("mu-rol")||"voluntario", estado:g("mu-estado")||"activo", notas:g("mu-notas"),
+    rol:g("mu-rol")||"voluntario", estado:g("mu-estado")||"activo", notas:g("mu-notas"), email:g("mu-invite-email")||undefined,
     indigena:cb("mu-indigena"), afrocolombian:cb("mu-afro"),
     desplazado:cb("mu-desplazado"), discapacidad:cb("mu-discapacidad"),
     lgtbiq:cb("mu-lgtbiq"), victima_conflicto:cb("mu-victima")
@@ -4283,7 +4307,7 @@ async function confirmarImport(){
     // PostgREST PGRST102: todos los objetos deben tener exactamente las mismas claves.
     // id se genera en el cliente para no depender del DEFAULT de la DB.
     var PERFILES_FIELDS=["nombres","apellidos","tipo_doc","cedula","anio_nacimiento","genero",
-      "nodo","departamento","municipio","rol","cargo","telefono","tipo_sangre","eps",
+      "nodo","departamento","municipio","rol","cargo","telefono","email","tipo_sangre","eps",
       "direccion","profesion","ocupacion","fecha_ingreso_rnja","contacto_emergencia",
       "indigena","afrocolombian","desplazado","discapacidad","lgtbiq","victima_conflicto",
       "estado","notas"];
@@ -4662,15 +4686,10 @@ async function loadUserProfile(){
   } catch(e){}
 
   try{
+    // Buscar por user_id (usuarios invitados) O por id (usuarios existentes pre-migración)
     var resp = await fetch(
-      window._SB_URL + '/rest/v1/perfiles?select=*&id=eq.' + uid + '&limit=1',
-      {
-        headers:{
-          'apikey': window._SB_KEY,
-          'Authorization': 'Bearer ' + token,
-          'Accept': 'application/json'
-        }
-      }
+      window._SB_URL + '/rest/v1/perfiles?select=*&or=(user_id.eq.'+uid+',id.eq.'+uid+')&limit=1',
+      { headers:{ 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
     );
     if(!resp.ok){ throw new Error('HTTP '+resp.status); }
     var rows = await resp.json();
@@ -4679,13 +4698,57 @@ async function loadUserProfile(){
       if(window.supabase) window.supabase.auth.signOut();
       return;
     }
-    window.currentProfile = rows[0];
-    updateProfileForRole(rows[0].rol);
-    loginAs(rows[0].rol);
-    if(rows[0].rol === 'super_admin' || rows[0].rol === 'coord_nacional'){ cargarSolicitudes(); cargarUsuarios(); }
+    var perfil = rows[0];
+    // Auto-migración: si el perfil fue encontrado por id (no user_id), vincularlo
+    if(!perfil.user_id && perfil.id === uid){
+      fetch(window._SB_URL+'/rest/v1/perfiles?id=eq.'+uid,
+        {method:'PATCH',headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,
+         'Content-Type':'application/json','Prefer':'return=minimal'},
+         body:JSON.stringify({user_id:uid})}).catch(function(){});
+      perfil.user_id = uid;
+    }
+    window.currentProfile = perfil;
+    updateProfileForRole(perfil.rol);
+    loginAs(perfil.rol);
+    if(perfil.rol === 'super_admin' || perfil.rol === 'coord_nacional'){ cargarSolicitudes(); cargarUsuarios(); }
   }catch(e){
     console.error('loadUserProfile error:',e);
     showToast('Error cargando perfil: '+e.message);
+  }
+}
+// ═══ INVITAR USUARIO AL SISTEMA ═══
+async function invitarUsuario(){
+  var perfilId=document.getElementById("mu-id")?.value;
+  var email=(document.getElementById("mu-invite-email")?.value||"").trim();
+  if(!perfilId){showToast("Error: perfil no encontrado");return;}
+  if(!email||!email.includes("@")){showToast("Ingresa un email válido para la invitación");return;}
+  var btn=document.getElementById("mu-invite-btn");
+  if(btn){btn.textContent="Enviando...";btn.disabled=true;}
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||"";
+    var resp=await fetch(
+      window._SB_URL+"/functions/v1/invitar-usuario",
+      {method:"POST",
+       headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json"},
+       body:JSON.stringify({perfil_id:perfilId,email:email})}
+    );
+    var rj=await resp.json();
+    if(!resp.ok||rj.error){
+      showToast("Error: "+(rj.error||resp.status));
+      if(btn){btn.textContent="Invitar";btn.disabled=false;}
+      return;
+    }
+    // Actualizar datos locales y ocultar banda
+    var idx=(window._usuariosData||[]).findIndex(function(x){return x.id===perfilId;});
+    if(idx>=0){window._usuariosData[idx].user_id=rj.user_id;window._usuariosData[idx].email=email;}
+    var invBand=document.getElementById("mu-invite-band");
+    if(invBand) invBand.style.display="none";
+    showToast("Invitación enviada a "+email);
+    if(btn){btn.textContent="Invitar";btn.disabled=false;}
+  }catch(e){
+    showToast("Error: "+e.message);
+    if(btn){btn.textContent="Invitar";btn.disabled=false;}
   }
 }
 </script></body>
