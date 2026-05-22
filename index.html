@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -584,6 +584,8 @@ tr:hover td{background:var(--surface2);}
 </style>
 <!-- ══ SUPABASE CDN ══ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- ══ SHEETJS (Excel reader) ══ -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -2205,6 +2207,35 @@ tr:hover td{background:var(--surface2);}
     </div>
   </div>
 </div>
+<!-- ═══ MODAL: IMPORTAR EXCEL ═══ -->
+<div id="modal-importar" class="modal-overlay">
+  <div style="background:var(--surface);border-radius:16px;max-width:800px;width:100%;padding:0;margin:auto;box-shadow:0 40px 80px rgba(0,0,0,.4);overflow:hidden;max-height:90vh;display:flex;flex-direction:column;">
+    <div style="background:linear-gradient(135deg,var(--g800),var(--g700));padding:22px 28px;position:relative;flex-shrink:0;">
+      <button onclick="closeModal('modal-importar')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;color:white;font-size:15px;cursor:pointer;">&#x2715;</button>
+      <div style="font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:white;">&#x1F4E5; Importar usuarios desde Excel</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;">Formatos .xlsx y .csv &#183; Upsert por c&#233;dula &#183; Mapeo autom&#225;tico de columnas</div>
+    </div>
+    <div style="padding:22px 28px;overflow-y:auto;flex:1;">
+      <label style="display:block;margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;">Selecciona el archivo</div>
+        <input type="file" id="imp-file-input" accept=".xlsx,.xls,.csv" onchange="leerArchivoImport(this)" style="width:100%;background:var(--surface2);border:1.5px dashed var(--border);border-radius:10px;padding:12px 14px;color:var(--ink);font-size:13px;cursor:pointer;box-sizing:border-box;">
+      </label>
+      <div style="background:var(--surface2);border-radius:10px;padding:11px 15px;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.6;">
+        <strong style="color:var(--ink);display:block;margin-bottom:3px;">Columnas reconocidas (encabezados en la fila 1):</strong>
+        PRIMER NOMBRE &bull; SEGUNDO NOMBRE &bull; PRIMER APELLIDO &bull; SEGUNDO APELLIDO &bull; T.I. / C.C. &bull; # DOCUMENTO &bull; A&#209;O NACIMIENTO &bull; M/F &bull; NODO &bull; ROL &bull; TIPO COORDINACI&#211;N &bull; DEPARTAMENTO &bull; MUNICIPIO &bull; TEL&#201;FONO &bull; CORREO &bull; TIPO DE SANGRE &bull; EPS &bull; DIRECCI&#211;N &bull; PROFESI&#211;N &bull; OCUPACI&#211;N &bull; FECHA INGRESO RNJA &bull; CONTACTO EMERGENCIA &bull; IND&#205;GENA &bull; AFRODESCENDIENTE &bull; DESPLAZADO &bull; DISCAPACIDAD &bull; LGTBIQ &bull; V&#205;CTIMA CONFLICTO &bull; ESTADO &bull; NOTAS
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px;">Vista previa</div>
+      <div id="imp-preview-wrap" style="background:var(--surface2);border-radius:10px;border:1px solid var(--border);margin-bottom:12px;min-height:64px;">
+        <p style="color:var(--muted);text-align:center;padding:18px;margin:0;font-size:13px;">Selecciona un archivo para previsualizar los datos</p>
+      </div>
+      <div id="imp-status" style="font-size:13px;color:var(--muted);margin-bottom:13px;min-height:18px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-neon" style="flex:1;" id="imp-confirm-btn" onclick="confirmarImport()" disabled>&#x2705; Confirmar importaci&#243;n</button>
+        <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 18px;" onclick="closeModal('modal-importar')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="modal-registro" class="modal-overlay">
   <div style="background:white;border-radius:20px;max-width:640px;width:100%;padding:0;margin:auto;box-shadow:0 40px 80px rgba(0,0,0,.3);overflow:hidden;">
     <!-- Header -->
@@ -2615,7 +2646,7 @@ tr:hover td{background:var(--surface2);}
 
         <!-- TODOS LOS USUARIOS -->
         <div class="page-section" id="sec-sa-usuarios">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">&#x1F465; Todos los usuarios</div><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="cargarUsuarios()">&#x21BB; Actualizar</button></div>
+          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">&#x1F465; Todos los usuarios</div><div style="display:flex;gap:8px;"><button class="btn btn-sm" style="background:var(--g700);color:white;border:none;" onclick="abrirImportModal()">&#x1F4E5; Importar Excel</button><button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);" onclick="cargarUsuarios()">&#x21BB; Actualizar</button></div></div>
           <div class="card" style="margin-bottom:14px;padding:14px;">
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
               <input class="form-input" id="usuarios-search" style="flex:1;min-width:200px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" placeholder="Buscar por nombre, c&#233;dula..." oninput="filtrarUsuarios()">
@@ -2971,11 +3002,21 @@ function updateProfileForRole(role){
   setEl('dash-perfil-cc', cc);
   setEl('dash-perfil-nivel', m.nivel||'');
   setEl('dash-perfil-ingreso', ingreso);
-  setEl('dash-perfil-rol-badge', m.label||'');
+  // ── Título completo: cargo + alcance geográfico ──
+  const cargoShort = (p.cargo||'').replace('Coordinación ','Coord. ');
+  let geoScope = '';
+  if(role==='coord_municipal' && p.municipio) geoScope = p.municipio;
+  else if(role==='coord_departamental' && p.departamento) geoScope = p.departamento;
+  else if(role==='coord_nacional') geoScope = 'Nacional';
+  else if(role==='super_admin') geoScope = 'Nacional';
+  const cargoDisplay = cargoShort || m.label || role;
+  const fullTitle = geoScope ? cargoDisplay+' · '+geoScope : cargoDisplay;
+
+  setEl('dash-perfil-rol-badge', fullTitle);
 
   // ── Sidebar (todos los dashboards) ──
   document.querySelectorAll('.sb-nombre').forEach(el => el.textContent = nombreCompleto);
-  document.querySelectorAll('.sb-subloc').forEach(el => el.textContent = m.label||role);
+  document.querySelectorAll('.sb-subloc').forEach(el => el.textContent = fullTitle);
 
   // ── Sección "Mi Perfil" detallada ──
   setEl('p-nombre', nombreCompleto);
@@ -2985,7 +3026,7 @@ function updateProfileForRole(role){
   setEl('p-departamento', p.departamento || '—');
   setEl('p-municipio', p.municipio || '—');
   setEl('p-ingreso-date', ingreso);
-  setEl('p-rol-tag', m.label||'');
+  setEl('p-rol-tag', fullTitle);
   setEl('p-situacion', p.situacion || '—');
   setEl('p-carrera', p.carrera || '—');
   setEl('p-semestre', p.semestre || '—');
@@ -3076,7 +3117,7 @@ function closeSidebar(){
   if(ov) ov.classList.remove('open');
   document.body.style.overflow='';
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeSidebar(); ['modal-registro','modal-perfil-usuario'].forEach(id=>closeModal(id)); }});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeSidebar(); ['modal-registro','modal-perfil-usuario','modal-importar'].forEach(id=>closeModal(id)); }});
 
 /* ══════════════════ MAPS ══════════════════ */
 function volColor(v){
@@ -3788,7 +3829,7 @@ function renderUsuarios(lista){
     var est=EC[u.estado]||'tag-gray';
     return '<tr>'+
       '<td class="td-bold">'+nom+'</td>'+
-      '<td><span class="tag" style="font-size:11px;">'+(RL[u.rol]||u.rol||'—')+'</span></td>'+
+      '<td><span class="tag" style="font-size:11px;">'+(function(){var cs=(u.cargo||'').replace('Coordinación ','Coord. ');var geo=u.rol==='coord_municipal'?u.municipio:(u.rol==='coord_departamental'?u.departamento:(u.rol==='coord_nacional'?'Nacional':''));var base=cs||(RL[u.rol]||u.rol||'—');return geo?base+' · '+geo:base;})()+'</span></td>'+
       '<td>'+(u.departamento||'—')+'</td>'+
       '<td>'+(u.cedula||'—')+'</td>'+
       '<td>'+ing+'</td>'+
@@ -3890,6 +3931,318 @@ async function guardarUsuario(){
     if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
     showToast("Error: "+e.message);
     console.error("guardarUsuario:",e);
+  }
+}
+// =======================================================
+//  EXCEL IMPORTER  — mapeo de columnas → tabla perfiles
+// =======================================================
+
+var EXCEL_COL_MAP = {
+  "PRIMER NOMBRE":           "p_nombre",
+  "SEGUNDO NOMBRE":          "s_nombre",
+  "PRIMER APELLIDO":         "p_apellido",
+  "SEGUNDO APELLIDO":        "s_apellido",
+  "T.I. / C.C.":             "tipo_doc",
+  "T.I./C.C.":               "tipo_doc",
+  "# DOCUMENTO":             "cedula",
+  "DOCUMENTO":               "cedula",
+  "NUMERO DE DOCUMENTO":     "cedula",
+  "NUMERO DOCUMENTO":        "cedula",
+  "AÑO NACIMIENTO":          "anio_nacimiento",
+  "AÑO DE NACIMIENTO":       "anio_nacimiento",
+  "M/F":                     "genero_raw",
+  "GENERO":                  "genero_raw",
+  "GENERO":                  "genero_raw",
+  "SEXO":                    "genero_raw",
+  "NODO":                    "nodo_raw",
+  "ROL":                     "rol_raw",
+  "CARGO":                   "cargo_raw",
+  "TIPO COORDINACION":       "tipo_coord",
+  "TIPO DE COORDINACION":    "tipo_coord",
+  "DEPARTAMENTO":            "departamento",
+  "MUNICIPIO":               "municipio_raw",
+  "TELEFONO":                "telefono",
+  "CELULAR":                 "telefono",
+  "CORREO":                  "email",
+  "EMAIL":                   "email",
+  "CORREO ELECTRONICO":      "email",
+  "TIPO DE SANGRE":          "tipo_sangre",
+  "TIPO SANGRE":             "tipo_sangre",
+  "SANGRE":                  "tipo_sangre",
+  "EPS":                     "eps",
+  "DIRECCION":               "direccion",
+  "PROFESION":               "profesion",
+  "OCUPACION":               "ocupacion",
+  "FECHA INGRESO RNJA":      "fecha_ingreso_rnja",
+  "FECHA DE INGRESO":        "fecha_ingreso_rnja",
+  "CONTACTO EMERGENCIA":     "contacto_emergencia",
+  "CONTACTO DE EMERGENCIA":  "contacto_emergencia",
+  "INDIGENA":                "indigena",
+  "AFRODESCENDIENTE":        "afrocolombian",
+  "AFRO":                    "afrocolombian",
+  "AFROCOLOMBIANO":          "afrocolombian",
+  "DESPLAZADO":              "desplazado",
+  "DISCAPACIDAD":            "discapacidad",
+  "LGTBIQ":                  "lgtbiq",
+  "LGBTIQ":                  "lgtbiq",
+  "VICTIMA CONFLICTO":       "victima_conflicto",
+  "VICTIMA DEL CONFLICTO":   "victima_conflicto",
+  "ESTADO":                  "estado",
+  "NOTAS":                   "notas",
+  "OBSERVACIONES":           "notas"
+};
+
+function _normStr(s){
+  return String(s||"").trim().toUpperCase()
+    .replace(/[ÁÀÂÄ]/g,"A").replace(/[ÉÈÊË]/g,"E")
+    .replace(/[ÍÌÎÏ]/g,"I").replace(/[ÓÒÔÖ]/g,"O")
+    .replace(/[ÚÙÛÜ]/g,"U").replace(/[Ñ]/g,"N");
+}
+
+function detectNodoLevel(nodoRaw){
+  if(!nodoRaw) return {rol:"voluntario",nodo:"",departamento:null,municipio:null};
+  var n=nodoRaw.trim();
+  var nNorm=_normStr(n);
+  if(nNorm==="NACIONAL"||nNorm==="COLOMBIA")
+    return {rol:"coord_nacional",nodo:n,departamento:null,municipio:null};
+  var deptos=Object.keys(COL_DEPTOS);
+  for(var i=0;i<deptos.length;i++){
+    if(_normStr(deptos[i])===nNorm)
+      return {rol:"coord_departamental",nodo:n,departamento:deptos[i],municipio:null};
+  }
+  for(var d=0;d<deptos.length;d++){
+    var munis=COL_DEPTOS[deptos[d]];
+    for(var m=0;m<munis.length;m++){
+      if(_normStr(munis[m])===nNorm)
+        return {rol:"coord_municipal",nodo:n,departamento:deptos[d],municipio:munis[m]};
+    }
+  }
+  return {rol:"voluntario",nodo:n,departamento:null,municipio:null};
+}
+
+function parseRolCargo(rolRaw,tipoCoord,nodoResult){
+  var CARGO_MAP={
+    "GENERAL":        "Coordinacion General",
+    "TERRITORIAL":    "Coordinacion Territorial",
+    "TEMATICA":       "Coordinacion Tematica",
+    "INSTITUCIONAL":  "Coordinacion Institucional",
+    "COMUNICACIONES": "Coordinacion de Comunicaciones",
+    "COMUNICACION":   "Coordinacion de Comunicaciones"
+  };
+  var cargo="";
+  if(tipoCoord){
+    var tcN=_normStr(tipoCoord);
+    for(var k in CARGO_MAP){ if(tcN.indexOf(k)>=0){cargo=CARGO_MAP[k];break;} }
+    if(!cargo) cargo="Coordinacion "+tipoCoord.trim();
+  }
+  var r=String(rolRaw||"").trim();
+  var rN=_normStr(r);
+  if(rN.indexOf("COORDINACI")>=0){
+    if(!cargo){
+      for(var k2 in CARGO_MAP){ if(rN.indexOf(k2)>=0){cargo=CARGO_MAP[k2];break;} }
+      if(!cargo) cargo=r;
+    }
+    var lvl=(nodoResult.rol&&nodoResult.rol!=="voluntario")?nodoResult.rol:"coord_municipal";
+    return {rol:lvl,cargo:cargo};
+  }
+  if(rN==="MIEMBRO"||rN==="VOLUNTARIO"||rN==="")
+    return {rol:"voluntario",cargo:cargo};
+  if(rN.indexOf("ETICA")>=0||rN.indexOf("ETICO")>=0)
+    return {rol:"etica",cargo:cargo};
+  return {rol:nodoResult.rol||"voluntario",cargo:cargo||r};
+}
+
+function parseBoolXlsx(val){
+  if(val===true||val===1) return true;
+  if(!val) return false;
+  var v=_normStr(String(val));
+  return v==="SI"||v==="YES"||v==="TRUE"||v==="1"||v==="X"||v==="V";
+}
+
+function parseExcelRow(rowArr,headerArr){
+  var raw={};
+  headerArr.forEach(function(h,i){
+    var hN=_normStr(h);
+    for(var col in EXCEL_COL_MAP){
+      if(_normStr(col)===hN){
+        raw[EXCEL_COL_MAP[col]]=rowArr[i]!==null&&rowArr[i]!==undefined?String(rowArr[i]).trim():"";
+        break;
+      }
+    }
+  });
+  var nombres=[raw.p_nombre,raw.s_nombre].filter(function(x){return x&&x!="";}).join(" ").trim();
+  var apellidos=[raw.p_apellido,raw.s_apellido].filter(function(x){return x&&x!="";}).join(" ").trim();
+  var nodoResult=detectNodoLevel(raw.nodo_raw||"");
+  var rolCargo=parseRolCargo(raw.rol_raw||"",raw.tipo_coord||"",nodoResult);
+  var gN=_normStr(raw.genero_raw||"");
+  var genero=gN==="M"?"Masculino":gN==="F"?"Femenino":(raw.genero_raw||"");
+  var tD=_normStr(raw.tipo_doc||"C.C.");
+  var tipoDoc=(tD.indexOf("T.I")>=0||tD==="TI")?"T.I.":"C.C.";
+  var eN=_normStr(raw.estado||"");
+  var estado=eN==="INACTIVO"?"inactivo":eN==="SUSPENDIDO"?"suspendido":"activo";
+  var fechaIngreso=null;
+  if(raw.fecha_ingreso_rnja){
+    var fd=new Date(raw.fecha_ingreso_rnja);
+    if(!isNaN(fd.getTime())) fechaIngreso=fd.toISOString().split("T")[0];
+  }
+  var deptoFinal=raw.departamento||nodoResult.departamento||null;
+  var muniRaw=raw.municipio_raw||null;
+  var muniFinal=muniRaw||nodoResult.municipio||null;
+  return {
+    _email:              raw.email||"",
+    nombres:             nombres||null,
+    apellidos:           apellidos||null,
+    tipo_doc:            tipoDoc,
+    cedula:              raw.cedula||null,
+    anio_nacimiento:     raw.anio_nacimiento?parseInt(raw.anio_nacimiento)||null:null,
+    genero:              genero||null,
+    nodo:                nodoResult.nodo||raw.nodo_raw||null,
+    departamento:        deptoFinal,
+    municipio:           muniFinal,
+    rol:                 rolCargo.rol,
+    cargo:               rolCargo.cargo||null,
+    telefono:            raw.telefono||null,
+    tipo_sangre:         raw.tipo_sangre||null,
+    eps:                 raw.eps||null,
+    direccion:           raw.direccion||null,
+    profesion:           raw.profesion||null,
+    ocupacion:           raw.ocupacion||null,
+    fecha_ingreso_rnja:  fechaIngreso,
+    contacto_emergencia: raw.contacto_emergencia||null,
+    indigena:            parseBoolXlsx(raw.indigena),
+    afrocolombian:       parseBoolXlsx(raw.afrocolombian),
+    desplazado:          parseBoolXlsx(raw.desplazado),
+    discapacidad:        parseBoolXlsx(raw.discapacidad),
+    lgtbiq:              parseBoolXlsx(raw.lgtbiq),
+    victima_conflicto:   parseBoolXlsx(raw.victima_conflicto),
+    estado:              estado,
+    notas:               raw.notas||null
+  };
+}
+
+window._importRows=[];
+
+function abrirImportModal(){
+  var fi=document.getElementById("imp-file-input"); if(fi) fi.value="";
+  var pw=document.getElementById("imp-preview-wrap");
+  if(pw) pw.innerHTML='<p style="color:var(--muted);text-align:center;padding:18px;margin:0;font-size:13px;">Selecciona un archivo para previsualizar los datos</p>';
+  var cb=document.getElementById("imp-confirm-btn");
+  if(cb){cb.disabled=true;cb.textContent="Confirmar importacion";}
+  var st=document.getElementById("imp-status"); if(st) st.textContent="";
+  window._importRows=[];
+  openModal("modal-importar");
+}
+
+function leerArchivoImport(input){
+  var file=input.files[0]; if(!file) return;
+  var st=document.getElementById("imp-status"); if(st) st.textContent="Leyendo archivo...";
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      if(typeof XLSX==="undefined"){
+        if(st) st.textContent="Error: libreria XLSX no disponible. Recarga la pagina.";
+        return;
+      }
+      var wb=XLSX.read(e.target.result,{type:"array",cellDates:true});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",blankrows:false});
+      if(!rows||rows.length<2){
+        if(st) st.textContent="El archivo no tiene filas de datos suficientes.";
+        return;
+      }
+      var headers=rows[0];
+      var parsed=[];
+      for(var i=1;i<rows.length;i++){
+        var row=rows[i];
+        var hasData=row.some(function(c){return c!==""&&c!==null&&c!==undefined;});
+        if(!hasData) continue;
+        parsed.push(parseExcelRow(row,headers));
+      }
+      window._importRows=parsed;
+      mostrarPreviaImport(parsed);
+      if(st) st.textContent=parsed.length+" registros leidos. Revisa la vista previa y confirma.";
+      var cb=document.getElementById("imp-confirm-btn");
+      if(cb) cb.disabled=parsed.length===0;
+    }catch(err){
+      if(st) st.textContent="Error al leer archivo: "+err.message;
+      console.error("Import parse error:",err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function mostrarPreviaImport(rows){
+  var wrap=document.getElementById("imp-preview-wrap");
+  if(!rows||rows.length===0){
+    wrap.innerHTML='<p style="color:var(--muted);text-align:center;padding:18px;margin:0;font-size:13px;">Sin registros para mostrar.</p>';
+    return;
+  }
+  var cols=["nombres","apellidos","cedula","tipo_doc","rol","cargo","departamento","municipio","estado"];
+  var lbs={nombres:"Nombres",apellidos:"Apellidos",cedula:"Cedula",tipo_doc:"Doc",rol:"Rol",cargo:"Cargo",departamento:"Dpto",municipio:"Municipio",estado:"Estado"};
+  var html='<div style="overflow:auto;max-height:260px;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  html+="<thead><tr>";
+  cols.forEach(function(c){html+='<th style="background:var(--surface2);color:var(--muted);padding:6px 9px;text-align:left;position:sticky;top:0;white-space:nowrap;border-bottom:1px solid var(--border);">'+lbs[c]+"</th>";});
+  html+="</tr></thead><tbody>";
+  rows.forEach(function(r){
+    html+='<tr style="border-bottom:1px solid var(--border);">';
+    cols.forEach(function(c){
+      var v=r[c];
+      var disp=v===true?"si":v===false?"":v===null?"":String(v);
+      html+='<td style="padding:5px 9px;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;" title="'+disp+'">'+disp+"</td>";
+    });
+    html+="</tr>";
+  });
+  html+="</tbody></table></div>";
+  wrap.innerHTML=html;
+}
+
+async function confirmarImport(){
+  var rows=window._importRows||[];
+  if(!rows.length) return;
+  var btn=document.getElementById("imp-confirm-btn");
+  var st=document.getElementById("imp-status");
+  if(btn){btn.disabled=true;btn.textContent="Importando...";}
+  try{
+    var sess=await window.supabase.auth.getSession();
+    var token=sess.data?.session?.access_token||"";
+    var profiles=rows.map(function(r){
+      var p=Object.assign({},r);
+      delete p._email;
+      Object.keys(p).forEach(function(k){if(p[k]===null||p[k]==="")delete p[k];});
+      return p;
+    });
+    var BATCH=50;
+    var errors=[];
+    var total=0;
+    for(var i=0;i<profiles.length;i+=BATCH){
+      var batch=profiles.slice(i,i+BATCH);
+      var resp=await fetch(
+        window._SB_URL+"/rest/v1/perfiles",
+        {method:"POST",
+         headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token,
+                  "Content-Type":"application/json",
+                  "Prefer":"resolution=merge-duplicates,return=minimal"},
+         body:JSON.stringify(batch)}
+      );
+      if(!resp.ok){
+        var et=await resp.text();
+        errors.push("Lote "+(Math.floor(i/BATCH)+1)+": "+et.substring(0,120));
+      } else {
+        total+=batch.length;
+      }
+    }
+    if(errors.length){
+      if(st) st.textContent="Parcialmente importado. Errores: "+errors.join(" | ");
+      if(btn){btn.disabled=false;btn.textContent="Confirmar importacion";}
+    } else {
+      closeModal("modal-importar");
+      showToast("Importados "+total+" registros correctamente");
+      cargarUsuarios();
+    }
+  }catch(err){
+    if(st) st.textContent="Error: "+err.message;
+    console.error("confirmarImport error:",err);
+    if(btn){btn.disabled=false;btn.textContent="Confirmar importacion";}
   }
 }
 </script>
