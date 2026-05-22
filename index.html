@@ -2156,6 +2156,7 @@ tr:hover td{background:var(--surface2);}
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">G&#233;nero</label><select class="form-input form-select" id="mu-genero" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Sin especificar &#x2014;</option><option value="M">M &#x2014; Masculino</option><option value="F">F &#x2014; Femenino</option><option value="Otro">Otro</option></select></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tel&#233;fono</label><input class="form-input" id="mu-telefono" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Tel&#233;fono"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Email</label><input class="form-input" id="mu-email" type="email" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Nuevo email (vac&#237;o = sin cambio)"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Nueva contrase&#241;a <span style="font-weight:400;color:var(--muted);">(vac&#237;o = sin cambio)</span></label><input class="form-input" id="mu-password" type="password" autocomplete="new-password" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="M&#237;n. 8 caracteres"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tipo sangre</label><select class="form-input form-select" id="mu-tipo-sangre" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014;</option><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">EPS</label><input class="form-input" id="mu-eps" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="EPS o aseguradora"></div>
         <div style="grid-column:1/-1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Direcci&#243;n</label><input class="form-input" id="mu-direccion" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Direcci&#243;n de residencia"></div>
@@ -3931,6 +3932,7 @@ async function guardarUsuario(){
   var g=function(elId){var el=document.getElementById(elId);if(!el)return null;var v=(el.value||"").trim();return v||null;};
   var cb=function(elId){var el=document.getElementById(elId);return el?el.checked:false;};
   var newEmail=(document.getElementById("mu-email")?.value||"").trim();
+  var newPassword=(document.getElementById("mu-password")?.value||"").trim();
   var payload={
     nombres:g("mu-nombres"), apellidos:g("mu-apellidos"),
     tipo_doc:g("mu-tipo-doc")||"C.C.", cedula:g("mu-cedula"),
@@ -3961,22 +3963,36 @@ async function guardarUsuario(){
       if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
       showToast("Error al guardar perfil ("+resp.status+")");return;
     }
-    if(newEmail&&newEmail.includes("@")){
+    if((newEmail&&newEmail.includes("@"))||( newPassword&&newPassword.length>=8)){
+      if(newPassword&&newPassword.length>0&&newPassword.length<8){
+        if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
+        showToast("La contraseña debe tener mínimo 8 caracteres");return;
+      }
+      var authBody={user_id:id};
+      if(newEmail&&newEmail.includes("@")) authBody.email=newEmail;
+      if(newPassword&&newPassword.length>=8) authBody.password=newPassword;
       var re=await fetch(window._SB_URL+"/functions/v1/actualizar-email",
         {method:"POST",headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json"},
-         body:JSON.stringify({user_id:id,email:newEmail})});
+         body:JSON.stringify(authBody)});
       var rj=await re.json();
       if(!re.ok||rj.error){
         if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
-        showToast("Perfil guardado. Error email: "+(rj.error||re.status));
+        showToast("Perfil guardado. Error credenciales: "+(rj.error||re.status));
         filtrarUsuarios();return;
       }
     }
     if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
     var idx=(window._usuariosData||[]).findIndex(function(x){return x.id===id;});
     if(idx>=0)Object.assign(window._usuariosData[idx],payload);
+    // Limpiar campos sensibles
+    var pe=document.getElementById("mu-password"); if(pe) pe.value="";
+    var em=document.getElementById("mu-email"); if(em) em.value="";
     closeModal("modal-perfil-usuario");
-    showToast(newEmail&&newEmail.includes("@")?"✅ Perfil y email actualizados":"✅ Perfil actualizado");
+    var msg="✅ Perfil actualizado";
+    if(newEmail&&newEmail.includes("@")&&newPassword) msg="✅ Perfil, email y contraseña actualizados";
+    else if(newEmail&&newEmail.includes("@")) msg="✅ Perfil y email actualizados";
+    else if(newPassword) msg="✅ Perfil y contraseña actualizados";
+    showToast(msg);
     filtrarUsuarios();
   }catch(e){
     if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
@@ -4357,10 +4373,6 @@ async function cargarHistorialPerfil(perfilId){
     console.error("cargarHistorialPerfil:",e);
   }
 }
-</script>
-
-<!-- ══════════════════════════════════════════
-  SUPABASE — Inicialización (script independiente)
 function toggleFormHistorial(){
   var fw=document.getElementById("historial-form-wrap");
   if(!fw) return;
@@ -4439,6 +4451,88 @@ async function eliminarHistorial(histId, perfilId){
     cargarHistorialPerfil(perfilId);
   }catch(e){showToast("Error: "+e.message);}
 }
+</script>
+
+<!-- ══════════════════════════════════════════
+  SUPABASE — Inicialización (script independiente)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   Se ejecuta al final del body para garantizar que:
   1. El CDN ya cargó (está en <head> como blocking script)
   2. Las funciones del juego principal ya están definidas

@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════
 //  RNJA NEXUS — Edge Function: actualizar-email
 //  Permite que un super_admin o coord_nacional
-//  cambie el correo de cualquier usuario.
+//  cambie el email y/o contraseña de cualquier usuario.
 //
 //  Deploy: supabase functions deploy actualizar-email
 // ══════════════════════════════════════════════════
@@ -49,22 +49,31 @@ Deno.serve(async (req) => {
     }
 
     // Leer cuerpo
-    const { user_id, email } = await req.json()
+    const { user_id, email, password } = await req.json()
     if (!user_id) throw new Error('Falta user_id')
-    if (!email || !email.includes('@')) throw new Error('Email inválido')
+    if (!email && !password) throw new Error('Debes indicar email o password a cambiar')
+    if (email && !email.includes('@')) throw new Error('Email inválido')
+    if (password && password.length < 8) throw new Error('La contraseña debe tener al menos 8 caracteres')
 
-    // No permitir que un admin cambie su propio email por esta ruta
-    // (puede hacerlo desde su perfil normalmente)
-    // Actualizar email en Supabase Auth
+    // Construir payload de actualización
+    const updatePayload: { email?: string; password?: string } = {}
+    if (email) updatePayload.email = email
+    if (password) updatePayload.password = password
+
     const { data: updated, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       user_id,
-      { email }
+      updatePayload
     )
 
-    if (updateError) throw new Error(`Error actualizando email: ${updateError.message}`)
+    if (updateError) throw new Error(`Error actualizando credenciales: ${updateError.message}`)
 
     return new Response(
-      JSON.stringify({ success: true, email: updated.user.email }),
+      JSON.stringify({
+        success: true,
+        email_updated: !!email,
+        password_updated: !!password,
+        email: updated.user.email,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
