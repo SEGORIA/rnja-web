@@ -1734,12 +1734,19 @@ tr:hover td{background:var(--surface2);}
               <div class="card-title mb-4">Nuevo certificado</div>
               <div style="display:flex;flex-direction:column;gap:10px;">
                 <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Voluntario</label>
-                  <select id="cert-dep-perfil" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;"><option value="">— Selecciona —</option></select></div>
+                  <div style="position:relative;">
+                    <input type="text" id="cert-dep-perfil-search" class="form-input" autocomplete="off" placeholder="Buscar por nombre, apellido o c&#233;dula..." oninput="buscarPerfilCert('dep')" onblur="hideCertPerfilList('dep')" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                    <input type="hidden" id="cert-dep-perfil">
+                    <div id="cert-dep-perfil-list" style="display:none;position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);z-index:300;max-height:200px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,.2);"></div>
+                  </div></div>
                 <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Tipo</label>
                   <select id="cert-dep-tipo" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
                     <option value="participacion">Participaci&#243;n en actividad</option>
-                    <option value="voluntariado">Voluntariado general</option>
+                    <option value="pertenencia">Pertenencia a la Red</option>
+                    <option value="trayectoria">Trayectoria y servicio</option>
+                    <option value="reconocimiento">Reconocimiento y m&#233;rito</option>
                     <option value="coordinacion">Rol de coordinaci&#243;n</option>
+                    <option value="formacion">Formaci&#243;n y capacitaci&#243;n</option>
                   </select></div>
                 <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">T&#237;tulo / Actividad</label>
                   <input type="text" id="cert-dep-titulo" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Jornada de Reforestaci&#243;n"></div>
@@ -2743,12 +2750,19 @@ tr:hover td{background:var(--surface2);}
             <div class="card-title mb-4">Nuevo certificado</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Voluntario</label>
-                <select id="cert-sa-perfil" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;"><option value="">— Selecciona usuario —</option></select></div>
+                <div style="position:relative;">
+                  <input type="text" id="cert-sa-perfil-search" class="form-input" autocomplete="off" placeholder="Buscar por nombre, apellido o c&#233;dula..." oninput="buscarPerfilCert('sa')" onblur="hideCertPerfilList('sa')" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <input type="hidden" id="cert-sa-perfil">
+                  <div id="cert-sa-perfil-list" style="display:none;position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);z-index:300;max-height:200px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,.2);"></div>
+                </div></div>
               <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Tipo</label>
                 <select id="cert-sa-tipo" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
                   <option value="participacion">Participaci&#243;n en actividad</option>
-                  <option value="voluntariado">Voluntariado general</option>
+                  <option value="pertenencia">Pertenencia a la Red</option>
+                  <option value="trayectoria">Trayectoria y servicio</option>
+                  <option value="reconocimiento">Reconocimiento y m&#233;rito</option>
                   <option value="coordinacion">Rol de coordinaci&#243;n</option>
+                  <option value="formacion">Formaci&#243;n y capacitaci&#243;n</option>
                 </select></div>
               <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Horas</label>
                 <input type="number" id="cert-sa-horas" class="form-input" min="1" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: 8"></div>
@@ -2771,8 +2785,11 @@ tr:hover td{background:var(--surface2);}
               <select class="form-input form-select" id="cert-sa-filter-tipo" style="width:180px;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 14px;" onchange="filtrarCertificadosAdmin()">
                 <option value="">Todos los tipos</option>
                 <option value="participacion">Participaci&#243;n</option>
-                <option value="voluntariado">Voluntariado</option>
+                <option value="pertenencia">Pertenencia</option>
+                <option value="trayectoria">Trayectoria</option>
+                <option value="reconocimiento">Reconocimiento</option>
                 <option value="coordinacion">Coordinaci&#243;n</option>
+                <option value="formacion">Formaci&#243;n</option>
               </select>
             </div>
           </div>
@@ -3354,13 +3371,31 @@ function downloadCert(evento,fecha,codigo,horas,esGeneral,perfilOverride){
   const p=perfilOverride||window.currentProfile||{};
   const name=[p.nombres,p.apellidos].filter(Boolean).join(' ')||'Usuario';
   const cc=p.cedula||'—';
+  const _tipo = window._certTipo || (esGeneral ? 'voluntariado' : 'participacion');
+  window._certTipo = null;
+  const _tipoTitulos = {
+    participacion:'CERTIFICADO DE PARTICIPACIÓN',
+    pertenencia:'CERTIFICADO DE MEMBRESÍA',
+    trayectoria:'CERTIFICADO DE TRAYECTORIA',
+    reconocimiento:'CERTIFICADO DE RECONOCIMIENTO',
+    coordinacion:'CERTIFICADO DE COORDINACIÓN',
+    formacion:'CERTIFICADO DE FORMACIÓN',
+    voluntariado:'CERTIFICADO DE VOLUNTARIADO'
+  };
+  const _tipoCuerpos = {
+    participacion:`Participó en la actividad<br><strong>"${evento}"</strong><br>Realizada el ${fecha}<br>Duración: <strong>${horas} horas</strong>`,
+    pertenencia:`Es miembro activo/a de la <strong>Red Nacional Jóvenes de Ambiente — RNJA</strong><br>Nodo: <strong>${evento}</strong><br>Período: <strong>${fecha}</strong>`,
+    trayectoria:`Por su destacada trayectoria y servicio en la <strong>RNJA</strong><br>Período activo: <strong>${fecha}</strong><br>Horas acumuladas de voluntariado: <strong>${horas}</strong>`,
+    reconocimiento:`Por su destacado compromiso y liderazgo ambiental<br>Reconocimiento: <strong>"${evento}"</strong><br>Fecha: <strong>${fecha}</strong>`,
+    coordinacion:`Por su desempeño como coordinador/a en la <strong>RNJA</strong><br>Rol / Actividad: <strong>${evento}</strong><br>Período: <strong>${fecha}</strong>`,
+    formacion:`Completó satisfactoriamente la formación<br><strong>"${evento}"</strong><br>Realizada el ${fecha}<br>Duración: <strong>${horas} horas</strong>`,
+    voluntariado:`Participó en el <strong>Programa de Voluntariado Ambiental RNJA</strong><br>Período: <strong>${fecha}</strong><br>Total: <strong>${horas} horas</strong> · Nivel: <strong>🌿 Brote</strong>`
+  };
   document.getElementById('cert-name').textContent=name;
   document.getElementById('cert-cc').textContent='C.C. '+cc;
-  document.getElementById('cert-titulo-modal').textContent=esGeneral?'CERTIFICADO DE VOLUNTARIADO':'CERTIFICADO DE PARTICIPACIÓN';
+  document.getElementById('cert-titulo-modal').textContent=_tipoTitulos[_tipo]||'CERTIFICADO DE PARTICIPACIÓN';
   document.getElementById('cert-intro-modal').textContent='Se certifica que';
-  document.getElementById('cert-body').innerHTML=esGeneral
-    ?`Participó en el <strong>Programa de Voluntariado Ambiental RNJA</strong><br>Período: <strong>${fecha}</strong><br>Total: <strong>${horas} horas</strong> · Nivel: <strong>🌿 Brote</strong>`
-    :`Participó en la actividad<br><strong>"${evento}"</strong><br>Realizada el ${fecha}<br>Duración: <strong>${horas} horas</strong>`;
+  document.getElementById('cert-body').innerHTML=_tipoCuerpos[_tipo]||_tipoCuerpos.participacion;
   document.getElementById('cert-cierre-modal').textContent='Gracias por tu compromiso con el ambiente.';
   document.getElementById('cert-firmante-modal').textContent='Coordinación Nacional RNJA';
   document.getElementById('cert-code').textContent='Código: '+codigo;
@@ -4824,20 +4859,11 @@ function toggleEmitirForm(scope) {
   var showing = form.style.display !== 'none';
   form.style.display = showing ? 'none' : 'block';
   if (!showing) {
-    // Poblar selector de usuario
-    var sel = document.getElementById('cert-' + scope + '-perfil');
-    if (sel) {
-      sel.innerHTML = '<option value="">— Selecciona usuario —</option>';
-      var lista = (window._usuariosData || []).slice().sort(function(a, b) {
-        return ((a.nombres||'')+(a.apellidos||'')).localeCompare((b.nombres||'')+(b.apellidos||''));
-      });
-      lista.forEach(function(u) {
-        var opt = document.createElement('option');
-        opt.value = u.id;
-        opt.textContent = [(u.nombres||''),(u.apellidos||'')].filter(Boolean).join(' ') + (u.cedula ? ' · '+u.cedula : '');
-        sel.appendChild(opt);
-      });
-    }
+    // Limpiar búsqueda anterior
+    var searchEl = document.getElementById('cert-' + scope + '-perfil-search');
+    if (searchEl) searchEl.value = '';
+    var hiddenEl = document.getElementById('cert-' + scope + '-perfil');
+    if (hiddenEl) hiddenEl.value = '';
     // Fecha por defecto: hoy
     var fechaEl = document.getElementById('cert-' + scope + '-fecha');
     if (fechaEl && !fechaEl.value) fechaEl.value = new Date().toISOString().slice(0, 10);
@@ -4846,24 +4872,8 @@ function toggleEmitirForm(scope) {
 
 // ── Inicializar formulario DEP al entrar a la sección ──
 async function cargarCertDepForm() {
-  // Asegurar que _usuariosData esté cargado
+  // Asegurar que _usuariosData esté cargado (necesario para la búsqueda)
   if (!window._usuariosData || window._usuariosData.length === 0) await cargarUsuarios();
-  var sel = document.getElementById('cert-dep-perfil');
-  if (sel) {
-    var deptActual = (window.currentProfile || {}).departamento;
-    sel.innerHTML = '<option value="">— Selecciona —</option>';
-    var lista = (window._usuariosData || []).filter(function(u) {
-      return !deptActual || u.departamento === deptActual;
-    }).sort(function(a, b) {
-      return ((a.nombres||'')+(a.apellidos||'')).localeCompare((b.nombres||'')+(b.apellidos||''));
-    });
-    lista.forEach(function(u) {
-      var opt = document.createElement('option');
-      opt.value = u.id;
-      opt.textContent = [(u.nombres||''),(u.apellidos||'')].filter(Boolean).join(' ') + (u.cedula ? ' · '+u.cedula : '');
-      sel.appendChild(opt);
-    });
-  }
   var fechaEl = document.getElementById('cert-dep-fecha');
   if (fechaEl && !fechaEl.value) fechaEl.value = new Date().toISOString().slice(0, 10);
   cargarCertDepRecientes();
@@ -4938,7 +4948,7 @@ async function cargarMisCertificados() {
       list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">No tienes certificados todavía 🌱</div>';
       return;
     }
-    var tipoL = { participacion:'Participación', voluntariado:'Voluntariado', coordinacion:'Coordinación' };
+    var tipoL = { participacion:'Participación', pertenencia:'Pertenencia', trayectoria:'Trayectoria', reconocimiento:'Reconocimiento', coordinacion:'Coordinación', formacion:'Formación', voluntariado:'Voluntariado' };
     list.innerHTML = certs.map(function(c) {
       var fecha = c.fecha_actividad ? new Date(c.fecha_actividad+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—';
       var tit = (c.titulo||'—').replace(/'/g,'&#39;');
@@ -4999,8 +5009,8 @@ function renderCertificadosAdmin(list) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Sin certificados registrados</td></tr>';
     return;
   }
-  var tipoL = { participacion:'Participación', voluntariado:'Voluntariado', coordinacion:'Coordinación' };
-  var tipoTag = { participacion:'tag-amber', voluntariado:'tag-green', coordinacion:'tag-blue' };
+  var tipoL = { participacion:'Participación', pertenencia:'Pertenencia', trayectoria:'Trayectoria', reconocimiento:'Reconocimiento', coordinacion:'Coordinación', formacion:'Formación', voluntariado:'Voluntariado' };
+  var tipoTag = { participacion:'tag-amber', pertenencia:'tag-green', trayectoria:'tag-blue', reconocimiento:'tag-amber', coordinacion:'tag-blue', formacion:'tag-gray', voluntariado:'tag-green' };
   tbody.innerHTML = list.map(function(c) {
     var nom = c.perfil ? [(c.perfil.nombres||''),(c.perfil.apellidos||'')].filter(Boolean).join(' ') : '—';
     var fecha = c.fecha_actividad ? new Date(c.fecha_actividad+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—';
@@ -5079,6 +5089,7 @@ async function emitirCertificado(scope) {
     // Descargar — buscar datos del destinatario
     var recipiente = (window._usuariosData || []).find(function(u) { return u.id === perfilId; }) || {};
     var fechaLabel = fecha ? new Date(fecha+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+    window._certTipo = tipo; // tipo-specific text in downloadCert
     downloadCert(titulo, fechaLabel, nuevo.codigo || '', horas ? String(horas) : '—', false, recipiente);
 
     // Actualizar vistas
@@ -5094,6 +5105,54 @@ async function emitirCertificado(scope) {
     console.error('emitirCertificado:', e);
     if (btn) { btn.textContent = scope === 'sa' ? '📜 Emitir y descargar certificado' : '📜 Emitir y descargar'; btn.disabled = false; }
   }
+}
+
+// ── Autocomplete de voluntario en formularios de certificados ──
+function buscarPerfilCert(scope) {
+  var q = (document.getElementById('cert-'+scope+'-perfil-search')?.value || '').trim().toLowerCase();
+  var list = document.getElementById('cert-'+scope+'-perfil-list');
+  var hiddenId = document.getElementById('cert-'+scope+'-perfil');
+  if (!list) return;
+  // Limpiar id si el usuario está escribiendo de nuevo
+  if (hiddenId) hiddenId.value = '';
+  if (q.length < 2) { list.style.display = 'none'; return; }
+  var deptFiltro = scope === 'dep' ? (window.currentProfile || {}).departamento : null;
+  var matches = (window._usuariosData || []).filter(function(u) {
+    if (deptFiltro && u.departamento !== deptFiltro) return false;
+    var nom = [(u.nombres||''),(u.apellidos||'')].filter(Boolean).join(' ').toLowerCase();
+    var ced = (u.cedula || '').toLowerCase();
+    return nom.includes(q) || ced.includes(q);
+  }).slice(0, 12);
+  if (matches.length === 0) { list.style.display = 'none'; return; }
+  list.innerHTML = matches.map(function(u) {
+    var nom = [(u.nombres||''),(u.apellidos||'')].filter(Boolean).join(' ');
+    var nomEsc = nom.replace(/'/g,'&#39;');
+    var idEsc = (u.id||'').replace(/'/g,'&#39;');
+    return '<div style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;transition:background .15s;" ' +
+      'onmousedown="seleccionarPerfilCert(\''+scope+'\',\''+idEsc+'\',\''+nomEsc+'\')" ' +
+      'onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'\'">' +
+      '<span style="font-weight:600;color:var(--ink);">'+nom+'</span>' +
+      (u.cedula ? '<span style="color:var(--muted);font-size:11px;margin-left:8px;">CC '+u.cedula+'</span>' : '') +
+      (u.municipio ? '<span style="color:var(--muted);font-size:11px;margin-left:8px;">· '+u.municipio+'</span>' : '') +
+      '</div>';
+  }).join('');
+  list.style.display = 'block';
+}
+
+function seleccionarPerfilCert(scope, id, nombre) {
+  var searchEl = document.getElementById('cert-'+scope+'-perfil-search');
+  var hiddenEl = document.getElementById('cert-'+scope+'-perfil');
+  var listEl   = document.getElementById('cert-'+scope+'-perfil-list');
+  if (searchEl) searchEl.value = nombre;
+  if (hiddenEl) hiddenEl.value = id;
+  if (listEl)   listEl.style.display = 'none';
+}
+
+function hideCertPerfilList(scope) {
+  setTimeout(function() {
+    var listEl = document.getElementById('cert-'+scope+'-perfil-list');
+    if (listEl) listEl.style.display = 'none';
+  }, 200);
 }
 </script></body>
 </html>
