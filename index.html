@@ -4206,14 +4206,14 @@ async function confirmarImport(){
     var sess=await window.supabase.auth.getSession();
     var token=sess.data?.session?.access_token||"";
     // PostgREST PGRST102: todos los objetos deben tener exactamente las mismas claves.
-    // Definimos el set fijo de campos y usamos null para los vacíos.
+    // id se genera en el cliente para no depender del DEFAULT de la DB.
     var PERFILES_FIELDS=["nombres","apellidos","tipo_doc","cedula","anio_nacimiento","genero",
       "nodo","departamento","municipio","rol","cargo","telefono","tipo_sangre","eps",
       "direccion","profesion","ocupacion","fecha_ingreso_rnja","contacto_emergencia",
       "indigena","afrocolombian","desplazado","discapacidad","lgtbiq","victima_conflicto",
       "estado","notas"];
     var profiles=rows.map(function(r){
-      var p={};
+      var p={id:(crypto.randomUUID?crypto.randomUUID():([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,function(c){return(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16);}))};
       PERFILES_FIELDS.forEach(function(k){
         var v=r[k];
         p[k]=(v===undefined||v==="")?null:v;
