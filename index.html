@@ -2134,37 +2134,70 @@ tr:hover td{background:var(--surface2);}
 ════════════════════════════════════════ -->
 <!-- MODAL: Perfil de Usuario (Admin) -->
 <div id="modal-perfil-usuario" class="modal-overlay">
-  <div style="background:var(--surface);border-radius:20px;max-width:600px;width:100%;padding:0;margin:auto;box-shadow:0 40px 80px rgba(0,0,0,.5);overflow:hidden;border:1px solid var(--border);">
+  <div style="background:var(--surface);border-radius:20px;max-width:660px;width:100%;padding:0;margin:auto;box-shadow:0 40px 80px rgba(0,0,0,.5);overflow:hidden;border:1px solid var(--border);">
     <div style="background:linear-gradient(135deg,var(--g800),var(--g700));padding:22px 28px;position:relative;">
       <button onclick="closeModal('modal-perfil-usuario')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;color:white;font-size:15px;cursor:pointer;">&#x2715;</button>
       <div style="font-family:Montserrat,sans-serif;font-size:17px;font-weight:700;color:white;">&#x1F464; Editar perfil de usuario</div>
       <div id="mu-nombre-header" style="color:rgba(255,255,255,.65);font-size:13px;margin-top:4px;">&#x2014;</div>
     </div>
-    <div style="padding:22px 28px;display:flex;flex-direction:column;gap:0;max-height:72vh;overflow-y:auto;">
+    <div style="padding:22px 28px;display:flex;flex-direction:column;gap:0;max-height:75vh;overflow-y:auto;">
       <input type="hidden" id="mu-id">
+
+      <!-- ── Datos personales ── -->
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Datos personales</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Nombres</label><input class="form-input" id="mu-nombres" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Nombres"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Apellidos</label><input class="form-input" id="mu-apellidos" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Apellidos"></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">C&#233;dula</label><input class="form-input" id="mu-cedula" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="N&#250;mero de c&#233;dula"></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Fecha de nacimiento</label><input class="form-input" id="mu-fecha-nac" type="date" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tipo doc.</label><select class="form-input form-select" id="mu-tipo-doc" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="C.C.">C.C. &#x2014; C&#233;dula ciudadan&#237;a</option><option value="T.I.">T.I. &#x2014; Tarjeta identidad</option><option value="CE">C.E. &#x2014; C&#233;dula extranjer&#237;a</option><option value="PA">Pasaporte</option></select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;"># Documento</label><input class="form-input" id="mu-cedula" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="N&#250;mero de documento"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">A&#241;o de nacimiento</label><input class="form-input" id="mu-anio-nac" type="number" min="1960" max="2015" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Ej: 2001"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">G&#233;nero</label><select class="form-input form-select" id="mu-genero" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Sin especificar &#x2014;</option><option value="M">M &#x2014; Masculino</option><option value="F">F &#x2014; Femenino</option><option value="Otro">Otro</option></select></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tel&#233;fono</label><input class="form-input" id="mu-telefono" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Tel&#233;fono"></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Email</label><input class="form-input" id="mu-email" type="email" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Nuevo email (vac&#237;o = sin cambio)"></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">G&#233;nero</label><select class="form-input form-select" id="mu-genero" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Sin especificar &#x2014;</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option><option value="No binario">No binario</option><option value="Prefiero no decir">Prefiero no decir</option></select></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Grupo &#233;tnico</label><input class="form-input" id="mu-grupo-etnico" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Ej: Afrocolombiano, Ind&#237;gena..."></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Tipo sangre</label><select class="form-input form-select" id="mu-tipo-sangre" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014;</option><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">EPS</label><input class="form-input" id="mu-eps" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="EPS o aseguradora"></div>
+        <div style="grid-column:1/-1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Direcci&#243;n</label><input class="form-input" id="mu-direccion" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Direcci&#243;n de residencia"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Profesi&#243;n</label><input class="form-input" id="mu-profesion" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="T&#237;tulo o profesi&#243;n"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Ocupaci&#243;n</label><input class="form-input" id="mu-ocupacion" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Ocupaci&#243;n actual"></div>
       </div>
+
+      <!-- ── Ubicación ── -->
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Ubicaci&#243;n</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Departamento</label><select class="form-input form-select" id="mu-departamento" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" onchange="poblarMunicipios(this.value,true)"><option value="">&#x2014; Selecciona departamento &#x2014;</option></select></div>
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Municipio</label><select class="form-input form-select" id="mu-municipio" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Selecciona municipio &#x2014;</option></select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Departamento</label><select class="form-input form-select" id="mu-departamento" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" onchange="poblarMunicipios(this.value,true)"><option value="">&#x2014; Selecciona &#x2014;</option></select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Municipio</label><select class="form-input form-select" id="mu-municipio" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Selecciona &#x2014;</option></select></div>
       </div>
+
+      <!-- ── Organización RNJA ── -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Organizaci&#243;n RNJA</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Nodo</label><input class="form-input" id="mu-nodo" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Nombre del nodo"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Cargo</label><select class="form-input form-select" id="mu-cargo" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="">&#x2014; Sin cargo espec&#237;fico &#x2014;</option><option value="Coordinacion General">Coordinaci&#243;n General</option><option value="Coordinacion Territorial">Coordinaci&#243;n Territorial</option><option value="Coordinacion Tematica">Coordinaci&#243;n Tem&#225;tica</option><option value="Coordinacion Institucional">Coordinaci&#243;n Institucional</option><option value="Coordinacion Comunicaciones">Coordinaci&#243;n Comunicaciones</option></select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Fecha ingreso RNJA</label><input class="form-input" id="mu-fecha-ingreso" type="date" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Contacto emergencia</label><input class="form-input" id="mu-contacto-emerg" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;" placeholder="Nombre y tel&#233;fono"></div>
+      </div>
+
+      <!-- ── Rol y estado ── -->
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Rol y estado</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Rol</label><select id="mu-rol" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="voluntario">Voluntario</option><option value="coord_municipal">Coord. Municipal</option><option value="coord_departamental">Coord. Departamental</option><option value="coord_nacional">Coord. Nacional</option><option value="etica">Comit&#233; &#201;tica</option><option value="super_admin">Super Admin</option></select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Rol</label><select id="mu-rol" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="voluntario">Voluntario / Miembro</option><option value="coord_municipal">Coord. Municipal</option><option value="coord_departamental">Coord. Departamental</option><option value="coord_nacional">Coord. Nacional</option><option value="etica">Comit&#233; &#201;tica</option><option value="super_admin">Super Admin</option></select></div>
         <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Estado</label><select id="mu-estado" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;"><option value="activo">Activo</option><option value="inactivo">Inactivo</option><option value="suspendido">Suspendido</option></select></div>
-        <div style="grid-column:1/-1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Notas internas</label><textarea class="form-input" id="mu-notas" rows="3" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;resize:vertical;" placeholder="Notas sobre este usuario (solo visible para admins)..."></textarea></div>
+        <div style="grid-column:1/-1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Notas internas</label><textarea class="form-input" id="mu-notas" rows="2" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:8px 12px;font-size:14px;resize:vertical;" placeholder="Notas sobre este usuario (solo visible para admins)..."></textarea></div>
       </div>
-      <div style="font-size:12px;color:var(--muted);padding:8px 0 12px;border-top:1px solid var(--border);">&#x1F4C5; Ingreso: <strong id="mu-ingreso" style="color:var(--ink);">&#x2014;</strong></div>
+
+      <!-- ── Grupo poblacional ── -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Grupo poblacional</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;"><input type="checkbox" id="mu-indigena" style="accent-color:var(--green);width:15px;height:15px;"> Ind&#237;gena</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;"><input type="checkbox" id="mu-afro" style="accent-color:var(--green);width:15px;height:15px;"> Afrodescendiente</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;"><input type="checkbox" id="mu-desplazado" style="accent-color:var(--green);width:15px;height:15px;"> Desplazado</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;"><input type="checkbox" id="mu-discapacidad" style="accent-color:var(--green);width:15px;height:15px;"> Discapacidad</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;"><input type="checkbox" id="mu-lgtbiq" style="accent-color:var(--green);width:15px;height:15px;"> LGTBIQ+</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer;"><input type="checkbox" id="mu-victima" style="accent-color:var(--green);width:15px;height:15px;"> V&#237;ctima conflicto</label>
+      </div>
+
+      <!-- Ingreso + botones -->
+      <div style="font-size:12px;color:var(--muted);padding:8px 0 12px;border-top:1px solid var(--border);">&#x1F4C5; Ingreso al sistema: <strong id="mu-ingreso" style="color:var(--ink);">&#x2014;</strong></div>
       <div style="display:flex;gap:10px;">
         <button class="btn btn-neon" style="flex:1;" id="mu-save-btn" onclick="guardarUsuario()">&#x1F4BE; Guardar cambios</button>
         <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 18px;" onclick="closeModal('modal-perfil-usuario')">Cancelar</button>
@@ -3767,93 +3800,96 @@ function renderUsuarios(lista){
 
 function verUsuario(id){
   var u=(window._usuariosData||[]).find(function(x){return x.id===id;});
-  if(!u){showToast('Usuario no encontrado');return;}
-  var setVal=function(elId,val){var el=document.getElementById(elId);if(!el)return;if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=val||'';else if(el.tagName==='SELECT')el.value=val||'';else el.textContent=val||'—';};
-  document.getElementById('mu-id').value=u.id;
-  document.getElementById('mu-nombre-header').textContent=((u.nombres||'')+' '+(u.apellidos||'')).trim()||'—';
-  setVal('mu-nombres', u.nombres);
-  setVal('mu-apellidos', u.apellidos);
-  setVal('mu-cedula', u.cedula);
-  setVal('mu-fecha-nac', u.fecha_nacimiento||'');
-  setVal('mu-telefono', u.telefono);
-  setVal('mu-genero', u.genero||'');
-  setVal('mu-grupo-etnico', u.grupo_etnico);
-  setVal('mu-notas', u.notas);
-  setVal('mu-rol', u.rol||'voluntario');
-  setVal('mu-estado', u.estado||'activo');
-  // Email: campo vacío (el email viene de auth.users, no de perfiles)
-  var emailEl = document.getElementById('mu-email'); if(emailEl) emailEl.value = '';
-  // Departamento y municipio: selects dinámicos
+  if(!u){showToast("Usuario no encontrado");return;}
+  var sv=function(id,val){
+    var el=document.getElementById(id);if(!el)return;
+    if(el.type==="checkbox")el.checked=val===true||val==="true";
+    else if(el.tagName==="INPUT"||el.tagName==="TEXTAREA")el.value=val||"";
+    else if(el.tagName==="SELECT")el.value=val||"";
+    else el.textContent=val||"—";
+  };
+  sv("mu-id",u.id);
+  document.getElementById("mu-nombre-header").textContent=((u.nombres||"")+" "+(u.apellidos||"")).trim()||"—";
+  sv("mu-nombres",u.nombres); sv("mu-apellidos",u.apellidos);
+  sv("mu-tipo-doc",u.tipo_doc||"C.C."); sv("mu-cedula",u.cedula);
+  sv("mu-anio-nac",u.anio_nacimiento); sv("mu-genero",u.genero||"");
+  sv("mu-telefono",u.telefono);
+  var emailEl=document.getElementById("mu-email"); if(emailEl)emailEl.value="";
+  sv("mu-tipo-sangre",u.tipo_sangre||""); sv("mu-eps",u.eps);
+  sv("mu-direccion",u.direccion); sv("mu-profesion",u.profesion); sv("mu-ocupacion",u.ocupacion);
   poblarDeptos();
-  var deptoSel = document.getElementById('mu-departamento');
-  if(deptoSel){ deptoSel.value = u.departamento||''; }
-  poblarMunicipios(u.departamento||'', false);
-  var muniSel = document.getElementById('mu-municipio');
-  if(muniSel){ muniSel.value = u.municipio||''; }
-  var ing='—'; if(u.created_at){var d=new Date(u.created_at);var M2=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];ing=d.getDate()+' '+M2[d.getMonth()]+' '+d.getFullYear();}
-  document.getElementById('mu-ingreso').textContent=ing;
-  openModal('modal-perfil-usuario');
+  var ds=document.getElementById("mu-departamento"); if(ds)ds.value=u.departamento||"";
+  poblarMunicipios(u.departamento||"",false);
+  var ms=document.getElementById("mu-municipio"); if(ms)ms.value=u.municipio||"";
+  sv("mu-nodo",u.nodo); sv("mu-cargo",u.cargo||"");
+  sv("mu-fecha-ingreso",u.fecha_ingreso_rnja||""); sv("mu-contacto-emerg",u.contacto_emergencia);
+  sv("mu-rol",u.rol||"voluntario"); sv("mu-estado",u.estado||"activo"); sv("mu-notas",u.notas);
+  sv("mu-indigena",u.indigena); sv("mu-afro",u.afrocolombian);
+  sv("mu-desplazado",u.desplazado); sv("mu-discapacidad",u.discapacidad);
+  sv("mu-lgtbiq",u.lgtbiq); sv("mu-victima",u.victima_conflicto);
+  var ing="—";
+  if(u.created_at){var d=new Date(u.created_at);var M=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];ing=d.getDate()+" "+M[d.getMonth()]+" "+d.getFullYear();}
+  document.getElementById("mu-ingreso").textContent=ing;
+  openModal("modal-perfil-usuario");
 }
 
 async function guardarUsuario(){
-  var id=document.getElementById('mu-id')?.value;
-  if(!id){showToast('Error: ID no encontrado');return;}
-  var g=function(elId){var el=document.getElementById(elId);if(!el)return null;var v=(el.value||'').trim();return v||null;};
-  var newEmail=(document.getElementById('mu-email')?.value||'').trim();
+  var id=document.getElementById("mu-id")?.value;
+  if(!id){showToast("Error: ID no encontrado");return;}
+  var g=function(elId){var el=document.getElementById(elId);if(!el)return null;var v=(el.value||"").trim();return v||null;};
+  var cb=function(elId){var el=document.getElementById(elId);return el?el.checked:false;};
+  var newEmail=(document.getElementById("mu-email")?.value||"").trim();
   var payload={
-    nombres:      g('mu-nombres'),
-    apellidos:    g('mu-apellidos'),
-    cedula:       g('mu-cedula'),
-    fecha_nacimiento: g('mu-fecha-nac')||null,
-    telefono:     g('mu-telefono'),
-    departamento: g('mu-departamento'),
-    municipio:    g('mu-municipio'),
-    genero:       g('mu-genero'),
-    grupo_etnico: g('mu-grupo-etnico'),
-    rol:          g('mu-rol')||'voluntario',
-    estado:       g('mu-estado')||'activo',
-    notas:        g('mu-notas')
+    nombres:g("mu-nombres"), apellidos:g("mu-apellidos"),
+    tipo_doc:g("mu-tipo-doc")||"C.C.", cedula:g("mu-cedula"),
+    anio_nacimiento:g("mu-anio-nac")?parseInt(g("mu-anio-nac")):null,
+    genero:g("mu-genero"), telefono:g("mu-telefono"),
+    tipo_sangre:g("mu-tipo-sangre"), eps:g("mu-eps"),
+    direccion:g("mu-direccion"), profesion:g("mu-profesion"), ocupacion:g("mu-ocupacion"),
+    departamento:g("mu-departamento"), municipio:g("mu-municipio"),
+    nodo:g("mu-nodo"), cargo:g("mu-cargo"),
+    fecha_ingreso_rnja:g("mu-fecha-ingreso")||null,
+    contacto_emergencia:g("mu-contacto-emerg"),
+    rol:g("mu-rol")||"voluntario", estado:g("mu-estado")||"activo", notas:g("mu-notas"),
+    indigena:cb("mu-indigena"), afrocolombian:cb("mu-afro"),
+    desplazado:cb("mu-desplazado"), discapacidad:cb("mu-discapacidad"),
+    lgtbiq:cb("mu-lgtbiq"), victima_conflicto:cb("mu-victima")
   };
-  if(!payload.nombres||!payload.apellidos){showToast('⚠️ Nombres y apellidos son obligatorios');return;}
-  var btn=document.getElementById('mu-save-btn');
-  if(btn){btn.textContent='Guardando...';btn.disabled=true;}
+  if(!payload.nombres||!payload.apellidos){showToast("Nombres y apellidos son obligatorios");return;}
+  var btn=document.getElementById("mu-save-btn");
+  if(btn){btn.textContent="Guardando...";btn.disabled=true;}
   try{
     var sess=await window.supabase.auth.getSession();
-    var token=sess.data?.session?.access_token||'';
-    // 1. Actualizar perfiles
+    var token=sess.data?.session?.access_token||"";
     var resp=await fetch(
-      window._SB_URL+'/rest/v1/perfiles?id=eq.'+id,
-      {method:'PATCH',headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(payload)}
+      window._SB_URL+"/rest/v1/perfiles?id=eq."+id,
+      {method:"PATCH",headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(payload)}
     );
     if(!resp.ok){
-      if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
-      showToast('⚠️ Error al guardar perfil ('+resp.status+')');return;
+      if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
+      showToast("Error al guardar perfil ("+resp.status+")");return;
     }
-    // 2. Actualizar email si se ingresó uno
-    if(newEmail && newEmail.includes('@')){
-      var respEmail=await fetch(
-        window._SB_URL+'/functions/v1/actualizar-email',
-        {method:'POST',headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json'},
-         body:JSON.stringify({user_id:id,email:newEmail})}
-      );
-      var resEmail=await respEmail.json();
-      if(!respEmail.ok||resEmail.error){
-        if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
-        showToast('✅ Perfil guardado, pero error actualizando email: '+(resEmail.error||respEmail.status));
+    if(newEmail&&newEmail.includes("@")){
+      var re=await fetch(window._SB_URL+"/functions/v1/actualizar-email",
+        {method:"POST",headers:{"apikey":window._SB_KEY,"Authorization":"Bearer "+token,"Content-Type":"application/json"},
+         body:JSON.stringify({user_id:id,email:newEmail})});
+      var rj=await re.json();
+      if(!re.ok||rj.error){
+        if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
+        showToast("Perfil guardado. Error email: "+(rj.error||re.status));
         filtrarUsuarios();return;
       }
     }
-    if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
-    // Actualizar cache local
+    if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
     var idx=(window._usuariosData||[]).findIndex(function(x){return x.id===id;});
-    if(idx>=0){Object.assign(window._usuariosData[idx],payload);}
-    closeModal('modal-perfil-usuario');
-    showToast(newEmail && newEmail.includes('@') ? '✅ Perfil y email actualizados' : '✅ Perfil actualizado');
+    if(idx>=0)Object.assign(window._usuariosData[idx],payload);
+    closeModal("modal-perfil-usuario");
+    showToast(newEmail&&newEmail.includes("@")?"✅ Perfil y email actualizados":"✅ Perfil actualizado");
     filtrarUsuarios();
   }catch(e){
-    if(btn){btn.textContent='💾 Guardar cambios';btn.disabled=false;}
-    showToast('⚠️ Error: '+e.message);
-    console.error('guardarUsuario:',e);
+    if(btn){btn.textContent="💾 Guardar cambios";btn.disabled=false;}
+    showToast("Error: "+e.message);
+    console.error("guardarUsuario:",e);
   }
 }
 </script>
