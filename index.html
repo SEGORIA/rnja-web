@@ -102,6 +102,10 @@ h1,h2,h3,h4{font-family:'Montserrat',sans-serif;font-weight:700;}
 .land-nav-links a{color:rgba(255,255,255,.65);font-size:13px;font-weight:500;text-decoration:none;transition:color .2s;}
 .land-nav-links a:hover{color:var(--neon);}
 
+/* SKELETON LOADER */
+@keyframes skPulse{0%,100%{opacity:.35}50%{opacity:.7}}
+.kpi-skel{display:inline-block;background:currentColor;border-radius:4px;animation:skPulse 1.2s ease-in-out infinite;color:var(--muted);min-width:48px;height:1em;vertical-align:middle;}
+
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:100px;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:all .2s;font-family:'Poppins',sans-serif;}
 .btn-neon{background:linear-gradient(135deg,var(--blue) 0%,var(--g600) 100%);color:var(--g900);font-weight:700;background-size:200% 200%;}
@@ -3933,14 +3937,14 @@ function loginAs(role){
   updateProfileForRole(role);
   showView('v-'+role);
   setupNotifs(role);
-  // Cargar estadísticas del dashboard inicial
+  // Cargar estadísticas del dashboard inicial (50ms = 1 frame para pintar la vista)
   setTimeout(function(){
     if(role==='super_admin') cargarEstadisticasSA();
     else if(role==='coord_nacional') cargarEstadisticasNAC();
     else if(role==='coord_departamental') cargarEstadisticasDep();
     else if(role==='coord_municipal') { cargarEstadisticasMun(); cargarValidacionesMun(); }
     else if(role==='voluntario') cargarEstadisticasVol();
-  }, 300);
+  }, 50);
 }
 
 async function doLogin(){
@@ -4485,7 +4489,7 @@ function setupNotifs(role){
   // Ocultar el dot hasta saber si hay notificaciones
   document.querySelectorAll('.notif-dot').forEach(function(d){ d.style.display='none'; });
   // Cargar async con retardo para que el perfil ya esté cargado
-  setTimeout(function(){ cargarNotificaciones(role); }, 600);
+  setTimeout(function(){ cargarNotificaciones(role); }, 200);
 }
 
 async function cargarNotificaciones(role) {
@@ -4502,22 +4506,22 @@ async function cargarNotificaciones(role) {
     var en7dias = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
 
     if (role === 'super_admin' || role === 'coord_nacional') {
-      // Solicitudes pendientes
-      var rSols = await fetch(window._SB_URL + '/rest/v1/solicitudes?estado=eq.pendiente&select=id&limit=100', { headers: h });
-      var sols = rSols.ok ? await rSols.json() : [];
+      // 3 fetches en paralelo en lugar de secuencial (ahorra ~600-1200ms)
+      var [rSols, rDeps, rVols] = await Promise.all([
+        fetch(window._SB_URL + '/rest/v1/solicitudes?estado=eq.pendiente&select=id&limit=100', { headers: h }),
+        fetch(window._SB_URL + '/rest/v1/perfiles?rol=eq.coord_departamental&select=departamento', { headers: h }),
+        fetch(window._SB_URL + '/rest/v1/perfiles?rol=eq.voluntario&select=departamento&limit=1000', { headers: h })
+      ]);
+      var sols    = rSols.ok ? await rSols.json() : [];
+      var deps    = rDeps.ok ? await rDeps.json() : [];
+      var allVols = rVols.ok ? await rVols.json() : [];
+
       if (sols.length > 0) notifs.push({ urgente: true, ic:'📨', t: sols.length+' solicitud'+(sols.length>1?'es':'')+' pendiente'+(sols.length>1?'s':''), s:'Nuevos registros por aprobar', accion: "navToByName('sec-sa-solicitudes','sidebar-sa','topbar-title-sa','Solicitudes')" });
 
-      // Coordinaciones nacionales sin asignar (deptos sin coord)
-      if (role === 'coord_nacional' || role === 'super_admin') {
-        var rDeps = await fetch(window._SB_URL + '/rest/v1/perfiles?rol=eq.coord_departamental&select=departamento', { headers: h });
-        var deps = rDeps.ok ? await rDeps.json() : [];
-        var rVols = await fetch(window._SB_URL + '/rest/v1/perfiles?rol=eq.voluntario&select=departamento&limit=1000', { headers: h });
-        var allVols = rVols.ok ? await rVols.json() : [];
-        var depsConCoord = new Set(deps.map(function(d) { return d.departamento; }));
-        var depsConVols = new Set(allVols.map(function(v) { return v.departamento; }).filter(Boolean));
-        var sinCoord = [...depsConVols].filter(function(d) { return d && !depsConCoord.has(d); });
-        if (sinCoord.length > 0) notifs.push({ ic:'⚠️', t: sinCoord.length+' departamento'+(sinCoord.length>1?'s':'')+' sin coordinador', s: sinCoord.slice(0,3).join(', ')+(sinCoord.length>3?' y más':'') });
-      }
+      var depsConCoord = new Set(deps.map(function(d) { return d.departamento; }));
+      var depsConVols  = new Set(allVols.map(function(v) { return v.departamento; }).filter(Boolean));
+      var sinCoord = [...depsConVols].filter(function(d) { return d && !depsConCoord.has(d); });
+      if (sinCoord.length > 0) notifs.push({ ic:'⚠️', t: sinCoord.length+' departamento'+(sinCoord.length>1?'s':'')+' sin coordinador', s: sinCoord.slice(0,3).join(', ')+(sinCoord.length>3?' y más':'') });
     }
 
     if (role === 'coord_municipal') {
@@ -4612,6 +4616,32 @@ function toggleNotif(){
 document.addEventListener('click',function(e){
   if(!e.target.closest('#notif-panel')&&!e.target.closest('.notif-btn')) document.getElementById('notif-panel').classList.remove('open');
 });
+
+/* ══════════════════ AUTH TOKEN CACHE ══════════════════ */
+// Evita llamar getSession() en cada función (el token dura 1h).
+var _tkCache = { v: '', exp: 0 };
+async function getToken() {
+  if (_tkCache.v && Date.now() < _tkCache.exp - 60000) return _tkCache.v;
+  try {
+    var s = await window.supabase.auth.getSession();
+    _tkCache.v   = s.data?.session?.access_token || '';
+    _tkCache.exp = (s.data?.session?.expires_at  || 0) * 1000 || (Date.now() + 3600000);
+  } catch(e) { _tkCache.v = ''; }
+  return _tkCache.v;
+}
+
+/* ══════════════════ KPI SKELETON HELPERS ══════════════════ */
+// Muestra spinner esquelético en los KPIs mientras cargan los datos.
+function setKpiLoading(ids) {
+  ids.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = '<span class="kpi-skel">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+  });
+}
+function setKpiValue(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
 
 /* ══════════════════ INIT ══════════════════ */
 window.addEventListener('load',()=>setTimeout(()=>initMapsForView('v-landing'),400));
@@ -6533,9 +6563,9 @@ async function cargarHistorialOrg() {
 
 // ── Estadísticas SA ──
 async function cargarEstadisticasSA() {
+  setKpiLoading(['kpi-sa-usuarios','kpi-sa-pendientes','kpi-sa-certs']);
   try {
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
 
     // Conteos en paralelo
@@ -6598,9 +6628,9 @@ async function cargarEstadisticasSA() {
 
 // ── Estadísticas NAC ──
 async function cargarEstadisticasNAC() {
+  setKpiLoading(['kpi-nac-usuarios','kpi-nac-deptos','kpi-nac-munis','kpi-nac-certs','kpi-nac-horas']);
   try {
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
 
     var [rPerfiles, rCerts] = await Promise.all([
@@ -6909,9 +6939,9 @@ async function cargarPerfilCoord(scope) {
 
 // ── Estadísticas voluntario ──
 async function cargarEstadisticasVol() {
+  setKpiLoading(['vol-stat-eventos','vol-stat-horas','vol-stat-certs']);
   try {
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var pid = (window.currentProfile || {}).id;
     if (!pid) return;
     var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
@@ -6970,12 +7000,12 @@ async function cargarEstadisticasVol() {
 
 // ── Estadísticas Departamental ──
 async function cargarEstadisticasDep() {
+  setKpiLoading(['kpi-dep-voluntarios','kpi-dep-municipios','kpi-dep-certs','kpi-dep-horas']);
   try {
     var p = window.currentProfile || {};
     var depto = p.departamento || '';
     if (!depto) return;
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
 
     // Actualizar label del KPI
@@ -7091,13 +7121,13 @@ async function cargarEstadisticasDep() {
 
 // ── Estadísticas Municipal ──
 async function cargarEstadisticasMun() {
+  setKpiLoading(['kpi-mun-voluntarios','kpi-mun-certs','kpi-mun-eventos','kpi-mun-horas']);
   try {
     var p = window.currentProfile || {};
     var muni = p.municipio || '';
     var depto = p.departamento || '';
     if (!muni) return;
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
 
     // Actualizar label
