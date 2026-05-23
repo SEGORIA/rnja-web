@@ -1559,9 +1559,9 @@ tr:hover td{background:var(--surface2);}
           <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">🗺️ Mapa Municipal — Bogotá D.C.</div></div>
           <div class="svg-map-wrap" id="wrap-dash-map-municipal"><div id="dash-map-municipal" style="height:380px;position:relative;"></div></div>
           <div class="kpi-grid kpi-grid-3 mt-5">
-            <div class="kpi"><div class="kpi-num">287</div><div class="kpi-label">Voluntarios en Bogotá</div></div>
-            <div class="kpi"><div class="kpi-num">18</div><div class="kpi-label">Eventos organizados</div></div>
-            <div class="kpi"><div class="kpi-num">1.840</div><div class="kpi-label">Horas registradas</div></div>
+            <div class="kpi"><div class="kpi-num" id="mapa-mun-vols">—</div><div class="kpi-label">Voluntarios en <span id="mapa-mun-label">mi municipio</span></div></div>
+            <div class="kpi"><div class="kpi-num" id="mapa-mun-eventos">—</div><div class="kpi-label">Eventos organizados</div></div>
+            <div class="kpi"><div class="kpi-num" id="mapa-mun-horas">—</div><div class="kpi-label">Horas registradas</div></div>
           </div>
         </div>
 
@@ -1655,34 +1655,75 @@ tr:hover td{background:var(--surface2);}
             <div class="profile-av-big">&#x1F464;</div>
             <div style="flex:1;">
               <div class="profile-meta">
-                <strong>Carlos Díaz Mora</strong>
-                <div class="loc">&#x1F4CD; Bogotá D.C.</div>
+                <strong id="mun-perfil-nombre">—</strong>
+                <div class="loc">&#x1F4CD; <span id="mun-perfil-loc">—</span> · C.C. <span id="mun-perfil-cc">—</span></div>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-                <span class="p-badge level">🌳 Árbol</span>
-                <span class="p-badge">Voluntario desde 2018</span>
+                <span class="p-badge level" id="mun-perfil-nivel">—</span>
+                <span class="p-badge">Ingreso: <strong id="mun-perfil-ingreso">—</strong></span>
               </div>
               <div class="profile-stats">
-                <div class="p-stat"><span class="p-stat-num">47</span><span class="p-stat-lbl">Eventos totales</span></div>
-                <div class="p-stat"><span class="p-stat-num">312</span><span class="p-stat-lbl">Horas totales</span></div>
-                <div class="p-stat"><span class="p-stat-num">12</span><span class="p-stat-lbl">Certificados</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="mun-perfil-stat-eventos">—</span><span class="p-stat-lbl">Eventos</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="mun-perfil-stat-horas">—</span><span class="p-stat-lbl">Horas</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="mun-perfil-stat-certs">—</span><span class="p-stat-lbl">Certificados</span></div>
               </div>
             </div>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;flex-shrink:0;" onclick="toggleEditPerfil('mun')">✏️ Editar perfil</button>
           </div>
+
+          <!-- Formulario de edición -->
+          <div id="mun-edit-perfil-form" style="display:none;" class="card mb-5">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="card-title">✏️ Editar mi perfil</div>
+              <button onclick="toggleEditPerfil('mun')" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="grid-column:1/-1;background:var(--surface2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);">ℹ️ <strong>Nombre, cédula y ubicación</strong> solo pueden modificarlos los administradores. Puedes actualizar tu información de contacto y académica.</div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Teléfono</label><input type="tel" id="mun-ep-telefono" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="300 000 0000"></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Género</label>
+                <select id="mun-ep-genero" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option><option value="Mujer">Mujer</option><option value="Hombre">Hombre</option><option value="No binario">No binario</option><option value="Prefiero no decir">Prefiero no decir</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Situación académica</label>
+                <select id="mun-ep-situacion" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option><option value="Bachiller">Bachiller</option><option value="Técnico">Técnico / Tecnólogo</option><option value="Universitario">Universitario</option><option value="Graduado">Graduado / Profesional</option><option value="Posgrado">Posgrado</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Carrera / Programa</label><input type="text" id="mun-ep-carrera" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Biología, Ingeniería Ambiental..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Semestre / Año</label><input type="text" id="mun-ep-semestre" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: 6, Graduado..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Institución educativa</label><input type="text" id="mun-ep-institucion" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Universidad de Antioquia"></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Área de interés ambiental</label><input type="text" id="mun-ep-area" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Conservación de fauna, Cambio climático..."></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Bio / Presentación</label><textarea id="mun-ep-bio" class="form-input" rows="2" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;resize:vertical;" placeholder="Cuéntanos un poco sobre ti y tu motivación ambiental..."></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button id="mun-ep-save-btn" class="btn btn-neon" style="flex:1;" onclick="guardarPerfil('mun')">💾 Guardar cambios</button>
+              <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 20px;" onclick="toggleEditPerfil('mun')">Cancelar</button>
+            </div>
+          </div>
+
           <div class="two-col">
             <div class="card">
-              <div class="card-title mb-4">Datos personales</div>
+              <div class="card-title mb-4">Información personal</div>
               <div class="info-grid">
-                <div class="info-item"><div class="lbl">Nombre</div><div class="val">Carlos Díaz Mora</div></div>
-                <div class="info-item"><div class="lbl">Departamento</div><div class="val">Bogotá D.C.</div></div>
-                <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" style="color:var(--g600);">Marzo 2018</div></div>
-                <div class="info-item"><div class="lbl">Rol actual</div><div class="val" id="p-rol-mun">Ver sidebar</div></div>
+                <div class="info-item"><div class="lbl">Nombre completo</div><div class="val" id="mun-p-nombre">—</div></div>
+                <div class="info-item"><div class="lbl">Cédula</div><div class="val" id="mun-p-cedula">—</div></div>
+                <div class="info-item"><div class="lbl">Correo</div><div class="val" id="mun-p-email">—</div></div>
+                <div class="info-item"><div class="lbl">Teléfono</div><div class="val" id="mun-p-telefono">—</div></div>
+                <div class="info-item"><div class="lbl">Departamento</div><div class="val" id="mun-p-departamento">—</div></div>
+                <div class="info-item"><div class="lbl">Municipio</div><div class="val" id="mun-p-municipio">—</div></div>
+                <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" id="mun-p-ingreso" style="color:var(--g600);">—</div></div>
+                <div class="info-item"><div class="lbl">Rol actual</div><div class="val"><span class="tag tag-blue" id="mun-p-rol">—</span></div></div>
+                <div class="info-item"><div class="lbl">Situación académica</div><div class="val" id="mun-p-situacion">—</div></div>
+                <div class="info-item"><div class="lbl">Carrera</div><div class="val" id="mun-p-carrera">—</div></div>
+                <div class="info-item"><div class="lbl">Semestre</div><div class="val" id="mun-p-semestre">—</div></div>
+                <div class="info-item"><div class="lbl">Área de interés</div><div class="val" id="mun-p-area">—</div></div>
               </div>
             </div>
             <div class="card">
               <div class="card-title mb-4">&#x1F4D6; Historial en la RNJA</div>
-              <div class="user-timeline" id="utl-mun">
-                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot join"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">10 Mar 2020</div><div class="utl-title">Ingreso como Voluntario</div><div class="utl-desc">Bogotá D.C. · Chapinero</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot event"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">2018-2019</div><div class="utl-title">12 eventos como voluntario</div><div class="utl-desc">148 horas acumuladas · Nivel Brote</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">15 Ene 2022</div><div class="utl-title">Electo Coordinador Municipal</div><div class="utl-desc">Asamblea Municipal Bogotá · Período 2020 · Por: Coordinación Nacional</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2025</div><div class="utl-title">Reelegido Coord. Municipal 2021</div><div class="utl-desc">Período 2021</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2026</div><div class="utl-title">Reelegido Coord. Municipal 2024</div><div class="utl-desc">Período 2022 · 245 voluntarios gestionados</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2025</div><div class="utl-title">Reelegido Coord. Municipal 2025</div><div class="utl-desc">Período 2025</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">15 Ene 2026</div><div class="utl-title">Reelegido Coord. Municipal 2026</div><div class="utl-desc">Período 2026 · Por: Coord. Nacional</div></div></div>
+              <div class="user-timeline" id="mun-perfil-timeline">
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot join"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">Ingreso</div><div class="utl-title">Voluntario RNJA</div><div class="utl-desc" id="mun-tl-join">—</div></div></div>
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">Designación</div><div class="utl-title">Coordinador/a Municipal</div><div class="utl-desc" id="mun-tl-role">—</div></div></div>
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot event"></div></div><div class="utl-content"><div class="utl-date">Activo</div><div class="utl-title">Gestión municipal en curso</div><div class="utl-desc" id="mun-tl-active">—</div></div></div>
               </div>
             </div>
           </div>
@@ -1806,10 +1847,10 @@ tr:hover td{background:var(--surface2);}
           <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">🗺️ Mapa Departamental — Valle del Cauca</div></div>
           <div class="svg-map-wrap" id="wrap-dash-map-departamental"><div id="dash-map-departamental" style="height:380px;position:relative;"></div></div>
           <div class="kpi-grid kpi-grid-4 mt-5">
-            <div class="kpi"><div class="kpi-num">498</div><div class="kpi-label">Voluntarios</div></div>
-            <div class="kpi"><div class="kpi-num">42</div><div class="kpi-label">Municipios activos</div></div>
-            <div class="kpi"><div class="kpi-num">341</div><div class="kpi-label">Certificados emitidos</div></div>
-            <div class="kpi"><div class="kpi-num">3.210</div><div class="kpi-label">Horas acumuladas</div></div>
+            <div class="kpi"><div class="kpi-num" id="mapa-dep-vols">—</div><div class="kpi-label">Voluntarios</div></div>
+            <div class="kpi"><div class="kpi-num" id="mapa-dep-munis">—</div><div class="kpi-label">Municipios activos</div></div>
+            <div class="kpi"><div class="kpi-num" id="mapa-dep-certs">—</div><div class="kpi-label">Certificados emitidos</div></div>
+            <div class="kpi"><div class="kpi-num" id="mapa-dep-horas">—</div><div class="kpi-label">Horas acumuladas</div></div>
           </div>
         </div>
 
@@ -1981,34 +2022,75 @@ tr:hover td{background:var(--surface2);}
             <div class="profile-av-big">&#x1F464;</div>
             <div style="flex:1;">
               <div class="profile-meta">
-                <strong>Ana Ruiz Castaño</strong>
-                <div class="loc">&#x1F4CD; Valle del Cauca · Cali</div>
+                <strong id="dep-perfil-nombre">—</strong>
+                <div class="loc">&#x1F4CD; <span id="dep-perfil-loc">—</span> · C.C. <span id="dep-perfil-cc">—</span></div>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-                <span class="p-badge level">🌲 Guardabosque</span>
-                <span class="p-badge">Voluntario desde 2019</span>
+                <span class="p-badge level" id="dep-perfil-nivel">—</span>
+                <span class="p-badge">Ingreso: <strong id="dep-perfil-ingreso">—</strong></span>
               </div>
               <div class="profile-stats">
-                <div class="p-stat"><span class="p-stat-num">52</span><span class="p-stat-lbl">Eventos totales</span></div>
-                <div class="p-stat"><span class="p-stat-num">498</span><span class="p-stat-lbl">Horas totales</span></div>
-                <div class="p-stat"><span class="p-stat-num">18</span><span class="p-stat-lbl">Certificados</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="dep-perfil-stat-eventos">—</span><span class="p-stat-lbl">Eventos</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="dep-perfil-stat-horas">—</span><span class="p-stat-lbl">Horas</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="dep-perfil-stat-certs">—</span><span class="p-stat-lbl">Certificados</span></div>
               </div>
             </div>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;flex-shrink:0;" onclick="toggleEditPerfil('dep')">✏️ Editar perfil</button>
           </div>
+
+          <!-- Formulario de edición -->
+          <div id="dep-edit-perfil-form" style="display:none;" class="card mb-5">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="card-title">✏️ Editar mi perfil</div>
+              <button onclick="toggleEditPerfil('dep')" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="grid-column:1/-1;background:var(--surface2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);">ℹ️ <strong>Nombre, cédula y ubicación</strong> solo pueden modificarlos los administradores. Puedes actualizar tu información de contacto y académica.</div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Teléfono</label><input type="tel" id="dep-ep-telefono" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="300 000 0000"></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Género</label>
+                <select id="dep-ep-genero" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option><option value="Mujer">Mujer</option><option value="Hombre">Hombre</option><option value="No binario">No binario</option><option value="Prefiero no decir">Prefiero no decir</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Situación académica</label>
+                <select id="dep-ep-situacion" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option><option value="Bachiller">Bachiller</option><option value="Técnico">Técnico / Tecnólogo</option><option value="Universitario">Universitario</option><option value="Graduado">Graduado / Profesional</option><option value="Posgrado">Posgrado</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Carrera / Programa</label><input type="text" id="dep-ep-carrera" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Biología, Ingeniería Ambiental..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Semestre / Año</label><input type="text" id="dep-ep-semestre" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: 6, Graduado..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Institución educativa</label><input type="text" id="dep-ep-institucion" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Universidad de Antioquia"></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Área de interés ambiental</label><input type="text" id="dep-ep-area" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Conservación de fauna, Cambio climático..."></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Bio / Presentación</label><textarea id="dep-ep-bio" class="form-input" rows="2" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;resize:vertical;" placeholder="Cuéntanos un poco sobre ti y tu motivación ambiental..."></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button id="dep-ep-save-btn" class="btn btn-neon" style="flex:1;" onclick="guardarPerfil('dep')">💾 Guardar cambios</button>
+              <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 20px;" onclick="toggleEditPerfil('dep')">Cancelar</button>
+            </div>
+          </div>
+
           <div class="two-col">
             <div class="card">
-              <div class="card-title mb-4">Datos personales</div>
+              <div class="card-title mb-4">Información personal</div>
               <div class="info-grid">
-                <div class="info-item"><div class="lbl">Nombre</div><div class="val">Ana Ruiz Castaño</div></div>
-                <div class="info-item"><div class="lbl">Departamento</div><div class="val">Valle del Cauca</div></div>
-                <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" style="color:var(--g600);">Febrero 2019</div></div>
-                <div class="info-item"><div class="lbl">Rol actual</div><div class="val" id="p-rol-dep">Ver sidebar</div></div>
+                <div class="info-item"><div class="lbl">Nombre completo</div><div class="val" id="dep-p-nombre">—</div></div>
+                <div class="info-item"><div class="lbl">Cédula</div><div class="val" id="dep-p-cedula">—</div></div>
+                <div class="info-item"><div class="lbl">Correo</div><div class="val" id="dep-p-email">—</div></div>
+                <div class="info-item"><div class="lbl">Teléfono</div><div class="val" id="dep-p-telefono">—</div></div>
+                <div class="info-item"><div class="lbl">Departamento</div><div class="val" id="dep-p-departamento">—</div></div>
+                <div class="info-item"><div class="lbl">Municipio</div><div class="val" id="dep-p-municipio">—</div></div>
+                <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" id="dep-p-ingreso" style="color:var(--g600);">—</div></div>
+                <div class="info-item"><div class="lbl">Rol actual</div><div class="val"><span class="tag tag-blue" id="dep-p-rol">—</span></div></div>
+                <div class="info-item"><div class="lbl">Situación académica</div><div class="val" id="dep-p-situacion">—</div></div>
+                <div class="info-item"><div class="lbl">Carrera</div><div class="val" id="dep-p-carrera">—</div></div>
+                <div class="info-item"><div class="lbl">Semestre</div><div class="val" id="dep-p-semestre">—</div></div>
+                <div class="info-item"><div class="lbl">Área de interés</div><div class="val" id="dep-p-area">—</div></div>
               </div>
             </div>
             <div class="card">
               <div class="card-title mb-4">&#x1F4D6; Historial en la RNJA</div>
-              <div class="user-timeline" id="utl-dep">
-                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot join"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Feb 2021</div><div class="utl-title">Ingreso como Voluntaria</div><div class="utl-desc">Valle del Cauca · Cali · Bióloga UV</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot event"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">2019-2021</div><div class="utl-title">38 eventos como voluntaria</div><div class="utl-desc">312 horas · Nivel Árbol alcanzado</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2026</div><div class="utl-title">Electa Coordinadora Departamental</div><div class="utl-desc">Valle del Cauca · Período 2022 · Por: Coord. Nacional</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2025</div><div class="utl-title">Reelegida Coord. Departamental 2025</div><div class="utl-desc">498 voluntarios en el departamento</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2026</div><div class="utl-title">Reelegida Coord. Departamental 2026</div><div class="utl-desc">Período 2026 · Por: Jorge Medina Peña</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot cert"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">Mar 2026</div><div class="utl-title">Certificado: Liderazgo Ambiental</div><div class="utl-desc">Reconocimiento Ministerio de Ambiente</div></div></div>
+              <div class="user-timeline" id="dep-perfil-timeline">
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot join"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">Ingreso</div><div class="utl-title">Voluntario/a RNJA</div><div class="utl-desc" id="dep-tl-join">—</div></div></div>
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">Designación</div><div class="utl-title">Coordinador/a Departamental</div><div class="utl-desc" id="dep-tl-role">—</div></div></div>
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot event"></div></div><div class="utl-content"><div class="utl-date">Activo</div><div class="utl-title">Gestión departamental en curso</div><div class="utl-desc" id="dep-tl-active">—</div></div></div>
               </div>
             </div>
           </div>
@@ -2684,34 +2766,75 @@ tr:hover td{background:var(--surface2);}
             <div class="profile-av-big">&#x1F464;</div>
             <div style="flex:1;">
               <div class="profile-meta">
-                <strong>Jorge Medina Peña</strong>
-                <div class="loc">&#x1F4CD; Nacional · Bogotá</div>
+                <strong id="nac-perfil-nombre">—</strong>
+                <div class="loc">&#x1F4CD; <span id="nac-perfil-loc">—</span> · C.C. <span id="nac-perfil-cc">—</span></div>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-                <span class="p-badge level">🏔️ Líder Ambiental</span>
-                <span class="p-badge">Voluntario desde 2018</span>
+                <span class="p-badge level" id="nac-perfil-nivel">—</span>
+                <span class="p-badge">Ingreso: <strong id="nac-perfil-ingreso">—</strong></span>
               </div>
               <div class="profile-stats">
-                <div class="p-stat"><span class="p-stat-num">68</span><span class="p-stat-lbl">Eventos totales</span></div>
-                <div class="p-stat"><span class="p-stat-num">820</span><span class="p-stat-lbl">Horas totales</span></div>
-                <div class="p-stat"><span class="p-stat-num">24</span><span class="p-stat-lbl">Certificados</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="nac-perfil-stat-eventos">—</span><span class="p-stat-lbl">Eventos</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="nac-perfil-stat-horas">—</span><span class="p-stat-lbl">Horas</span></div>
+                <div class="p-stat"><span class="p-stat-num" id="nac-perfil-stat-certs">—</span><span class="p-stat-lbl">Certificados</span></div>
               </div>
             </div>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;flex-shrink:0;" onclick="toggleEditPerfil('nac')">✏️ Editar perfil</button>
           </div>
+
+          <!-- Formulario de edición -->
+          <div id="nac-edit-perfil-form" style="display:none;" class="card mb-5">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="card-title">✏️ Editar mi perfil</div>
+              <button onclick="toggleEditPerfil('nac')" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="grid-column:1/-1;background:var(--surface2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);">ℹ️ <strong>Nombre, cédula y ubicación</strong> solo pueden modificarlos los administradores. Puedes actualizar tu información de contacto y académica.</div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Teléfono</label><input type="tel" id="nac-ep-telefono" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="300 000 0000"></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Género</label>
+                <select id="nac-ep-genero" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option><option value="Mujer">Mujer</option><option value="Hombre">Hombre</option><option value="No binario">No binario</option><option value="Prefiero no decir">Prefiero no decir</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Situación académica</label>
+                <select id="nac-ep-situacion" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option><option value="Bachiller">Bachiller</option><option value="Técnico">Técnico / Tecnólogo</option><option value="Universitario">Universitario</option><option value="Graduado">Graduado / Profesional</option><option value="Posgrado">Posgrado</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Carrera / Programa</label><input type="text" id="nac-ep-carrera" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Biología, Ingeniería Ambiental..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Semestre / Año</label><input type="text" id="nac-ep-semestre" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: 6, Graduado..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Institución educativa</label><input type="text" id="nac-ep-institucion" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Universidad de Antioquia"></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Área de interés ambiental</label><input type="text" id="nac-ep-area" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Conservación de fauna, Cambio climático..."></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Bio / Presentación</label><textarea id="nac-ep-bio" class="form-input" rows="2" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;resize:vertical;" placeholder="Cuéntanos un poco sobre ti y tu motivación ambiental..."></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button id="nac-ep-save-btn" class="btn btn-neon" style="flex:1;" onclick="guardarPerfil('nac')">💾 Guardar cambios</button>
+              <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 20px;" onclick="toggleEditPerfil('nac')">Cancelar</button>
+            </div>
+          </div>
+
           <div class="two-col">
             <div class="card">
-              <div class="card-title mb-4">Datos personales</div>
+              <div class="card-title mb-4">Información personal</div>
               <div class="info-grid">
-                <div class="info-item"><div class="lbl">Nombre</div><div class="val">Jorge Medina Peña</div></div>
-                <div class="info-item"><div class="lbl">Departamento</div><div class="val">Nacional</div></div>
-                <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" style="color:var(--g600);">Enero 2018</div></div>
-                <div class="info-item"><div class="lbl">Rol actual</div><div class="val" id="p-rol-nac">Ver sidebar</div></div>
+                <div class="info-item"><div class="lbl">Nombre completo</div><div class="val" id="nac-p-nombre">—</div></div>
+                <div class="info-item"><div class="lbl">Cédula</div><div class="val" id="nac-p-cedula">—</div></div>
+                <div class="info-item"><div class="lbl">Correo</div><div class="val" id="nac-p-email">—</div></div>
+                <div class="info-item"><div class="lbl">Teléfono</div><div class="val" id="nac-p-telefono">—</div></div>
+                <div class="info-item"><div class="lbl">Departamento</div><div class="val" id="nac-p-departamento">—</div></div>
+                <div class="info-item"><div class="lbl">Municipio</div><div class="val" id="nac-p-municipio">—</div></div>
+                <div class="info-item"><div class="lbl">&#x1F4C5; Fecha de ingreso</div><div class="val" id="nac-p-ingreso" style="color:var(--g600);">—</div></div>
+                <div class="info-item"><div class="lbl">Rol actual</div><div class="val"><span class="tag tag-amber" id="nac-p-rol">—</span></div></div>
+                <div class="info-item"><div class="lbl">Situación académica</div><div class="val" id="nac-p-situacion">—</div></div>
+                <div class="info-item"><div class="lbl">Carrera</div><div class="val" id="nac-p-carrera">—</div></div>
+                <div class="info-item"><div class="lbl">Semestre</div><div class="val" id="nac-p-semestre">—</div></div>
+                <div class="info-item"><div class="lbl">Área de interés</div><div class="val" id="nac-p-area">—</div></div>
               </div>
             </div>
             <div class="card">
               <div class="card-title mb-4">&#x1F4D6; Historial en la RNJA</div>
-              <div class="user-timeline" id="utl-nac">
-                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot join"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">05 Ene 2020</div><div class="utl-title">Ingreso como Voluntario</div><div class="utl-desc">Bogotá D.C. · Abogado Ambiental</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot event"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">2018-2021</div><div class="utl-title">52 eventos como voluntario</div><div class="utl-desc">580 horas · Nivel Árbol, Guardabosque</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2026</div><div class="utl-title">Electo Coordinador Departamental</div><div class="utl-desc">Cundinamarca · Período 2022</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2025</div><div class="utl-title">Reelegido Coord. Departamental 2025</div><div class="utl-desc">398 voluntarios</div></div></div><div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">01 Ene 2026</div><div class="utl-title">Electo Coordinador Nacional 2026</div><div class="utl-desc">Elección nacional · Período 2026</div></div></div>
+              <div class="user-timeline" id="nac-perfil-timeline">
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot join"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">Ingreso</div><div class="utl-title">Voluntario/a RNJA</div><div class="utl-desc" id="nac-tl-join">—</div></div></div>
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot role"></div><div class="utl-line"></div></div><div class="utl-content"><div class="utl-date">Designación</div><div class="utl-title">Coordinador/a Nacional</div><div class="utl-desc" id="nac-tl-role">—</div></div></div>
+                <div class="utl-item"><div class="utl-dot-col"><div class="utl-dot event"></div></div><div class="utl-content"><div class="utl-date">Activo</div><div class="utl-title">Gestión nacional en curso</div><div class="utl-desc" id="nac-tl-active">—</div></div></div>
               </div>
             </div>
           </div>
@@ -3259,15 +3382,32 @@ tr:hover td{background:var(--surface2);}
 
         <!-- HISTORIAL ORGANIZACIONAL -->
         <div class="page-section" id="sec-sa-historial-org">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">📖 Historial Organizacional</div></div>
+          <div class="card-header mb-5">
+            <div class="card-title" style="font-size:20px;">📖 Historial Organizacional</div>
+            <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);" onclick="cargarHistorialOrg()">🔄 Actualizar</button>
+          </div>
+
+          <!-- KPIs en tiempo real -->
+          <div class="kpi-grid kpi-grid-4 mb-5">
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">👥</div></div><div class="kpi-num" id="hist-total-vols">—</div><div class="kpi-label">Voluntarios activos</div></div>
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">⏱️</div></div><div class="kpi-num" id="hist-total-horas">—</div><div class="kpi-label">Horas acumuladas</div></div>
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">📜</div></div><div class="kpi-num" id="hist-total-certs">—</div><div class="kpi-label">Certificados emitidos</div></div>
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">🏛️</div></div><div class="kpi-num" id="hist-total-deptos">—</div><div class="kpi-label">Departamentos con red</div></div>
+          </div>
+
           <div class="two-col">
             <div>
               <div class="card mb-4">
-                <div class="card-title mb-4">Timeline de la organización</div>
+                <div class="card-title mb-4">📅 Timeline de la organización</div>
                 <div style="display:flex;flex-direction:column;gap:0;">
+                  <!-- Período vigente — cifras dinámicas -->
                   <div style="display:flex;gap:16px;">
                     <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:12px;height:12px;border-radius:50%;background:var(--neon);flex-shrink:0;margin-top:3px;"></div><div style="width:2px;flex:1;background:var(--border);margin:4px 0;"></div></div>
-                    <div style="padding-bottom:20px;"><div style="font-weight:700;font-size:14px;">Período 2026 — Jorge Medina Peña</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">Ene 2026 · Coord. Nacional electo · 6.400 voluntarios activos</div><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;"><span class="tag tag-green">+32 dptos</span><span class="tag tag-green">+14K horas</span></div></div>
+                    <div style="padding-bottom:20px;">
+                      <div style="font-weight:700;font-size:14px;">Período 2026 — <span id="hist-coord-actual">Coordinación Nacional</span></div>
+                      <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="hist-periodo-desc">Ene 2026 · Cargando estadísticas...</div>
+                      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;" id="hist-periodo-tags"><span class="tag tag-green">Activo</span></div>
+                    </div>
                   </div>
                   <div style="display:flex;gap:16px;">
                     <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:12px;height:12px;border-radius:50%;background:var(--g300);flex-shrink:0;margin-top:3px;"></div><div style="width:2px;flex:1;background:var(--border);margin:4px 0;"></div></div>
@@ -3284,14 +3424,27 @@ tr:hover td{background:var(--surface2);}
                 </div>
               </div>
             </div>
+              <!-- Últimos registros -->
+              <div class="card">
+                <div class="card-title mb-4">🆕 Registros recientes</div>
+                <div id="hist-recientes-list" style="display:flex;flex-direction:column;gap:8px;">
+                  <p style="color:var(--muted);font-size:13px;">Cargando...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coordinadores dinámicos + distribución por rol -->
             <div>
               <div class="card mb-4">
-                <div class="card-title mb-4">Coordinadores Nacionales históricos</div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                  <div class="av-row" style="padding:12px;background:rgba(102,187,106,.08);border-radius:var(--r);border:1px solid rgba(37,129,196,.2);"><div class="av-sm" style="width:40px;height:40px;font-size:20px;border-radius:10px;background:linear-gradient(135deg,#ffd0a0,#f8b870);">🏛️</div><div style="flex:1;"><strong style="font-size:14px;">Jorge Medina Peña</strong><p style="font-size:12px;color:var(--muted);">2026 · Actual · Abogado Ambiental</p></div><span class="tag tag-green">Vigente</span></div>
-                  <div class="av-row" style="padding:12px;background:var(--surface2);border-radius:var(--r);"><div class="av-sm" style="width:40px;height:40px;font-size:20px;border-radius:10px;">🏛️</div><div style="flex:1;"><strong style="font-size:14px;">Gloria Rueda Vargas</strong><p style="font-size:12px;color:var(--muted);">2023 · Bióloga · Bogotá</p></div><span class="tag tag-gray">Anterior</span></div>
-                  <div class="av-row" style="padding:12px;background:var(--surface2);border-radius:var(--r);"><div class="av-sm" style="width:40px;height:40px;font-size:20px;border-radius:10px;">🏛️</div><div style="flex:1;"><strong style="font-size:14px;">Patricia Mora Cano</strong><p style="font-size:12px;color:var(--muted);">2022 · Ecóloga · Medellín</p></div><span class="tag tag-gray">Anterior</span></div>
-                  <div class="av-row" style="padding:12px;background:var(--surface2);border-radius:var(--r);"><div class="av-sm" style="width:40px;height:40px;font-size:20px;border-radius:10px;">🏛️</div><div style="flex:1;"><strong style="font-size:14px;">Camilo Torres Ríos</strong><p style="font-size:12px;color:var(--muted);">2021 · Ing. Forestal · Cali</p></div><span class="tag tag-gray">Anterior</span></div>
+                <div class="card-title mb-4">🏛️ Coordinadores Nacionales en la red</div>
+                <div id="hist-coords-list" style="display:flex;flex-direction:column;gap:10px;">
+                  <p style="color:var(--muted);font-size:13px;">Cargando...</p>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title mb-4">📊 Distribución por rol</div>
+                <div id="hist-roles-bars" style="display:flex;flex-direction:column;gap:8px;">
+                  <p style="color:var(--muted);font-size:13px;">Cargando...</p>
                 </div>
               </div>
             </div>
@@ -3620,6 +3773,35 @@ function updateProfileForRole(role){
   setEl('vol-bienvenida', '¡Bienvenido/a, ' + primerNombre + '! 👋');
   setEl('vol-bienvenida-loc', '📍 ' + (loc !== '—' ? loc + ' · ' : '') + (m.label||''));
 
+  // ── Coord perfil sections (mun / dep / nac) ──
+  var nivelActualVol = getNivel(Number(p.total_horas)||0);
+  var nivelLabel = nivelActualVol ? (nivelActualVol.emoji + ' ' + nivelActualVol.nombre) : '—';
+  ['mun','dep','nac'].forEach(function(sc) {
+    var s = function(sfx, val) { var el = document.getElementById(sc+'-'+sfx); if(el) el.textContent = val||'—'; };
+    s('perfil-nombre',  nombreCompleto);
+    s('perfil-loc',     loc !== '—' ? loc : (p.departamento || '—'));
+    s('perfil-cc',      cc);
+    s('perfil-nivel',   nivelLabel);
+    s('perfil-ingreso', ingreso);
+    s('p-nombre',  nombreCompleto);
+    s('p-cedula',  cc);
+    s('p-email',   u.email || p.email || '—');
+    s('p-telefono', p.telefono || '—');
+    s('p-departamento', p.departamento || '—');
+    s('p-municipio',    p.municipio || '—');
+    s('p-ingreso',      ingreso);
+    s('p-rol',          fullTitle);
+    s('p-situacion', p.situacion_academica || '—');
+    s('p-carrera',   p.carrera || '—');
+    s('p-semestre',  p.semestre || '—');
+    s('p-area',      p.area_interes || '—');
+    // Timeline mini
+    var tlJoin = [p.departamento, p.municipio].filter(Boolean).join(' · ');
+    s('tl-join', tlJoin || '—');
+    s('tl-role', fullTitle + (p.departamento ? ' · ' + p.departamento : ''));
+    s('tl-active', (Number(p.total_horas)||0).toLocaleString('es-CO') + ' horas acumuladas');
+  });
+
   // Render timeline
   renderTimeline(role);
 }
@@ -3661,6 +3843,9 @@ function navTo(el,sectionId){
   const topbar=shell.querySelector('.topbar-title');
   if(topbar) topbar.textContent=el.textContent.trim().replace(/\d+$/,'').trim();
   if(sectionId==='sec-vol-perfil') renderTimeline(currentRole);
+  if(sectionId==='sec-mun-vol-perfil') cargarPerfilCoord('mun');
+  if(sectionId==='sec-dep-vol-perfil') cargarPerfilCoord('dep');
+  if(sectionId==='sec-nac-vol-perfil') cargarPerfilCoord('nac');
   if(sectionId==='sec-sa-solicitudes') cargarSolicitudes();
   if(sectionId==='sec-sa-usuarios') cargarUsuarios();
   if(sectionId==='sec-sa-certificados') { if(!window._usuariosData||!window._usuariosData.length) cargarUsuarios(); cargarCertificadosAdmin('sa'); }
@@ -3670,7 +3855,9 @@ function navTo(el,sectionId){
   if(sectionId==='sec-sa-home') cargarEstadisticasSA();
   if(sectionId==='sec-nac-home') cargarEstadisticasNAC();
   if(sectionId==='sec-dep-home') cargarEstadisticasDep();
+  if(sectionId==='sec-dep-mapa') cargarEstadisticasDep();
   if(sectionId==='sec-mun-home') cargarEstadisticasMun();
+  if(sectionId==='sec-mun-mapa') cargarEstadisticasMun();
   if(sectionId==='sec-vol-home') cargarEstadisticasVol();
   if(sectionId==='sec-dep-voluntarios') cargarVoluntariosDep();
   if(sectionId==='sec-mun-voluntarios') cargarVoluntariosMun();
@@ -3690,6 +3877,7 @@ function navTo(el,sectionId){
   if(sectionId==='sec-mun-eventos') cargarEventosAdmin('mun');
   if(sectionId==='sec-vol-eventos') cargarEventosVol();
   if(sectionId==='sec-nac-reportes') cargarIndicadoresNAC();
+  if(sectionId==='sec-sa-historial-org') cargarHistorialOrg();
   setTimeout(()=>initMapsForSection(sectionId),200);
   if(window.innerWidth<=1100) closeSidebar();
 }
@@ -5988,6 +6176,106 @@ function getProxNivel(horas) {
   return null;
 }
 
+// ── Historial Organizacional SA ──
+async function cargarHistorialOrg() {
+  var setNum = function(id, n) { var el = document.getElementById(id); if(el) el.textContent = n !== null && n !== undefined ? Number(n).toLocaleString('es-CO') : '—'; };
+  ['hist-total-vols','hist-total-horas','hist-total-certs','hist-total-deptos'].forEach(function(id){ setNum(id, '…'); });
+  ['hist-coords-list','hist-roles-bars','hist-recientes-list'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.innerHTML = '<p style="color:var(--muted);font-size:13px;">Cargando...</p>';
+  });
+
+  try {
+    var sess  = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h     = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+
+    var [rPerfiles, rCerts] = await Promise.all([
+      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,nombres,apellidos,rol,departamento,municipio,total_horas,created_at&order=created_at.desc', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/certificados?select=id', { headers: h })
+    ]);
+    var perfiles = rPerfiles.ok ? await rPerfiles.json() : [];
+    var certs    = rCerts.ok   ? await rCerts.json()    : [];
+
+    // ── KPIs ──
+    var totalHoras  = perfiles.reduce(function(s, p) { return s + (Number(p.total_horas)||0); }, 0);
+    var deptosActivos = new Set(perfiles.map(function(p){ return p.departamento; }).filter(Boolean));
+    setNum('hist-total-vols',   perfiles.length);
+    setNum('hist-total-horas',  Math.round(totalHoras));
+    setNum('hist-total-certs',  certs.length);
+    setNum('hist-total-deptos', deptosActivos.size);
+
+    // ── Período vigente (timeline) ──
+    var coords = perfiles.filter(function(p){ return p.rol === 'coord_nacional' || p.rol === 'super_admin'; });
+    var coordActual = coords[0];
+    if (coordActual) {
+      var nomC = [(coordActual.nombres||''),(coordActual.apellidos||'')].filter(Boolean).join(' ');
+      var el = document.getElementById('hist-coord-actual'); if(el) el.textContent = nomC || 'Coordinación Nacional';
+    }
+    var descEl = document.getElementById('hist-periodo-desc');
+    if (descEl) descEl.textContent = 'Ene 2026 · '+perfiles.length.toLocaleString('es-CO')+' voluntarios · '+deptosActivos.size+' departamentos · '+Math.round(totalHoras).toLocaleString('es-CO')+' horas';
+    var tagsEl = document.getElementById('hist-periodo-tags');
+    if (tagsEl) tagsEl.innerHTML = '<span class="tag tag-green">Activo</span><span class="tag tag-blue">'+deptosActivos.size+' dptos</span><span class="tag tag-green">'+Math.round(totalHoras/1000)+'K horas</span>';
+
+    // ── Coordinadores nacionales ──
+    var coordsEl = document.getElementById('hist-coords-list');
+    if (coordsEl) {
+      if (coords.length === 0) {
+        coordsEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Sin coordinadores registrados.</p>';
+      } else {
+        coordsEl.innerHTML = coords.slice(0, 6).map(function(c, i) {
+          var nom  = [(c.nombres||''),(c.apellidos||'')].filter(Boolean).join(' ') || 'Sin nombre';
+          var loc  = [c.municipio, c.departamento].filter(Boolean).join(' · ') || '—';
+          var isFirst = i === 0;
+          var bg = isFirst ? 'background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);' : 'background:var(--surface2);';
+          var tag = isFirst ? '<span class="tag tag-amber">Vigente</span>' : '<span class="tag tag-gray">En red</span>';
+          return '<div class="av-row" style="padding:12px;border-radius:var(--r);'+bg+'">' +
+            '<div class="av-sm" style="width:40px;height:40px;font-size:20px;border-radius:10px;background:linear-gradient(135deg,#ffd0a0,#f8b870);">🏛️</div>' +
+            '<div style="flex:1;"><strong style="font-size:14px;">'+nom+'</strong>' +
+            '<p style="font-size:12px;color:var(--muted);">'+loc+' · '+(Number(c.total_horas)||0).toLocaleString('es-CO')+' h</p></div>' +
+            tag+'</div>';
+        }).join('');
+      }
+    }
+
+    // ── Distribución por rol ──
+    var rolLabels = { voluntario:'👤 Voluntarios', coord_municipal:'🏘️ Coord. Municipal', coord_departamental:'📋 Coord. Departamental', coord_nacional:'🏛️ Coord. Nacional', super_admin:'⚙️ Super Admin' };
+    var rolMap = {};
+    perfiles.forEach(function(p){ rolMap[p.rol] = (rolMap[p.rol]||0)+1; });
+    var rolArr = Object.keys(rolLabels).map(function(r){ return { key:r, label:rolLabels[r], cnt:rolMap[r]||0 }; });
+    var maxR = Math.max.apply(null, rolArr.map(function(r){ return r.cnt; })) || 1;
+    var rolesEl = document.getElementById('hist-roles-bars');
+    if (rolesEl) {
+      rolesEl.innerHTML = rolArr.map(function(r){
+        var pct = Math.round((r.cnt/maxR)*100);
+        return '<div class="dept-row"><div class="dept-name text-sm">'+r.label+'</div>' +
+          '<div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:'+pct+'%"></div></div></div>' +
+          '<div class="dept-num">'+r.cnt+'</div></div>';
+      }).join('');
+    }
+
+    // ── Registros recientes ──
+    var recEl = document.getElementById('hist-recientes-list');
+    if (recEl) {
+      var recent = perfiles.slice(0, 6);
+      if (recent.length === 0) {
+        recEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Sin voluntarios registrados.</p>';
+      } else {
+        recEl.innerHTML = recent.map(function(p){
+          var nom = [(p.nombres||''),(p.apellidos||'')].filter(Boolean).join(' ') || 'Sin nombre';
+          var loc = [p.municipio, p.departamento].filter(Boolean).join(', ') || '—';
+          var fecha = p.created_at ? new Date(p.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+          var nv = getNivel(Number(p.total_horas)||0);
+          return '<div class="av-row"><div class="av-sm" style="width:36px;height:36px;font-size:18px;">🙋</div>' +
+            '<div style="flex:1;"><strong style="font-size:13px;">'+nom+'</strong>' +
+            '<p style="font-size:11px;color:var(--muted);">'+loc+' · '+(nv?nv.emoji+' '+nv.nombre:'—')+'</p></div>' +
+            '<span style="font-size:11px;color:var(--muted2);">'+fecha+'</span></div>';
+        }).join('');
+      }
+    }
+
+  } catch(e) { console.error('cargarHistorialOrg:', e); }
+}
+
 // ── Estadísticas SA ──
 async function cargarEstadisticasSA() {
   try {
@@ -6335,6 +6623,35 @@ function exportarIndicadoresCSV() {
   showToast('✅ CSV descargado correctamente');
 }
 
+// ── Stats de perfil para coords (mun / dep / nac) ──
+async function cargarPerfilCoord(scope) {
+  var pid = (window.currentProfile || {}).id;
+  if (!pid) return;
+  var s = function(sfx, val) { var el = document.getElementById(scope+'-'+sfx); if(el) el.textContent = val !== null && val !== undefined ? String(val) : '—'; };
+  s('perfil-stat-eventos', '…'); s('perfil-stat-horas', '…'); s('perfil-stat-certs', '…');
+  try {
+    var sess  = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h     = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
+    var [rIns, rCerts] = await Promise.all([
+      fetch(window._SB_URL + '/rest/v1/evento_inscripciones?perfil_id=eq.' + pid + '&select=id', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/certificados?perfil_id=eq.' + pid + '&select=id,horas', { headers: h })
+    ]);
+    var ins   = rIns.ok   ? await rIns.json()   : [];
+    var certs = rCerts.ok ? await rCerts.json()  : [];
+    var horas = certs.reduce(function(sum, c) { return sum + (Number(c.horas) || 0); }, 0);
+    // Prefer total_horas from profile if available
+    var profileHoras = Number((window.currentProfile || {}).total_horas) || 0;
+    s('perfil-stat-eventos', ins.length);
+    s('perfil-stat-horas',   (profileHoras || horas).toLocaleString('es-CO'));
+    s('perfil-stat-certs',   certs.length);
+    // Also update nivel badge with real hours
+    var totalH = profileHoras || horas;
+    var nv = getNivel(totalH);
+    if (nv) { var el = document.getElementById(scope+'-perfil-nivel'); if(el) el.textContent = nv.emoji + ' ' + nv.nombre; }
+  } catch(e) { console.error('cargarPerfilCoord ('+scope+'):', e); }
+}
+
 // ── Estadísticas voluntario ──
 async function cargarEstadisticasVol() {
   try {
@@ -6448,6 +6765,12 @@ async function cargarEstadisticasDep() {
     var muniArr = Object.keys(muniMap).map(function(m) { return { nombre: m, cnt: muniMap[m] }; });
     muniArr.sort(function(a, b) { return b.cnt - a.cnt; });
     setNum('kpi-dep-municipios', muniArr.length);
+    // Mapa departamental KPIs (mirror)
+    setNum('mapa-dep-vols',  vols.length);
+    setNum('mapa-dep-munis', muniArr.length);
+    setNum('mapa-dep-certs', certs.length);
+    setNum('mapa-dep-horas', Math.round(totalHoras));
+    var dhdr = document.querySelector('#sec-dep-mapa .card-title'); if(dhdr && depto) dhdr.textContent = '🗺️ Mapa Departamental — '+depto;
 
     // Barras de municipios (top 5)
     var barsEl = document.getElementById('dep-home-munis-bars');
@@ -6555,6 +6878,12 @@ async function cargarEstadisticasMun() {
     setNum('kpi-mun-certs', certs.length);
     setNum('kpi-mun-eventos', eventos.length);
     setNum('kpi-mun-horas', Math.round(totalHoras));
+    // Mapa municipal KPIs (mirror)
+    setNum('mapa-mun-vols', vols.length);
+    setNum('mapa-mun-eventos', eventos.length);
+    setNum('mapa-mun-horas', Math.round(totalHoras));
+    var mlabel = document.getElementById('mapa-mun-label'); if(mlabel) mlabel.textContent = muni || 'mi municipio';
+    var mhdr = document.querySelector('#sec-mun-mapa .card-title'); if(mhdr && muni) mhdr.textContent = '🗺️ Mapa Municipal — '+muni;
 
     // Badge en header
     var badgeEl = document.getElementById('mun-home-vol-badge');
@@ -6666,83 +6995,99 @@ async function cargarHistorialVol(scope) {
 }
 
 /* ══════════════════════════════════════════════════
-   EDICIÓN DE PERFIL
+   EDICIÓN DE PERFIL (todos los roles)
+   scope: 'vol' | 'mun' | 'dep' | 'nac'
 ══════════════════════════════════════════════════ */
-function toggleEditPerfil() {
-  var form = document.getElementById('edit-perfil-form');
+function _perfilIds(scope) {
+  // Devuelve los IDs de form, botón y campos según el scope
+  var pre = (scope === 'vol') ? '' : scope + '-';
+  return {
+    formId:  pre + 'edit-perfil-form',
+    saveBtn: pre + 'ep-save-btn',
+    f: function(field) { return document.getElementById(pre + 'ep-' + field); }
+  };
+}
+
+function toggleEditPerfil(scope) {
+  scope = scope || 'vol';
+  var ids  = _perfilIds(scope);
+  var form = document.getElementById(ids.formId);
   if (!form) return;
   var visible = form.style.display !== 'none';
   if (visible) {
     form.style.display = 'none';
   } else {
-    // Pre-rellenar con datos actuales
     var p = window.currentProfile || {};
-    var setVal = function(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; };
-    setVal('ep-telefono', p.telefono);
-    setVal('ep-genero', p.genero);
-    setVal('ep-situacion', p.situacion_academica);
-    setVal('ep-carrera', p.carrera);
-    setVal('ep-semestre', p.semestre);
-    setVal('ep-institucion', p.institucion);
-    setVal('ep-area', p.area_interes);
-    setVal('ep-bio', p.bio);
+    var sv = function(field, val) { var el = ids.f(field); if (el) el.value = val || ''; };
+    sv('telefono',  p.telefono);
+    sv('genero',    p.genero);
+    sv('situacion', p.situacion_academica);
+    sv('carrera',   p.carrera);
+    sv('semestre',  p.semestre);
+    sv('institucion', p.institucion);
+    sv('area',      p.area_interes);
+    sv('bio',       p.bio);
     form.style.display = 'block';
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
-async function guardarPerfil() {
-  var btn = document.getElementById('ep-save-btn');
+async function guardarPerfil(scope) {
+  scope = scope || 'vol';
+  var ids = _perfilIds(scope);
+  var btn = document.getElementById(ids.saveBtn);
   if (btn) { btn.textContent = 'Guardando...'; btn.disabled = true; }
 
   var pid = (window.currentProfile || {}).id;
-  if (!pid) { showToast('⚠️ Perfil no cargado — inicia sesión'); if (btn) { btn.textContent = '💾 Guardar cambios'; btn.disabled = false; } return; }
+  if (!pid) {
+    showToast('⚠️ Perfil no cargado — inicia sesión');
+    if (btn) { btn.textContent = '💾 Guardar cambios'; btn.disabled = false; }
+    return;
+  }
 
-  var g = function(id) { return (document.getElementById(id)?.value || '').trim(); };
+  var g = function(field) { var el = ids.f(field); return el ? (el.value || '').trim() : ''; };
   var updates = {
-    telefono:          g('ep-telefono'),
-    genero:            g('ep-genero'),
-    situacion_academica: g('ep-situacion'),
-    carrera:           g('ep-carrera'),
-    semestre:          g('ep-semestre'),
-    institucion:       g('ep-institucion'),
-    area_interes:      g('ep-area'),
-    bio:               g('ep-bio'),
-    updated_at:        new Date().toISOString()
+    telefono:            g('telefono'),
+    genero:              g('genero'),
+    situacion_academica: g('situacion'),
+    carrera:             g('carrera'),
+    semestre:            g('semestre'),
+    institucion:         g('institucion'),
+    area_interes:        g('area'),
+    bio:                 g('bio'),
+    updated_at:          new Date().toISOString()
   };
 
-  // Filtrar campos vacíos (mantener los que el usuario limpió igual, pero enviar todos)
   try {
-    var sess = await window.supabase.auth.getSession();
+    var sess  = await window.supabase.auth.getSession();
     var token = sess.data?.session?.access_token || '';
-    var resp = await fetch(
-      window._SB_URL + '/rest/v1/perfiles?id=eq.'+pid,
+    var resp  = await fetch(
+      window._SB_URL + '/rest/v1/perfiles?id=eq.' + pid,
       { method: 'PATCH',
-        headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token,
+        headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token,
           'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-        body: JSON.stringify(updates)
-      }
+        body: JSON.stringify(updates) }
     );
-    if (!resp.ok) throw new Error('HTTP '+resp.status);
-    var rows = await resp.json();
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var rows    = await resp.json();
     var updated = Array.isArray(rows) ? rows[0] : rows;
-    // Actualizar currentProfile en memoria
     if (updated) Object.assign(window.currentProfile, updated);
-    else Object.assign(window.currentProfile, updates);
+    else         Object.assign(window.currentProfile, updates);
 
-    // Actualizar los elementos de la vista
-    var setTxt = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '—'; };
-    setTxt('p-telefono', updates.telefono || '—');
-    setTxt('p-situacion', updates.situacion_academica || '—');
-    setTxt('p-carrera', updates.carrera || '—');
-    setTxt('p-semestre', updates.semestre || '—');
-    setTxt('p-area', updates.area_interes || '—');
+    // Actualizar elementos de la vista del scope correcto
+    var pre    = (scope === 'vol') ? '' : scope + '-';
+    var setTxt = function(id, val) { var el = document.getElementById(pre + id); if (el) el.textContent = val || '—'; };
+    setTxt('p-telefono', updates.telefono);
+    setTxt('p-situacion', updates.situacion_academica);
+    setTxt('p-carrera',   updates.carrera);
+    setTxt('p-semestre',  updates.semestre);
+    setTxt('p-area',      updates.area_interes);
 
     showToast('✅ Perfil actualizado correctamente');
-    toggleEditPerfil();
+    toggleEditPerfil(scope);
   } catch(e) {
     console.error('guardarPerfil:', e);
-    showToast('⚠️ Error al guardar: '+e.message);
+    showToast('⚠️ Error al guardar: ' + e.message);
   } finally {
     if (btn) { btn.textContent = '💾 Guardar cambios'; btn.disabled = false; }
   }
