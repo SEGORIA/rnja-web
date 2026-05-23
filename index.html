@@ -2235,34 +2235,55 @@ tr:hover td{background:var(--surface2);}
 
         <!-- INDICADORES -->
         <div class="page-section" id="sec-nac-reportes">
-          <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">📊 Indicadores Nacionales</div><button class="btn btn-neon btn-sm" onclick="showToast('📊 Exportando reporte PDF...')">⬇ Exportar</button></div>
-          <div class="three-col mb-5">
-            <div class="card" style="text-align:center;padding:28px;"><div style="font-size:48px;margin-bottom:8px;">👥</div><div style="font-family:'Montserrat',sans-serif;font-size:36px;font-weight:800;color:var(--g600);">6.400</div><div class="text-muted">Voluntarios activos</div></div>
-            <div class="card" style="text-align:center;padding:28px;"><div style="font-size:48px;margin-bottom:8px;">⏱️</div><div style="font-family:'Montserrat',sans-serif;font-size:36px;font-weight:800;color:var(--g600);">18.500</div><div class="text-muted">Horas de voluntariado</div></div>
-            <div class="card" style="text-align:center;padding:28px;"><div style="font-size:48px;margin-bottom:8px;">📜</div><div style="font-family:'Montserrat',sans-serif;font-size:36px;font-weight:800;color:var(--g600);">2.841</div><div class="text-muted">Certificados emitidos</div></div>
-          </div>
-          <div class="two-col">
-            <div class="card"><div class="card-title mb-5">Crecimiento mensual de voluntarios</div>
-              <svg width="100%" height="120" viewBox="0 0 400 120">
-                <line x1="0" y1="110" x2="400" y2="110" stroke="var(--border)" stroke-width="1"/>
-                <polyline points="0,90 67,78 133,65 200,48 267,28 333,15 400,8" fill="none" stroke="var(--neon)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <polyline points="0,90 67,78 133,65 200,48 267,28 333,15 400,8 400,110 0,110" fill="rgba(102,187,106,0.09)"/>
-                <circle cx="0" cy="90" r="4" fill="var(--neon)"/><circle cx="67" cy="78" r="4" fill="var(--neon)"/><circle cx="133" cy="65" r="4" fill="var(--neon)"/><circle cx="200" cy="48" r="4" fill="var(--neon)"/><circle cx="267" cy="28" r="4" fill="var(--neon)"/><circle cx="333" cy="15" r="4" fill="var(--neon)"/><circle cx="400" cy="8" r="4" fill="var(--neon)"/>
-                <text x="0" y="125" font-size="10" fill="var(--muted)" font-family="sans-serif">Ene</text>
-                <text x="60" y="125" font-size="10" fill="var(--muted)" font-family="sans-serif">Feb</text>
-                <text x="127" y="125" font-size="10" fill="var(--muted)" font-family="sans-serif">Mar</text>
-                <text x="193" y="125" font-size="10" fill="var(--muted)" font-family="sans-serif">Abr</text>
-                <text x="260" y="125" font-size="10" fill="var(--muted)" font-family="sans-serif">May</text>
-                <text x="327" y="125" font-size="10" fill="var(--muted)" font-family="sans-serif">Jun</text>
-              </svg>
+          <div class="card-header mb-5">
+            <div class="card-title" style="font-size:20px;">📊 Indicadores Nacionales</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);" onclick="cargarIndicadoresNAC()">🔄 Actualizar</button>
+              <button class="btn btn-neon btn-sm" onclick="exportarIndicadoresCSV()">⬇ Exportar CSV</button>
             </div>
-            <div class="card"><div class="card-title mb-5">Distribución por tipo de actividad</div>
-              <div style="display:flex;flex-direction:column;gap:10px;">
-                <div class="dept-row"><div class="dept-name">Reforestación</div><div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:38%"></div></div></div><div class="dept-num">38%</div></div>
-                <div class="dept-row"><div class="dept-name">Limpieza</div><div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:25%;background:linear-gradient(90deg,#60a5fa,#3b82f6);"></div></div></div><div class="dept-num">25%</div></div>
-                <div class="dept-row"><div class="dept-name">Formación</div><div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:20%;background:linear-gradient(90deg,#c4b5fd,#a78bfa);"></div></div></div><div class="dept-num">20%</div></div>
-                <div class="dept-row"><div class="dept-name">Biodiversidad</div><div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:12%;background:linear-gradient(90deg,#fde68a,#f59e0b);"></div></div></div><div class="dept-num">12%</div></div>
-                <div class="dept-row"><div class="dept-name">Otros</div><div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:5%;background:var(--border);"></div></div></div><div class="dept-num">5%</div></div>
+          </div>
+
+          <!-- KPIs principales -->
+          <div class="kpi-grid kpi-grid-4 mb-5" style="grid-template-columns:repeat(5,1fr);">
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">👥</div></div><div class="kpi-num" id="ind-total-vols">—</div><div class="kpi-label">Voluntarios</div></div>
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">⏱️</div></div><div class="kpi-num" id="ind-total-horas">—</div><div class="kpi-label">Horas acumuladas</div></div>
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">📜</div></div><div class="kpi-num" id="ind-total-certs">—</div><div class="kpi-label">Certificados emitidos</div></div>
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">📅</div></div><div class="kpi-num" id="ind-total-eventos">—</div><div class="kpi-label">Eventos creados</div></div>
+            <div class="kpi"><div class="kpi-top"><div class="kpi-icon">🏛️</div></div><div class="kpi-num" id="ind-total-deptos">—</div><div class="kpi-label">Departamentos activos</div></div>
+          </div>
+
+          <div class="two-col mb-5">
+            <!-- Gráfico de crecimiento mensual -->
+            <div class="card">
+              <div class="card-title mb-4">📈 Registros por mes (últimos 6 meses)</div>
+              <div id="ind-chart-mensual" style="min-height:140px;display:flex;align-items:flex-end;gap:0;">
+                <p style="color:var(--muted);font-size:13px;align-self:center;padding:20px 0;">Cargando...</p>
+              </div>
+            </div>
+
+            <!-- Distribución por nivel -->
+            <div class="card">
+              <div class="card-title mb-4">🏅 Distribución por nivel RNJA</div>
+              <div id="ind-niveles-bars" style="display:flex;flex-direction:column;gap:8px;">
+                <p style="color:var(--muted);font-size:13px;">Cargando...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <!-- Top departamentos -->
+            <div class="card">
+              <div class="card-title mb-4">🏛️ Top departamentos por voluntarios</div>
+              <div id="ind-deptos-bars" style="display:flex;flex-direction:column;gap:8px;">
+                <p style="color:var(--muted);font-size:13px;">Cargando...</p>
+              </div>
+            </div>
+
+            <!-- Distribución por categoría de evento -->
+            <div class="card">
+              <div class="card-title mb-4">🌿 Eventos por categoría</div>
+              <div id="ind-cat-bars" style="display:flex;flex-direction:column;gap:8px;">
+                <p style="color:var(--muted);font-size:13px;">Cargando...</p>
               </div>
             </div>
           </div>
@@ -3668,6 +3689,7 @@ function navTo(el,sectionId){
   if(sectionId==='sec-dep-eventos') cargarEventosAdmin('dep');
   if(sectionId==='sec-mun-eventos') cargarEventosAdmin('mun');
   if(sectionId==='sec-vol-eventos') cargarEventosVol();
+  if(sectionId==='sec-nac-reportes') cargarIndicadoresNAC();
   setTimeout(()=>initMapsForSection(sectionId),200);
   if(window.innerWidth<=1100) closeSidebar();
 }
@@ -6068,6 +6090,249 @@ async function cargarEstadisticasNAC() {
       // ya seteado arriba
     });
   } catch(e) { console.error('cargarEstadisticasNAC:', e); }
+}
+
+// ── Indicadores Nacionales (sec-nac-reportes) ──
+var _indicadoresCache = null;
+async function cargarIndicadoresNAC() {
+  // Helper: set KPI text
+  var setNum = function(id, n) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = n === null || n === undefined ? '—' : Number(n).toLocaleString('es-CO');
+  };
+  // Loading state
+  ['ind-total-vols','ind-total-horas','ind-total-certs','ind-total-eventos','ind-total-deptos']
+    .forEach(function(id) { setNum(id, '…'); });
+  ['ind-chart-mensual','ind-niveles-bars','ind-deptos-bars','ind-cat-bars'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = '<p style="color:var(--muted);font-size:13px;">Cargando...</p>';
+  });
+
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+
+    // Parallel fetch: perfiles (total_horas, departamento, created_at), certificados (count), eventos (categoria, created_at)
+    var [rPerfiles, rCerts, rEventos] = await Promise.all([
+      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,total_horas,departamento,created_at&order=created_at.asc', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/certificados?select=id', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/eventos?select=id,categoria,estado,created_at', { headers: h })
+    ]);
+
+    var perfiles = rPerfiles.ok ? await rPerfiles.json() : [];
+    var certs    = rCerts.ok   ? await rCerts.json()    : [];
+    var eventos  = rEventos.ok ? await rEventos.json()  : [];
+
+    // ── KPIs ──
+    var totalHoras = perfiles.reduce(function(s, p) { return s + (Number(p.total_horas) || 0); }, 0);
+    var deptosSet  = new Set(perfiles.map(function(p) { return p.departamento; }).filter(Boolean));
+
+    setNum('ind-total-vols',    perfiles.length);
+    setNum('ind-total-horas',   Math.round(totalHoras));
+    setNum('ind-total-certs',   certs.length);
+    setNum('ind-total-eventos', eventos.length);
+    setNum('ind-total-deptos',  deptosSet.size);
+
+    // ── Gráfico mensual (registros de voluntarios, últimos 6 meses) ──
+    var now    = new Date();
+    var meses  = [];
+    for (var i = 5; i >= 0; i--) {
+      var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      meses.push({ key: d.getFullYear()+'-'+(String(d.getMonth()+1).padStart(2,'0')), label: d.toLocaleDateString('es-CO', { month:'short' }), cnt: 0 });
+    }
+    perfiles.forEach(function(p) {
+      if (!p.created_at) return;
+      var mk = p.created_at.substring(0, 7);
+      var m  = meses.find(function(x) { return x.key === mk; });
+      if (m) m.cnt++;
+    });
+    var chartEl = document.getElementById('ind-chart-mensual');
+    if (chartEl) {
+      var maxMes = Math.max.apply(null, meses.map(function(m) { return m.cnt; })) || 1;
+      var barColors = ['#2E7D32','#2581C4','#00695C','#1A5C9A','#4CAF50','#3D95D0'];
+      var chartHtml = '<div style="display:flex;align-items:flex-end;gap:6px;height:130px;width:100%;">';
+      meses.forEach(function(m, idx) {
+        var pct   = Math.max(4, Math.round((m.cnt / maxMes) * 100));
+        var color = barColors[idx % barColors.length];
+        chartHtml += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">' +
+          '<div style="font-size:11px;font-weight:600;color:var(--ink);">' + (m.cnt || '') + '</div>' +
+          '<div style="width:100%;background:'+color+';border-radius:4px 4px 0 0;height:'+pct+'%;min-height:4px;transition:height .4s;"></div>' +
+          '<div style="font-size:10px;color:var(--muted);text-transform:capitalize;">' + m.label + '</div>' +
+          '</div>';
+      });
+      chartHtml += '</div>';
+      chartEl.style.cssText = 'min-height:140px;display:flex;align-items:flex-end;';
+      chartEl.innerHTML = chartHtml;
+    }
+
+    // ── Distribución por nivel ──
+    var nivelMap = {};
+    NIVELES.forEach(function(n) { nivelMap[n.nombre] = 0; });
+    perfiles.forEach(function(p) {
+      var nv = getNivel(Number(p.total_horas) || 0);
+      if (nv) nivelMap[nv.nombre] = (nivelMap[nv.nombre] || 0) + 1;
+    });
+    var nivelesEl = document.getElementById('ind-niveles-bars');
+    if (nivelesEl) {
+      var totalV = perfiles.length || 1;
+      var nHtml = '';
+      NIVELES.forEach(function(n) {
+        var cnt = nivelMap[n.nombre] || 0;
+        var pct = Math.round((cnt / totalV) * 100);
+        nHtml += '<div class="dept-row">' +
+          '<div class="dept-name text-sm">' + n.emoji + ' ' + n.nombre + '</div>' +
+          '<div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div></div>' +
+          '<div class="dept-num">' + cnt + '</div>' +
+          '</div>';
+      });
+      nivelesEl.innerHTML = nHtml || '<p style="color:var(--muted);font-size:13px;">Sin datos.</p>';
+    }
+
+    // ── Top departamentos ──
+    var deptoMap = {};
+    perfiles.forEach(function(p) {
+      if (p.departamento) deptoMap[p.departamento] = (deptoMap[p.departamento] || 0) + 1;
+    });
+    var deptoArr = Object.keys(deptoMap).map(function(d) { return { nombre: d, cnt: deptoMap[d] }; });
+    deptoArr.sort(function(a, b) { return b.cnt - a.cnt; });
+    var deptosEl = document.getElementById('ind-deptos-bars');
+    if (deptosEl) {
+      if (deptoArr.length === 0) {
+        deptosEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Sin datos.</p>';
+      } else {
+        var maxD   = deptoArr[0].cnt || 1;
+        var top8   = deptoArr.slice(0, 8);
+        var restD  = deptoArr.slice(8).reduce(function(s, d) { return s + d.cnt; }, 0);
+        var dHtml  = '';
+        top8.forEach(function(d) {
+          var pct = Math.round((d.cnt / maxD) * 100);
+          dHtml += '<div class="dept-row">' +
+            '<div class="dept-name text-sm">' + d.nombre + '</div>' +
+            '<div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div></div>' +
+            '<div class="dept-num">' + d.cnt + '</div>' +
+            '</div>';
+        });
+        if (restD > 0) {
+          var rPct = Math.round((restD / maxD) * 100);
+          dHtml += '<div class="dept-row">' +
+            '<div class="dept-name text-sm">Otros (' + (deptoArr.length - 8) + ')</div>' +
+            '<div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:' + rPct + '%"></div></div></div>' +
+            '<div class="dept-num">' + restD + '</div>' +
+            '</div>';
+        }
+        deptosEl.innerHTML = dHtml;
+      }
+    }
+
+    // ── Eventos por categoría ──
+    var catLabels = {
+      reforestacion:'🌿 Reforestación', limpieza:'🧹 Limpieza',
+      formacion:'📚 Formación', sensibilizacion:'📢 Sensibilización',
+      biodiversidad:'🦋 Biodiversidad', otro:'🌀 Otro'
+    };
+    var catMap = {};
+    eventos.forEach(function(e) {
+      var cat = e.categoria || 'otro';
+      catMap[cat] = (catMap[cat] || 0) + 1;
+    });
+    var catArr = Object.keys(catMap).map(function(c) { return { key: c, label: catLabels[c] || ('🌀 '+c), cnt: catMap[c] }; });
+    catArr.sort(function(a, b) { return b.cnt - a.cnt; });
+    var catEl = document.getElementById('ind-cat-bars');
+    if (catEl) {
+      if (catArr.length === 0) {
+        catEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Sin eventos registrados.</p>';
+      } else {
+        var maxC  = catArr[0].cnt || 1;
+        var cHtml = '';
+        catArr.forEach(function(c) {
+          var pct = Math.round((c.cnt / maxC) * 100);
+          cHtml += '<div class="dept-row">' +
+            '<div class="dept-name text-sm">' + c.label + '</div>' +
+            '<div class="dept-bar-wrap"><div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div></div>' +
+            '<div class="dept-num">' + c.cnt + '</div>' +
+            '</div>';
+        });
+        catEl.innerHTML = cHtml;
+      }
+    }
+
+    // ── Caché para exportación CSV ──
+    _indicadoresCache = {
+      resumen: [
+        { indicador: 'Total voluntarios',     valor: perfiles.length },
+        { indicador: 'Horas acumuladas',       valor: Math.round(totalHoras) },
+        { indicador: 'Certificados emitidos',  valor: certs.length },
+        { indicador: 'Eventos creados',        valor: eventos.length },
+        { indicador: 'Departamentos activos',  valor: deptosSet.size }
+      ],
+      niveles:  NIVELES.map(function(n) { return { nivel: n.nombre, voluntarios: nivelMap[n.nombre] || 0 }; }),
+      deptos:   deptoArr.slice(0, 20).map(function(d) { return { departamento: d.nombre, voluntarios: d.cnt }; }),
+      categorias: catArr.map(function(c) { return { categoria: c.label.replace(/^[^ ]+ /,''), eventos: c.cnt }; }),
+      mensual: meses.map(function(m) { return { mes: m.key, registros: m.cnt }; })
+    };
+
+  } catch(e) {
+    console.error('cargarIndicadoresNAC:', e);
+    ['ind-total-vols','ind-total-horas','ind-total-certs','ind-total-eventos','ind-total-deptos'].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.textContent = 'Error';
+    });
+  }
+}
+
+// ── Exportar Indicadores CSV ──
+function exportarIndicadoresCSV() {
+  if (!_indicadoresCache) {
+    showToast('⚠️ Primero carga los indicadores (🔄 Actualizar)');
+    return;
+  }
+  var d = _indicadoresCache;
+  var lines = [];
+
+  // Sección 1: Resumen
+  lines.push('INDICADORES NACIONALES RNJA');
+  lines.push('Generado:,' + new Date().toLocaleDateString('es-CO', { day:'2-digit', month:'long', year:'numeric' }));
+  lines.push('');
+  lines.push('RESUMEN GENERAL');
+  lines.push('Indicador,Valor');
+  d.resumen.forEach(function(r) { lines.push('"'+r.indicador+'",'+r.valor); });
+
+  // Sección 2: Distribución por nivel
+  lines.push('');
+  lines.push('DISTRIBUCIÓN POR NIVEL');
+  lines.push('Nivel,Voluntarios');
+  d.niveles.forEach(function(n) { lines.push('"'+n.nivel+'",'+n.voluntarios); });
+
+  // Sección 3: Top departamentos
+  lines.push('');
+  lines.push('VOLUNTARIOS POR DEPARTAMENTO');
+  lines.push('Departamento,Voluntarios');
+  d.deptos.forEach(function(d2) { lines.push('"'+d2.departamento+'",'+d2.voluntarios); });
+
+  // Sección 4: Eventos por categoría
+  lines.push('');
+  lines.push('EVENTOS POR CATEGORÍA');
+  lines.push('Categoría,Eventos');
+  d.categorias.forEach(function(c) { lines.push('"'+c.categoria+'",'+c.eventos); });
+
+  // Sección 5: Registros mensuales
+  lines.push('');
+  lines.push('REGISTROS MENSUALES (ÚLTIMOS 6 MESES)');
+  lines.push('Mes,Nuevos registros');
+  d.mensual.forEach(function(m) { lines.push(m.mes+','+m.registros); });
+
+  var csv     = lines.join('\n');
+  var blob    = new Blob(['﻿'+csv], { type: 'text/csv;charset=utf-8;' });
+  var url     = URL.createObjectURL(blob);
+  var fecha   = new Date().toISOString().slice(0,10);
+  var a       = document.createElement('a');
+  a.href      = url;
+  a.download  = 'RNJA_Indicadores_'+fecha+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✅ CSV descargado correctamente');
 }
 
 // ── Estadísticas voluntario ──
