@@ -1153,8 +1153,55 @@ tr:hover td{background:var(--surface2);}
                 <div class="p-stat"><span class="p-stat-num">5</span><span class="p-stat-lbl">Insignias</span></div>
               </div>
             </div>
-            <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;flex-shrink:0;" onclick="showToast('&#x270F;&#xFE0F; Edición de perfil — próximamente')">Editar perfil</button>
+            <button class="btn btn-sm" id="btn-edit-perfil" style="background:rgba(255,255,255,.15);color:#fff;flex-shrink:0;" onclick="toggleEditPerfil()">✏️ Editar perfil</button>
           </div>
+
+          <!-- Formulario de edición de perfil -->
+          <div id="edit-perfil-form" style="display:none;" class="card mb-5">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="card-title">✏️ Editar mi perfil</div>
+              <button onclick="toggleEditPerfil()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);">✕</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="grid-column:1/-1;background:var(--surface2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--muted);">
+                ℹ️ <strong>Nombre, cédula y ubicación</strong> solo pueden modificarlos los coordinadores. Puedes actualizar tu información de contacto y académica.
+              </div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Teléfono</label>
+                <input type="tel" id="ep-telefono" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="300 000 0000"></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Género</label>
+                <select id="ep-genero" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option>
+                  <option value="Mujer">Mujer</option>
+                  <option value="Hombre">Hombre</option>
+                  <option value="No binario">No binario</option>
+                  <option value="Prefiero no decir">Prefiero no decir</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Situación académica</label>
+                <select id="ep-situacion" class="form-input form-select" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;">
+                  <option value="">Sin especificar</option>
+                  <option value="Bachiller">Bachiller</option>
+                  <option value="Técnico">Técnico / Tecnólogo</option>
+                  <option value="Universitario">Universitario</option>
+                  <option value="Graduado">Graduado / Profesional</option>
+                  <option value="Posgrado">Posgrado</option>
+                </select></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Carrera / Programa</label>
+                <input type="text" id="ep-carrera" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Biología, Ingeniería Ambiental..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Semestre / Año</label>
+                <input type="text" id="ep-semestre" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: 6, Graduado..."></div>
+              <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Institución educativa</label>
+                <input type="text" id="ep-institucion" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Universidad de Antioquia"></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Área de interés ambiental</label>
+                <input type="text" id="ep-area" class="form-input" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;" placeholder="Ej: Conservación de fauna, Cambio climático, Residuos sólidos..."></div>
+              <div style="grid-column:1/-1;"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px;">Bio / Presentación</label>
+                <textarea id="ep-bio" class="form-input" rows="2" style="width:100%;background:var(--surface2);color:var(--ink);border-color:var(--border);padding:9px 12px;font-size:14px;resize:vertical;" placeholder="Cuéntanos un poco sobre ti y tu motivación ambiental..."></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+              <button id="ep-save-btn" class="btn btn-neon" style="flex:1;" onclick="guardarPerfil()">💾 Guardar cambios</button>
+              <button class="btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);padding:10px 20px;" onclick="toggleEditPerfil()">Cancelar</button>
+            </div>
+          </div>
+
           <div class="two-col">
             <div>
               <div class="card mb-5">
@@ -3966,20 +4013,140 @@ function showToast(msg){
 }
 
 /* ══════════════════ NOTIFICATIONS ══════════════════ */
-const NOTIFS={
-  voluntario:[{ic:'📅',t:'Nuevo evento en Antioquia',s:'Jornada Reforestación · 25 Mayo'},{ic:'🏅',t:'Nueva insignia desbloqueada',s:'50 horas cumplidas'},{ic:'✅',t:'Participación validada',s:'Taller Cambio Climático'}],
-  coord_municipal:[{ic:'⚡',t:'5 participaciones pendientes',s:'Validar urgente'},{ic:'👥',t:'3 nuevos voluntarios',s:'Esta semana'},{ic:'📨',t:'Solicitud de cert. general',s:'Mariana López'}],
-  coord_departamental:[{ic:'📊',t:'Reporte mensual disponible',s:'Mayo 2026 · Valle'},{ic:'⚠️',t:'Municipio sin coordinador',s:'Buga'},{ic:'📜',t:'28 certificados emitidos',s:'Esta semana'}],
-  coord_nacional:[{ic:'📈',t:'6.400 voluntarios activos',s:'+22% vs enero'},{ic:'🏛️',t:'Nariño sin coordinador',s:'Asignar urgente'},{ic:'📨',t:'2 solicitudes cert. general',s:'Pendientes'},{ic:'🎭',t:'Cambio de rol realizado',s:'Laura Montoya → Ética'}],
-  etica:[{ic:'⚖️',t:'Caso #2024-007 urgente',s:'Valle del Cauca · Revisar'},{ic:'📋',t:'Reunión comité programada',s:'Viernes 24 Mayo'}],
-  super_admin:[{ic:'📨',t:'7 solicitudes pendientes',s:'Aprobar ingreso'},{ic:'🎭',t:'Cambio de rol registrado',s:'Jorge Medina → Coord. Nacional'},{ic:'⚠️',t:'Nariño sin coordinador',s:'Sin asignar'}],
-};
 function setupNotifs(role){
-  const list=document.getElementById('notif-list');
-  (NOTIFS[role]||[]).forEach(n=>{ const d=document.createElement('div'); d.className='notif-item'; d.innerHTML=`<div class="notif-ic">${n.ic}</div><div class="notif-text"><strong>${n.t}</strong><small>${n.s}</small></div>`; list.appendChild(d); });
+  // Limpiar lista y marcar como "cargando" — la carga real es async
+  var list = document.getElementById('notif-list');
+  if (list) list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Cargando notificaciones...</div>';
+  // Ocultar el dot hasta saber si hay notificaciones
+  document.querySelectorAll('.notif-dot').forEach(function(d){ d.style.display='none'; });
+  // Cargar async con retardo para que el perfil ya esté cargado
+  setTimeout(function(){ cargarNotificaciones(role); }, 600);
 }
-function toggleNotif(){ document.getElementById('notif-panel').classList.toggle('open'); }
-document.addEventListener('click',e=>{ if(!e.target.closest('#notif-panel')&&!e.target.closest('.notif-btn')) document.getElementById('notif-panel').classList.remove('open'); });
+
+async function cargarNotificaciones(role) {
+  var list = document.getElementById('notif-list');
+  if (!list) return;
+  var notifs = [];
+
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
+    var p = window.currentProfile || {};
+    var hoy = new Date().toISOString().split('T')[0];
+    var en7dias = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
+
+    if (role === 'super_admin' || role === 'coord_nacional') {
+      // Solicitudes pendientes
+      var rSols = await fetch(window._SB_URL + '/rest/v1/solicitudes?estado=eq.pendiente&select=id&limit=100', { headers: h });
+      var sols = rSols.ok ? await rSols.json() : [];
+      if (sols.length > 0) notifs.push({ urgente: true, ic:'📨', t: sols.length+' solicitud'+(sols.length>1?'es':'')+' pendiente'+(sols.length>1?'s':''), s:'Nuevos registros por aprobar', accion: "navToByName('sec-sa-solicitudes','sidebar-sa','topbar-title-sa','Solicitudes')" });
+
+      // Coordinaciones nacionales sin asignar (deptos sin coord)
+      if (role === 'coord_nacional' || role === 'super_admin') {
+        var rDeps = await fetch(window._SB_URL + '/rest/v1/perfiles?rol=eq.coord_departamental&select=departamento', { headers: h });
+        var deps = rDeps.ok ? await rDeps.json() : [];
+        var rVols = await fetch(window._SB_URL + '/rest/v1/perfiles?rol=eq.voluntario&select=departamento&limit=1000', { headers: h });
+        var allVols = rVols.ok ? await rVols.json() : [];
+        var depsConCoord = new Set(deps.map(function(d) { return d.departamento; }));
+        var depsConVols = new Set(allVols.map(function(v) { return v.departamento; }).filter(Boolean));
+        var sinCoord = [...depsConVols].filter(function(d) { return d && !depsConCoord.has(d); });
+        if (sinCoord.length > 0) notifs.push({ ic:'⚠️', t: sinCoord.length+' departamento'+(sinCoord.length>1?'s':'')+' sin coordinador', s: sinCoord.slice(0,3).join(', ')+(sinCoord.length>3?' y más':'') });
+      }
+    }
+
+    if (role === 'coord_municipal') {
+      // Inscripciones pendientes
+      var depto = p.departamento || '';
+      if (depto) {
+        var depFlt = encodeURIComponent(depto);
+        var rIns = await fetch(window._SB_URL + '/rest/v1/evento_inscripciones?estado=eq.pendiente&select=id,eventos!inner(departamento)&eventos.departamento=eq.'+depFlt+'&limit=100', { headers: h });
+        var ins = rIns.ok ? await rIns.json() : [];
+        var pending = ins.filter(function(i) { return i.eventos && i.eventos.departamento === depto; });
+        if (pending.length > 0) notifs.push({ urgente: true, ic:'⚡', t: pending.length+' participaci'+(pending.length>1?'ones':'ón')+' por confirmar', s:'Inscripciones a eventos de tu municipio', accion:"navTo(document.querySelector('#sidebar-mun .nav-item[onclick*=sec-mun-validar]'),'sec-mun-validar')" });
+      }
+
+      // Nuevos voluntarios (último mes)
+      var hace30 = new Date(Date.now() - 30*24*60*60*1000).toISOString();
+      var muni = p.municipio || '';
+      if (muni) {
+        var munFlt = encodeURIComponent(muni);
+        var rNuevos = await fetch(window._SB_URL + '/rest/v1/perfiles?municipio=eq.'+munFlt+'&rol=eq.voluntario&created_at=gte.'+hace30+'&select=id', { headers: h });
+        var nuevos = rNuevos.ok ? await rNuevos.json() : [];
+        if (nuevos.length > 0) notifs.push({ ic:'👥', t: nuevos.length+' nuevo'+(nuevos.length>1?'s':'')+' voluntario'+(nuevos.length>1?'s':'')+' este mes', s: muni });
+      }
+    }
+
+    if (role === 'coord_departamental') {
+      // Municipios sin coord en el departamento
+      var depto2 = p.departamento || '';
+      if (depto2) {
+        var depFlt2 = encodeURIComponent(depto2);
+        var [rMcoords, rMvols] = await Promise.all([
+          fetch(window._SB_URL + '/rest/v1/perfiles?departamento=eq.'+depFlt2+'&rol=eq.coord_municipal&select=municipio', { headers: h }),
+          fetch(window._SB_URL + '/rest/v1/perfiles?departamento=eq.'+depFlt2+'&rol=eq.voluntario&select=municipio&limit=500', { headers: h })
+        ]);
+        var mcoords = rMcoords.ok ? await rMcoords.json() : [];
+        var mvols = rMvols.ok ? await rMvols.json() : [];
+        var munisConCoord = new Set(mcoords.map(function(c){ return c.municipio; }));
+        var munisConVols = new Set(mvols.map(function(v){ return v.municipio; }).filter(Boolean));
+        var sinC = [...munisConVols].filter(function(m){ return m && !munisConCoord.has(m); });
+        if (sinC.length > 0) notifs.push({ ic:'⚠️', t: sinC.length+' municipio'+(sinC.length>1?'s':'')+' sin coordinador', s: sinC.slice(0,3).join(', ')+(sinC.length>3?' y más':'') });
+      }
+    }
+
+    if (role === 'voluntario') {
+      var pid = p.id;
+      if (pid) {
+        // Eventos inscritos próximos (7 días)
+        var rEvsProx = await fetch(
+          window._SB_URL + '/rest/v1/evento_inscripciones?perfil_id=eq.'+pid+'&estado=eq.confirmada&select=eventos!inner(titulo,fecha,estado)&eventos.fecha=gte.'+hoy+'&eventos.fecha=lte.'+en7dias+'&eventos.estado=eq.activo',
+          { headers: h }
+        );
+        var evsProx = rEvsProx.ok ? await rEvsProx.json() : [];
+        evsProx.forEach(function(ins) {
+          var ev = ins.eventos || {};
+          if (ev.titulo) {
+            var fecha = ev.fecha ? new Date(ev.fecha+'T12:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short'}) : '';
+            notifs.push({ ic:'📅', t:'Evento próximo: '+ev.titulo, s: fecha ? 'El '+fecha : 'Esta semana' });
+          }
+        });
+
+        // Certificados recientes (última semana)
+        var hace7 = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+        var rCertsR = await fetch(window._SB_URL + '/rest/v1/certificados?perfil_id=eq.'+pid+'&created_at=gte.'+hace7+'&select=id,titulo_actividad', { headers: h });
+        var certsR = rCertsR.ok ? await rCertsR.json() : [];
+        if (certsR.length > 0) notifs.push({ ic:'📜', t: certsR.length+' certificado'+(certsR.length>1?'s nuevo':' nuevo')+(certsR.length>1?'s':''), s:'Disponible para descargar' });
+      }
+    }
+
+  } catch(e) { console.error('cargarNotificaciones:', e); }
+
+  // Renderizar
+  if (notifs.length === 0) {
+    list.innerHTML = '<div style="padding:28px 18px;text-align:center;"><div style="font-size:36px;margin-bottom:8px;">🔕</div><div style="color:var(--muted);font-size:13px;">Sin notificaciones pendientes</div></div>';
+    document.querySelectorAll('.notif-dot').forEach(function(d){ d.style.display='none'; });
+    return;
+  }
+
+  // Mostrar el dot
+  document.querySelectorAll('.notif-dot').forEach(function(d){ d.style.display=''; });
+
+  list.innerHTML = notifs.map(function(n) {
+    var urgTag = n.urgente ? '<span style="font-size:10px;background:rgba(198,40,40,.12);color:var(--red);padding:1px 5px;border-radius:4px;font-weight:600;margin-left:6px;">Urgente</span>' : '';
+    return '<div class="notif-item"'+(n.accion?' onclick="'+n.accion+';document.getElementById(\'notif-panel\').classList.remove(\'open\')"':'')+'>'+
+      '<div class="notif-ic">'+n.ic+'</div>'+
+      '<div class="notif-text"><strong>'+n.t+urgTag+'</strong><small>'+n.s+'</small></div>'+
+      '</div>';
+  }).join('');
+}
+
+function toggleNotif(){
+  document.getElementById('notif-panel').classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#notif-panel')&&!e.target.closest('.notif-btn')) document.getElementById('notif-panel').classList.remove('open');
+});
 
 /* ══════════════════ INIT ══════════════════ */
 window.addEventListener('load',()=>setTimeout(()=>initMapsForView('v-landing'),400));
@@ -6230,6 +6397,89 @@ async function cargarHistorialVol(scope) {
     console.error('cargarHistorialVol:', e);
     var tbody2 = document.getElementById(tbodyId);
     if (tbody2) tbody2.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">Error al cargar historial.</td></tr>';
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   EDICIÓN DE PERFIL
+══════════════════════════════════════════════════ */
+function toggleEditPerfil() {
+  var form = document.getElementById('edit-perfil-form');
+  if (!form) return;
+  var visible = form.style.display !== 'none';
+  if (visible) {
+    form.style.display = 'none';
+  } else {
+    // Pre-rellenar con datos actuales
+    var p = window.currentProfile || {};
+    var setVal = function(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; };
+    setVal('ep-telefono', p.telefono);
+    setVal('ep-genero', p.genero);
+    setVal('ep-situacion', p.situacion_academica);
+    setVal('ep-carrera', p.carrera);
+    setVal('ep-semestre', p.semestre);
+    setVal('ep-institucion', p.institucion);
+    setVal('ep-area', p.area_interes);
+    setVal('ep-bio', p.bio);
+    form.style.display = 'block';
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+async function guardarPerfil() {
+  var btn = document.getElementById('ep-save-btn');
+  if (btn) { btn.textContent = 'Guardando...'; btn.disabled = true; }
+
+  var pid = (window.currentProfile || {}).id;
+  if (!pid) { showToast('⚠️ Perfil no cargado — inicia sesión'); if (btn) { btn.textContent = '💾 Guardar cambios'; btn.disabled = false; } return; }
+
+  var g = function(id) { return (document.getElementById(id)?.value || '').trim(); };
+  var updates = {
+    telefono:          g('ep-telefono'),
+    genero:            g('ep-genero'),
+    situacion_academica: g('ep-situacion'),
+    carrera:           g('ep-carrera'),
+    semestre:          g('ep-semestre'),
+    institucion:       g('ep-institucion'),
+    area_interes:      g('ep-area'),
+    bio:               g('ep-bio'),
+    updated_at:        new Date().toISOString()
+  };
+
+  // Filtrar campos vacíos (mantener los que el usuario limpió igual, pero enviar todos)
+  try {
+    var sess = await window.supabase.auth.getSession();
+    var token = sess.data?.session?.access_token || '';
+    var resp = await fetch(
+      window._SB_URL + '/rest/v1/perfiles?id=eq.'+pid,
+      { method: 'PATCH',
+        headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token,
+          'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify(updates)
+      }
+    );
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    var rows = await resp.json();
+    var updated = Array.isArray(rows) ? rows[0] : rows;
+    // Actualizar currentProfile en memoria
+    if (updated) Object.assign(window.currentProfile, updated);
+    else Object.assign(window.currentProfile, updates);
+
+    // Actualizar los elementos de la vista
+    var setTxt = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+    setTxt('p-telefono', updates.telefono || '—');
+    setTxt('p-situacion', updates.situacion_academica || '—');
+    setTxt('p-carrera', updates.carrera || '—');
+    setTxt('p-semestre', updates.semestre || '—');
+    setTxt('p-area', updates.area_interes || '—');
+
+    showToast('✅ Perfil actualizado correctamente');
+    toggleEditPerfil();
+  } catch(e) {
+    console.error('guardarPerfil:', e);
+    showToast('⚠️ Error al guardar: '+e.message);
+  } finally {
+    if (btn) { btn.textContent = '💾 Guardar cambios'; btn.disabled = false; }
   }
 }
 
