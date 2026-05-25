@@ -4847,7 +4847,7 @@ async function cargarSolicitudes(){
   try{
     var token = await getToken();
     var resp=await fetch(
-      window._SB_URL+'/rest/v1/solicitudes?select=*&order=created_at.desc',
+      window._SB_URL+'/rest/v1/solicitudes?select=*&order=created_at.desc&limit=300',
       {headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Accept':'application/json'}}
     );
     if(!resp.ok){console.error('cargarSolicitudes HTTP '+resp.status);return;}
@@ -4921,7 +4921,7 @@ async function aprobarSolicitud(id){
     } else {
       showToast('✅ Aprobada — invitación enviada a '+result.email);
     }
-    dcDel('solicitudes'); cargarSolicitudes();
+    dcDel('solicitudes','stats_sa'); cargarSolicitudes(); cargarEstadisticasSA();
   }catch(e){
     showToast('⚠️ Error: '+e.message);
     console.error('aprobarSolicitud:',e);
@@ -4950,7 +4950,7 @@ async function rechazarSolicitud(id){
     );
     if(!resp.ok){showToast('⚠️ Error al rechazar ('+resp.status+')');return;}
     showToast('✅ Solicitud rechazada');
-    dcDel('solicitudes'); cargarSolicitudes();
+    dcDel('solicitudes','stats_sa'); cargarSolicitudes(); cargarEstadisticasSA();
   }catch(e){
     showToast('⚠️ Error: '+e.message);
     console.error('rechazarSolicitud:',e);
@@ -5023,7 +5023,7 @@ async function cargarUsuarios(){
   try{
     var token = await getToken();
     var resp = await fetch(
-      window._SB_URL + '/rest/v1/perfiles?select=*&order=created_at.desc',
+      window._SB_URL + '/rest/v1/perfiles?select=*&order=created_at.desc&limit=1000',
       { headers:{ 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } }
     );
     if(!resp.ok){ console.error('cargarUsuarios HTTP '+resp.status); if(tbody) tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error al cargar ('+resp.status+')</td></tr>'; return; }
@@ -5886,13 +5886,16 @@ async function loadUserProfile(){
     updateProfileForRole(perfil.rol);
     loginAs(perfil.rol);
     if(perfil.rol === 'super_admin' || perfil.rol === 'coord_nacional'){
-      // Prefetch en paralelo: todas las secciones listas antes de que el usuario navegue
-      Promise.all([
-        cargarSolicitudes(),
-        cargarUsuarios(),
-        cargarEventosAdmin(perfil.rol === 'super_admin' ? 'sa' : 'nac'),
-        cargarHistorialOrg()
-      ]).catch(console.error);
+      // Prefetch diferido: esperar 1.5s para que el home-stats cargue primero sin competencia
+      var _pfScope = perfil.rol === 'super_admin' ? 'sa' : 'nac';
+      setTimeout(function(){
+        Promise.all([
+          cargarSolicitudes(),
+          cargarUsuarios(),
+          cargarEventosAdmin(_pfScope),
+          cargarHistorialOrg()
+        ]).catch(console.error);
+      }, 1500);
     }
   }catch(e){
     console.error('loadUserProfile error:',e);
@@ -6082,7 +6085,7 @@ async function cargarCertificadosAdmin(scope) {
   try {
     var token = await getToken();
     var resp = await fetch(
-      window._SB_URL + '/rest/v1/certificados?select=*,perfil:perfiles!perfil_id(nombres,apellidos,cedula)&order=created_at.desc',
+      window._SB_URL + '/rest/v1/certificados?select=*,perfil:perfiles!perfil_id(nombres,apellidos,cedula)&order=created_at.desc&limit=2000',
       { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
     );
     if (!resp.ok) throw new Error('HTTP '+resp.status);
@@ -6364,7 +6367,7 @@ async function cargarSolicitudesCertAdmin(scope) {
   try {
     var token = await getToken();
     var resp = await fetch(
-      window._SB_URL + '/rest/v1/cert_solicitudes?estado=eq.pendiente&select=*,perfil:perfiles!perfil_id(id,nombres,apellidos,email,departamento,municipio)&order=created_at.asc',
+      window._SB_URL + '/rest/v1/cert_solicitudes?estado=eq.pendiente&select=*,perfil:perfiles!perfil_id(id,nombres,apellidos,email,departamento,municipio)&order=created_at.asc&limit=100',
       { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
     );
     if (!resp.ok) throw new Error('HTTP '+resp.status);
@@ -6500,8 +6503,8 @@ async function cargarHistorialOrg() {
     var h     = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
 
     var [rPerfiles, rCerts] = await Promise.all([
-      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,nombres,apellidos,rol,departamento,municipio,total_horas,created_at&order=created_at.desc', { headers: h }),
-      fetch(window._SB_URL + '/rest/v1/certificados?select=id', { headers: h })
+      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,nombres,apellidos,rol,departamento,municipio,total_horas,created_at&order=created_at.desc&limit=2000', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/certificados?select=id&limit=5000', { headers: h })
     ]);
     var perfiles = rPerfiles.ok ? await rPerfiles.json() : [];
     var certs    = rCerts.ok   ? await rCerts.json()    : [];
@@ -6592,6 +6595,8 @@ function renderHistorialOrg(perfiles, certs) {
 
 // ── Estadísticas SA ──
 async function cargarEstadisticasSA() {
+  var cachedStats = dcGet('stats_sa');
+  if (cachedStats) { renderEstadisticasSA(cachedStats); return; }
   setKpiLoading(['kpi-sa-usuarios','kpi-sa-pendientes','kpi-sa-certs']);
   try {
     var token = await getToken();
@@ -6599,72 +6604,82 @@ async function cargarEstadisticasSA() {
 
     // Conteos en paralelo
     var [rPerfiles, rSols, rCerts] = await Promise.all([
-      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,rol', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,rol&limit=5000', { headers: h }),
       fetch(window._SB_URL + '/rest/v1/solicitudes?estado=eq.pendiente&select=id,nombres,apellidos,ciudad,departamento&order=created_at.desc&limit=5', { headers: h }),
-      fetch(window._SB_URL + '/rest/v1/certificados?select=id', { headers: h })
+      fetch(window._SB_URL + '/rest/v1/certificados?select=id&limit=10000', { headers: h })
     ]);
 
     var perfiles = rPerfiles.ok ? await rPerfiles.json() : [];
     var sols = rSols.ok ? await rSols.json() : [];
     var certs = rCerts.ok ? await rCerts.json() : [];
 
-    // KPIs
-    var setNum = function(id, n) { var el = document.getElementById(id); if (el) el.textContent = n.toLocaleString('es-CO'); };
-    setNum('kpi-sa-usuarios', perfiles.length);
-    setNum('kpi-sa-pendientes', sols.length);
-    setNum('kpi-sa-certs', certs.length);
-    var trendP = document.getElementById('kpi-sa-pendientes-trend');
-    if (trendP) { trendP.textContent = sols.length > 0 ? sols.length+' nuevas' : 'Al día'; trendP.className = 'kpi-trend '+(sols.length > 0 ? 'neutral' : 'up'); }
-
-    // Distribución de roles
-    var conteos = { voluntario:0, coord_municipal:0, coord_departamental:0, coord_nacional:0, super_admin:0 };
-    perfiles.forEach(function(p) { if (conteos.hasOwnProperty(p.rol)) conteos[p.rol]++; });
-    var total = perfiles.length || 1;
-    Object.keys(conteos).forEach(function(rol) {
-      setNum('sa-cnt-'+rol, conteos[rol]);
-      var bar = document.querySelector('.sa-bar-'+rol.split('_')[1] || '.sa-bar-'+rol);
-      // Seleccionar la barra correcta por ID de texto
-      var pct = Math.max(0.5, (conteos[rol]/total)*100).toFixed(1);
-      var barEl = null;
-      if (rol==='voluntario') barEl = document.querySelector('.sa-bar-vol');
-      if (rol==='coord_municipal') barEl = document.querySelector('.sa-bar-mun');
-      if (rol==='coord_departamental') barEl = document.querySelector('.sa-bar-dep');
-      if (rol==='coord_nacional') barEl = document.querySelector('.sa-bar-nac');
-      if (rol==='super_admin') barEl = document.querySelector('.sa-bar-sa');
-      if (barEl) barEl.style.width = pct+'%';
-    });
-
-    // Solicitudes recientes
-    var listEl = document.getElementById('sa-home-solicitudes-list');
-    if (listEl) {
-      if (sols.length === 0) {
-        listEl.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0;">Sin solicitudes pendientes ✅</p>';
-      } else {
-        listEl.innerHTML = sols.slice(0,3).map(function(s) {
-          var nom = [(s.nombres||''),(s.apellidos||'')].filter(Boolean).join(' ') || 'Sin nombre';
-          var loc = [s.ciudad, s.departamento].filter(Boolean).join(', ') || '—';
-          return '<div class="val-item"><div class="av-sm">🙋</div>' +
-            '<div class="val-info"><strong>'+nom+'</strong><small>'+loc+'</small></div>' +
-            '<div class="val-actions">' +
-            '<button class="btn-approve" onclick="aprobarSolicitud(\''+s.id+'\')">&#x2713;</button>' +
-            '<button class="btn-reject" onclick="rechazarSolicitud(\''+s.id+'\')">&#x2715;</button>' +
-            '</div></div>';
-        }).join('');
-      }
-    }
+    dcSet('stats_sa', { perfiles: perfiles, sols: sols, certs: certs });
+    renderEstadisticasSA({ perfiles: perfiles, sols: sols, certs: certs });
   } catch(e) { console.error('cargarEstadisticasSA:', e); }
+}
+
+function renderEstadisticasSA(d) {
+  var perfiles = d.perfiles || [], sols = d.sols || [], certs = d.certs || [];
+  var setNum = function(id, n) { var el = document.getElementById(id); if (el) el.textContent = n.toLocaleString('es-CO'); };
+  setNum('kpi-sa-usuarios', perfiles.length);
+  setNum('kpi-sa-pendientes', sols.length);
+  setNum('kpi-sa-certs', certs.length);
+  var trendP = document.getElementById('kpi-sa-pendientes-trend');
+  if (trendP) { trendP.textContent = sols.length > 0 ? sols.length+' nuevas' : 'Al día'; trendP.className = 'kpi-trend '+(sols.length > 0 ? 'neutral' : 'up'); }
+
+  // Distribución de roles
+  var conteos = { voluntario:0, coord_municipal:0, coord_departamental:0, coord_nacional:0, super_admin:0 };
+  perfiles.forEach(function(p) { if (conteos.hasOwnProperty(p.rol)) conteos[p.rol]++; });
+  var total = perfiles.length || 1;
+  Object.keys(conteos).forEach(function(rol) {
+    setNum('sa-cnt-'+rol, conteos[rol]);
+    var pct = Math.max(0.5, (conteos[rol]/total)*100).toFixed(1);
+    var barEl = null;
+    if (rol==='voluntario') barEl = document.querySelector('.sa-bar-vol');
+    if (rol==='coord_municipal') barEl = document.querySelector('.sa-bar-mun');
+    if (rol==='coord_departamental') barEl = document.querySelector('.sa-bar-dep');
+    if (rol==='coord_nacional') barEl = document.querySelector('.sa-bar-nac');
+    if (rol==='super_admin') barEl = document.querySelector('.sa-bar-sa');
+    if (barEl) barEl.style.width = pct+'%';
+  });
+
+  // Solicitudes recientes
+  var listEl = document.getElementById('sa-home-solicitudes-list');
+  if (listEl) {
+    if (sols.length === 0) {
+      listEl.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0;">Sin solicitudes pendientes ✅</p>';
+    } else {
+      listEl.innerHTML = sols.slice(0,3).map(function(s) {
+        var nom = [(s.nombres||''),(s.apellidos||'')].filter(Boolean).join(' ') || 'Sin nombre';
+        var loc = [s.ciudad, s.departamento].filter(Boolean).join(', ') || '—';
+        return '<div class="val-item"><div class="av-sm">🙋</div>' +
+          '<div class="val-info"><strong>'+nom+'</strong><small>'+loc+'</small></div>' +
+          '<div class="val-actions">' +
+          '<button class="btn-approve" onclick="aprobarSolicitud(\''+s.id+'\')">&#x2713;</button>' +
+          '<button class="btn-reject" onclick="rechazarSolicitud(\''+s.id+'\')">&#x2715;</button>' +
+          '</div></div>';
+      }).join('');
+    }
+  }
 }
 
 // ── Estadísticas NAC ──
 async function cargarEstadisticasNAC() {
+  var cachedNAC = dcGet('stats_nac');
+  if (cachedNAC) {
+    var setNum2 = function(id, n) { var el = document.getElementById(id); if (el) el.textContent = Number(n).toLocaleString('es-CO'); };
+    setNum2('kpi-nac-usuarios', cachedNAC.u); setNum2('kpi-nac-certs', cachedNAC.c);
+    setNum2('kpi-nac-deptos', cachedNAC.d); setNum2('kpi-nac-munis', cachedNAC.m); setNum2('kpi-nac-horas', cachedNAC.h);
+    return;
+  }
   setKpiLoading(['kpi-nac-usuarios','kpi-nac-deptos','kpi-nac-munis','kpi-nac-certs','kpi-nac-horas']);
   try {
     var token = await getToken();
     var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
 
     var [rPerfiles, rCerts] = await Promise.all([
-      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,departamento,municipio,total_horas', { headers: h }),
-      fetch(window._SB_URL + '/rest/v1/certificados?select=id', { headers: h })
+      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,departamento,municipio,total_horas&limit=5000', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/certificados?select=id&limit=10000', { headers: h })
     ]);
 
     var perfiles = rPerfiles.ok ? await rPerfiles.json() : [];
@@ -6685,12 +6700,7 @@ async function cargarEstadisticasNAC() {
     setNum('kpi-nac-deptos', deptos.size);
     setNum('kpi-nac-munis', munis.size);
     setNum('kpi-nac-horas', Math.round(totalHoras));
-
-    // Actualizar también los KPIs del mapa nacional
-    ['kpi-nac-usuarios','kpi-nac-deptos','kpi-nac-munis','kpi-nac-certs','kpi-nac-horas'].forEach(function(id) {
-      var el2 = document.getElementById(id);
-      // ya seteado arriba
-    });
+    dcSet('stats_nac', { u: perfiles.length, c: certs.length, d: deptos.size, m: munis.size, h: Math.round(totalHoras) });
   } catch(e) { console.error('cargarEstadisticasNAC:', e); }
 }
 
@@ -6717,9 +6727,9 @@ async function cargarIndicadoresNAC() {
 
     // Parallel fetch: perfiles (total_horas, departamento, created_at), certificados (count), eventos (categoria, created_at)
     var [rPerfiles, rCerts, rEventos] = await Promise.all([
-      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,total_horas,departamento,created_at&order=created_at.asc', { headers: h }),
-      fetch(window._SB_URL + '/rest/v1/certificados?select=id', { headers: h }),
-      fetch(window._SB_URL + '/rest/v1/eventos?select=id,categoria,estado,created_at', { headers: h })
+      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,total_horas,departamento,created_at&order=created_at.asc&limit=5000', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/certificados?select=id&limit=10000', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/eventos?select=id,categoria,estado,created_at&limit=1000', { headers: h })
     ]);
 
     var perfiles = rPerfiles.ok ? await rPerfiles.json() : [];
@@ -7868,7 +7878,7 @@ async function cargarEventosAdmin(scope) {
 
   try {
     var token = await getToken();
-    var query = window._SB_URL + '/rest/v1/eventos?order=fecha.desc';
+    var query = window._SB_URL + '/rest/v1/eventos?order=fecha.desc&limit=200';
     if (scope === 'dep' && p.departamento) query += '&departamento=eq.' + encodeURIComponent(p.departamento);
     else if (scope === 'mun' && p.departamento) query += '&departamento=eq.' + encodeURIComponent(p.departamento);
 
