@@ -4097,7 +4097,10 @@ function navTo(el,sectionId){
   const shell=sidebar.parentElement;
   shell.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
   const sec=document.getElementById(sectionId);
-  if(sec) sec.classList.add('active');
+  if(sec){
+    sec.classList.add('active');
+    sec.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale').forEach(function(r){r.style.transitionDelay='0s';r.classList.add('revealed');});
+  }
   const topbar=shell.querySelector('.topbar-title');
   if(topbar) topbar.textContent=el.textContent.trim().replace(/\d+$/,'').trim();
   if(sectionId==='sec-vol-perfil') renderTimeline(currentRole);
@@ -4153,7 +4156,10 @@ function navToByName(sectionId,sidebarId,topbarId,title){
   const shell=sidebar.parentElement;
   shell.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
   const sec=document.getElementById(sectionId);
-  if(sec) sec.classList.add('active');
+  if(sec){
+    sec.classList.add('active');
+    sec.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale').forEach(function(r){r.style.transitionDelay='0s';r.classList.add('revealed');});
+  }
   const tb=document.getElementById(topbarId);
   if(tb) tb.textContent=title;
   window.scrollTo({top:0,behavior:'instant'});
@@ -4712,13 +4718,8 @@ document.addEventListener('DOMContentLoaded',function(){
     el.classList.add('reveal-left');
     el.style.transitionDelay=(0.08*i)+'s';
   });
-  // KPI cards in dashboards
-  document.querySelectorAll('.kpi').forEach((el,i)=>{
-    el.classList.add('reveal');
-    el.style.transitionDelay=(0.06*i)+'s';
-  });
-  // Card elements
-  document.querySelectorAll('.card').forEach((el,i)=>{
+  // Card elements — solo landing page (dashboard cards no deben quedar ocultos)
+  document.querySelectorAll('#v-landing .card').forEach((el,i)=>{
     el.classList.add('reveal');
     el.style.transitionDelay=(0.05*i)+'s';
   });
