@@ -4136,6 +4136,7 @@ function navTo(el,sectionId){
   if(sectionId==='sec-vol-eventos') cargarEventosVol();
   if(sectionId==='sec-nac-reportes') cargarIndicadoresNAC();
   if(sectionId==='sec-sa-historial-org') cargarHistorialOrg();
+  window.scrollTo({top:0,behavior:'instant'});
   setTimeout(()=>initMapsForSection(sectionId),200);
   if(window.innerWidth<=1100) closeSidebar();
 }
@@ -4155,6 +4156,7 @@ function navToByName(sectionId,sidebarId,topbarId,title){
   if(sec) sec.classList.add('active');
   const tb=document.getElementById(topbarId);
   if(tb) tb.textContent=title;
+  window.scrollTo({top:0,behavior:'instant'});
   setTimeout(()=>initMapsForSection(sectionId),200);
 }
 
