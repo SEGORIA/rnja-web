@@ -4630,6 +4630,15 @@ async function getToken() {
   return _tkCache.v;
 }
 
+/* ══════════════════ DATA CACHE (TTL 2 min) ══════════════════ */
+// Evita re-fetchear al volver a una sección ya visitada.
+// Invalidar con dcDel() tras operaciones de escritura.
+var _dc = {};
+var _DC_TTL = 120000; // 2 minutos
+function dcGet(k)    { var c = _dc[k]; return (c && Date.now() - c.ts < _DC_TTL) ? c.v : null; }
+function dcSet(k, v) { _dc[k] = { v: v, ts: Date.now() }; }
+function dcDel()     { var keys = Array.prototype.slice.call(arguments); keys.forEach(function(k){ delete _dc[k]; }); }
+
 /* ══════════════════ KPI SKELETON HELPERS ══════════════════ */
 // Muestra spinner esquelético en los KPIs mientras cargan los datos.
 function setKpiLoading(ids) {
@@ -4833,15 +4842,18 @@ document.addEventListener('click', function(e){
 
 /* ══════════════════ GESTIÓN DE SOLICITUDES (ADMIN) ══════════════════ */
 async function cargarSolicitudes(){
+  var cached = dcGet('solicitudes');
+  if (cached) { renderSolicitudes(cached); return; }
   try{
-    var sess=await window.supabase.auth.getSession();
-    var token=sess.data?.session?.access_token||'';
+    var token = await getToken();
     var resp=await fetch(
       window._SB_URL+'/rest/v1/solicitudes?select=*&order=created_at.desc',
       {headers:{'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Accept':'application/json'}}
     );
     if(!resp.ok){console.error('cargarSolicitudes HTTP '+resp.status);return;}
-    renderSolicitudes(await resp.json());
+    var data = await resp.json();
+    dcSet('solicitudes', data);
+    renderSolicitudes(data);
   }catch(e){console.error('cargarSolicitudes:',e);}
 }
 
@@ -4909,7 +4921,7 @@ async function aprobarSolicitud(id){
     } else {
       showToast('✅ Aprobada — invitación enviada a '+result.email);
     }
-    cargarSolicitudes();
+    dcDel('solicitudes'); cargarSolicitudes();
   }catch(e){
     showToast('⚠️ Error: '+e.message);
     console.error('aprobarSolicitud:',e);
@@ -4938,7 +4950,7 @@ async function rechazarSolicitud(id){
     );
     if(!resp.ok){showToast('⚠️ Error al rechazar ('+resp.status+')');return;}
     showToast('✅ Solicitud rechazada');
-    cargarSolicitudes();
+    dcDel('solicitudes'); cargarSolicitudes();
   }catch(e){
     showToast('⚠️ Error: '+e.message);
     console.error('rechazarSolicitud:',e);
@@ -5004,17 +5016,19 @@ function poblarMunicipios(depto, resetMunicipio){
 window._usuariosData = [];
 
 async function cargarUsuarios(){
+  var cached = dcGet('usuarios');
+  if (cached) { window._usuariosData = cached; filtrarUsuarios(); return; }
   var tbody = document.getElementById('usuarios-tbody');
   if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Cargando...</td></tr>';
   try{
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var resp = await fetch(
       window._SB_URL + '/rest/v1/perfiles?select=*&order=created_at.desc',
       { headers:{ 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } }
     );
     if(!resp.ok){ console.error('cargarUsuarios HTTP '+resp.status); if(tbody) tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error al cargar ('+resp.status+')</td></tr>'; return; }
     window._usuariosData = await resp.json();
+    dcSet('usuarios', window._usuariosData);
     filtrarUsuarios();
   }catch(e){ console.error('cargarUsuarios:',e); if(tbody) tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error: '+e.message+'</td></tr>'; }
 }
@@ -5871,7 +5885,15 @@ async function loadUserProfile(){
     window.currentProfile = perfil;
     updateProfileForRole(perfil.rol);
     loginAs(perfil.rol);
-    if(perfil.rol === 'super_admin' || perfil.rol === 'coord_nacional'){ cargarSolicitudes(); cargarUsuarios(); }
+    if(perfil.rol === 'super_admin' || perfil.rol === 'coord_nacional'){
+      // Prefetch en paralelo: todas las secciones listas antes de que el usuario navegue
+      Promise.all([
+        cargarSolicitudes(),
+        cargarUsuarios(),
+        cargarEventosAdmin(perfil.rol === 'super_admin' ? 'sa' : 'nac'),
+        cargarHistorialOrg()
+      ]).catch(console.error);
+    }
   }catch(e){
     console.error('loadUserProfile error:',e);
     showToast('Error cargando perfil: '+e.message);
@@ -6050,25 +6072,27 @@ async function cargarMisCertificados() {
 // ── Admin: cargar todos los certificados ──
 async function cargarCertificadosAdmin(scope) {
   scope = scope || 'sa';
+  // Lanzar solicitudes de certs en paralelo desde el inicio (no esperar al main fetch)
+  cargarSolicitudesCertAdmin(scope);
+  var cached = dcGet('certs_'+scope);
+  if (cached) { window._certsData = cached; renderCertificadosAdmin(cached, scope); return; }
   var tbody = document.getElementById('cert-'+scope+'-tbody');
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">Cargando...</td></tr>';
   try {
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var resp = await fetch(
       window._SB_URL + '/rest/v1/certificados?select=*,perfil:perfiles!perfil_id(nombres,apellidos,cedula)&order=created_at.desc',
       { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
     );
     if (!resp.ok) throw new Error('HTTP '+resp.status);
     window._certsData = await resp.json();
+    dcSet('certs_'+scope, window._certsData);
     renderCertificadosAdmin(window._certsData, scope);
   } catch(e) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error: '+e.message+'</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error: '+e.message+'</td></tr>';
     console.error('cargarCertificadosAdmin:', e);
   }
-  // También cargar solicitudes pendientes
-  cargarSolicitudesCertAdmin(scope);
 }
 
 function filtrarCertificadosAdmin(scope) {
@@ -6338,8 +6362,7 @@ async function cargarSolicitudesCertAdmin(scope) {
   var wrap = document.getElementById('cert-'+scope+'-solicitudes');
   if (!wrap) return;
   try {
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var resp = await fetch(
       window._SB_URL + '/rest/v1/cert_solicitudes?estado=eq.pendiente&select=*,perfil:perfiles!perfil_id(id,nombres,apellidos,email,departamento,municipio)&order=created_at.asc',
       { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
@@ -6388,7 +6411,7 @@ async function rechazarSolicitudCert(solId, scope) {
     });
     if (!resp.ok) throw new Error('HTTP '+resp.status);
     showToast('Solicitud rechazada');
-    cargarSolicitudesCertAdmin(scope);
+    dcDel('certs_'+scope); cargarSolicitudesCertAdmin(scope);
   } catch(e) { showToast('⚠️ Error: '+e.message); }
 }
 
@@ -6463,6 +6486,9 @@ function getProxNivel(horas) {
 
 // ── Historial Organizacional SA ──
 async function cargarHistorialOrg() {
+  var cachedH = dcGet('historial_org');
+  if (cachedH) { renderHistorialOrg(cachedH.perfiles, cachedH.certs); return; }
+
   var setNum = function(id, n) { var el = document.getElementById(id); if(el) el.textContent = n !== null && n !== undefined ? Number(n).toLocaleString('es-CO') : '—'; };
   ['hist-total-vols','hist-total-horas','hist-total-certs','hist-total-deptos'].forEach(function(id){ setNum(id, '…'); });
   ['hist-coords-list','hist-roles-bars','hist-recientes-list'].forEach(function(id){
@@ -6470,8 +6496,7 @@ async function cargarHistorialOrg() {
   });
 
   try {
-    var sess  = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
+    var token = await getToken();
     var h     = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' };
 
     var [rPerfiles, rCerts] = await Promise.all([
@@ -6480,7 +6505,13 @@ async function cargarHistorialOrg() {
     ]);
     var perfiles = rPerfiles.ok ? await rPerfiles.json() : [];
     var certs    = rCerts.ok   ? await rCerts.json()    : [];
+    dcSet('historial_org', { perfiles: perfiles, certs: certs });
+    renderHistorialOrg(perfiles, certs);
+  } catch(e) { console.error('cargarHistorialOrg:', e); }
+}
 
+function renderHistorialOrg(perfiles, certs) {
+    var setNum = function(id, n) { var el = document.getElementById(id); if(el) el.textContent = n !== null && n !== undefined ? Number(n).toLocaleString('es-CO') : '—'; };
     // ── KPIs ──
     var totalHoras  = perfiles.reduce(function(s, p) { return s + (Number(p.total_horas)||0); }, 0);
     var deptosActivos = new Set(perfiles.map(function(p){ return p.departamento; }).filter(Boolean));
@@ -6557,8 +6588,6 @@ async function cargarHistorialOrg() {
         }).join('');
       }
     }
-
-  } catch(e) { console.error('cargarHistorialOrg:', e); }
 }
 
 // ── Estadísticas SA ──
@@ -7808,7 +7837,7 @@ async function crearEvento(scope) {
       var el = document.getElementById(px+'-'+f); if (el) el.value = '';
     });
     document.getElementById('evento-form-'+scope).style.display = 'none';
-    cargarEventosAdmin(scope);
+    dcDel('eventos_'+scope); cargarEventosAdmin(scope);
   } catch(e) {
     showToast('⚠️ Error: '+e.message);
     console.error('crearEvento:', e);
@@ -7821,42 +7850,36 @@ async function cargarEventosAdmin(scope) {
   scope = scope || 'sa';
   var listEl = document.getElementById('ev-'+scope+'-list');
   if (!listEl) return;
-  listEl.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">Cargando...</div>';
 
   var p = window.currentProfile || {};
+  if (scope === 'dep') { var zlDep = document.getElementById('ev-dep-zona-label'); if (zlDep) zlDep.textContent = 'Departamento: ' + (p.departamento || '—'); }
+  if (scope === 'mun') { var zlMun = document.getElementById('ev-mun-zona-label'); if (zlMun) zlMun.textContent = 'Municipio: ' + (p.municipio || p.departamento || '—'); }
 
-  // Etiqueta de zona para dep/mun
-  if (scope === 'dep') {
-    var zlDep = document.getElementById('ev-dep-zona-label');
-    if (zlDep) zlDep.textContent = 'Departamento: ' + (p.departamento || '—');
+  // Caché: evita re-fetch al volver a la sección
+  var cached = dcGet('eventos_'+scope);
+  if (cached) {
+    if (!window._eventosDataByScope) window._eventosDataByScope = {};
+    window._eventosDataByScope[scope] = cached;
+    if (scope === 'sa' || scope === 'nac') window._eventosData = cached;
+    renderEventosAdmin(cached, scope);
+    return;
   }
-  if (scope === 'mun') {
-    var zlMun = document.getElementById('ev-mun-zona-label');
-    if (zlMun) zlMun.textContent = 'Municipio: ' + (p.municipio || p.departamento || '—');
-  }
+  listEl.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">Cargando...</div>';
 
   try {
-    var sess = await window.supabase.auth.getSession();
-    var token = sess.data?.session?.access_token || '';
-
-    // dep ve solo eventos de su departamento; mun ve los de su municipio/depto
+    var token = await getToken();
     var query = window._SB_URL + '/rest/v1/eventos?order=fecha.desc';
-    if (scope === 'dep' && p.departamento) {
-      query += '&departamento=eq.' + encodeURIComponent(p.departamento);
-    } else if (scope === 'mun') {
-      // Muestra eventos donde municipio=su municipio OR departamento=su depto (eventos que los incluyen)
-      if (p.departamento) query += '&departamento=eq.' + encodeURIComponent(p.departamento);
-    }
+    if (scope === 'dep' && p.departamento) query += '&departamento=eq.' + encodeURIComponent(p.departamento);
+    else if (scope === 'mun' && p.departamento) query += '&departamento=eq.' + encodeURIComponent(p.departamento);
 
     var resp = await fetch(query,
       { headers: { 'apikey': window._SB_KEY, 'Authorization': 'Bearer '+token, 'Accept': 'application/json' } }
     );
     if (!resp.ok) throw new Error('HTTP '+resp.status);
-    // Cada scope tiene su propio cache
     if (!window._eventosDataByScope) window._eventosDataByScope = {};
     window._eventosDataByScope[scope] = await resp.json();
-    // SA y NAC comparten el cache global para filtros cruzados
     if (scope === 'sa' || scope === 'nac') window._eventosData = window._eventosDataByScope[scope];
+    dcSet('eventos_'+scope, window._eventosDataByScope[scope]);
     renderEventosAdmin(window._eventosDataByScope[scope], scope);
   } catch(e) {
     listEl.innerHTML = '<div style="text-align:center;color:var(--red);padding:40px;">Error: '+e.message+'</div>';
