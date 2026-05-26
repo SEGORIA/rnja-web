@@ -716,6 +716,28 @@ tr:hover td{background:var(--surface2);}
 [data-theme="dark"] .section-white .pillar{background:var(--surface3);border-color:var(--border);}
 [data-theme="dark"] .section-white .pillar h4{color:var(--ink);}
 
+/* ── CALENDARIO ── */
+.cal-day{min-height:72px;border:1px solid var(--border);border-radius:8px;padding:5px 6px;cursor:pointer;transition:all .18s;background:var(--surface);position:relative;overflow:hidden;}
+.cal-day:hover{border-color:var(--blue);background:var(--surface2);}
+.cal-day.today{border-color:var(--blue);background:rgba(37,129,196,.06);}
+.cal-day.today .cal-day-num{background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-day.other-month{opacity:.35;}
+.cal-day.has-events{border-color:rgba(14,109,52,.35);}
+.cal-day-num{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:3px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-event-dot{font-size:10px;padding:1px 5px;border-radius:4px;background:rgba(14,109,52,.12);color:var(--g600);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;display:block;line-height:1.4;}
+[data-theme="dark"] .cal-day{background:var(--surface);border-color:var(--border);}
+[data-theme="dark"] .cal-day:hover{background:var(--surface2);}
+[data-theme="dark"] .cal-day.today{background:rgba(37,129,196,.12);}
+
+/* ── VERIFICADOR DE CERTIFICADOS ── */
+.ver-success{background:rgba(14,109,52,.1);border:1px solid rgba(14,109,52,.3);border-radius:16px;padding:24px;}
+.ver-error{background:rgba(198,40,40,.1);border:1px solid rgba(198,40,40,.3);border-radius:16px;padding:24px;}
+.ver-cert-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.ver-cert-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--g600),var(--g400));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.ver-row{display:flex;gap:8px;margin-bottom:8px;font-size:13px;}
+.ver-lbl{color:rgba(255,255,255,.45);min-width:120px;flex-shrink:0;}
+.ver-val{color:#fff;font-weight:600;}
+
 /* ── BOTTOM NAV MÓVIL (dashboard) ── */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:150;padding:8px 0 calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px rgba(10,31,53,.08);}
 .bottom-nav-inner{display:flex;justify-content:space-around;align-items:center;}
@@ -732,8 +754,12 @@ tr:hover td{background:var(--surface2);}
 </style>
 <!-- ══ SUPABASE CDN ══ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- ══ SHEETJS (Excel reader) ══ -->
+<!-- ══ SHEETJS (Excel export) ══ -->
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<!-- ══ CHART.JS ══ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- ══ QR CODE (verificador certificados) ══ -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -3444,6 +3470,9 @@ tr:hover td{background:var(--surface2);}
         <div class="nav-item" onclick="navTo(this,'sec-sa-certificados')"><span class="nav-ic">📜</span>Certificados</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-periodos')"><span class="nav-ic">📅</span>Períodos y elecciones</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-historial-org')"><span class="nav-ic">📖</span>Historial organizacional</div>
+        <div class="nav-section">Análisis</div>
+        <div class="nav-item" onclick="navTo(this,'sec-sa-reportes')"><span class="nav-ic">📊</span>Reportes y analytics</div>
+        <div class="nav-item" onclick="navTo(this,'sec-sa-calendario')"><span class="nav-ic">📆</span>Calendario</div>
         <div class="nav-section">Sistema</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-config')"><span class="nav-ic">⚙️</span>Configuración sistema</div>
       </nav>
@@ -3853,6 +3882,95 @@ tr:hover td{background:var(--surface2);}
           </div>
         </div>
 
+        <!-- REPORTES Y ANALYTICS -->
+        <div class="page-section" id="sec-sa-reportes">
+          <div class="card-header mb-5">
+            <div class="card-title" style="font-size:20px;">📊 Reportes y Analytics</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);gap:6px;" onclick="exportarExcelSA()">📥 Excel</button>
+              <button class="btn btn-neon btn-sm" onclick="exportarPDFSA()">📄 PDF</button>
+            </div>
+          </div>
+          <!-- KPIs rápidos -->
+          <div class="kpi-grid kpi-grid-4 mb-5">
+            <div class="kpi kpi-blue"><div class="kpi-top"><div class="kpi-icon">👥</div><span class="kpi-trend up" id="rep-trend-users"></span></div><div class="kpi-num" id="rep-total-users">—</div><div class="kpi-label">Voluntarios totales</div></div>
+            <div class="kpi kpi-green"><div class="kpi-top"><div class="kpi-icon">🌱</div></div><div class="kpi-num" id="rep-new-month">—</div><div class="kpi-label">Nuevos este mes</div></div>
+            <div class="kpi kpi-gold"><div class="kpi-top"><div class="kpi-icon">📜</div></div><div class="kpi-num" id="rep-certs-total">—</div><div class="kpi-label">Certificados emitidos</div></div>
+            <div class="kpi kpi-teal"><div class="kpi-top"><div class="kpi-icon">📅</div></div><div class="kpi-num" id="rep-events-total">—</div><div class="kpi-label">Eventos registrados</div></div>
+          </div>
+          <!-- Charts fila 1 -->
+          <div class="two-col mb-5">
+            <div class="card">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div class="card-title">📈 Crecimiento de voluntarios</div>
+                <select id="rep-growth-range" onchange="updateGrowthChart()" style="padding:5px 10px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--ink);outline:none;cursor:pointer;">
+                  <option value="12">Últimos 12 meses</option>
+                  <option value="24">Últimos 24 meses</option>
+                  <option value="60">Últimos 5 años</option>
+                </select>
+              </div>
+              <canvas id="chart-growth" height="190"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title mb-4">🥧 Distribución por rol</div>
+              <canvas id="chart-roles" height="190"></canvas>
+            </div>
+          </div>
+          <!-- Charts fila 2 -->
+          <div class="two-col mb-5">
+            <div class="card">
+              <div class="card-title mb-4">🗺️ Top 10 departamentos</div>
+              <canvas id="chart-depts" height="260"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title mb-4">📅 Eventos por mes (último año)</div>
+              <canvas id="chart-events-month" height="260"></canvas>
+            </div>
+          </div>
+          <!-- Tabla por departamento -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div class="card-title">📋 Resumen por departamento</div>
+              <div class="search-wrap"><input class="search-input" id="rep-dept-search" placeholder="Buscar departamento..." oninput="filtrarTablaDepts(this.value)"></div>
+            </div>
+            <div class="table-wrap">
+              <table><thead><tr><th>#</th><th>Departamento</th><th>Voluntarios</th><th>Coordinadores</th><th>Municipios</th><th>Participación</th></tr></thead>
+              <tbody id="rep-dept-table"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px;">Cargando datos...</td></tr></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CALENDARIO -->
+        <div class="page-section" id="sec-sa-calendario">
+          <div class="card-header mb-5">
+            <div class="card-title" style="font-size:20px;">📆 Calendario de Eventos</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);" onclick="calNavMes(-1)">&#8249;</button>
+              <span id="cal-mes-label" style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;min-width:140px;text-align:center;">—</span>
+              <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);" onclick="calNavMes(1)">&#8250;</button>
+              <button class="btn btn-neon btn-sm" onclick="calIrHoy()">Hoy</button>
+            </div>
+          </div>
+          <!-- Grid días semana -->
+          <div class="card mb-4" style="padding:16px;">
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0;margin-bottom:8px;">
+              <div style="text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em;">Lun</div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em;">Mar</div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em;">Mié</div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em;">Jue</div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em;">Vie</div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em;">Sáb</div>
+              <div style="text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em;">Dom</div>
+            </div>
+            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;"></div>
+          </div>
+          <!-- Lista eventos del mes -->
+          <div class="card">
+            <div class="card-title mb-4" id="cal-list-title">Eventos del mes</div>
+            <div id="cal-events-list"><p style="color:var(--muted);font-size:13px;">Selecciona un mes para ver los eventos.</p></div>
+          </div>
+        </div>
+
         <!-- CONFIG SISTEMA -->
         <div class="page-section" id="sec-sa-config">
           <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">&#x2699;&#xFE0F; Configuración del Sistema</div><button class="btn btn-neon btn-sm" onclick="showToast('&#x2705; Configuración guardada')">&#x1F4BE; Guardar</button></div>
@@ -3937,6 +4055,34 @@ tr:hover td{background:var(--surface2);}
 <!-- ════════════════════════════════════════
   CERT MODAL (hidden)
 ════════════════════════════════════════ -->
+
+<!-- ═══ VIEW: VERIFICADOR PÚBLICO DE CERTIFICADOS ═══ -->
+<div class="view" id="v-verificar" style="background:var(--b900);align-items:center;justify-content:center;padding:24px;min-height:100vh;">
+  <div style="max-width:560px;width:100%;">
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--g600),var(--g400));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">🎖️</div>
+      <h1 style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;">Verificador de Certificados</h1>
+      <p style="color:rgba(255,255,255,.5);font-size:13px;">Red Nacional Jóvenes de Ambiente — RNJA Colombia</p>
+    </div>
+    <!-- Card buscar -->
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px;backdrop-filter:blur(20px);margin-bottom:16px;">
+      <label style="display:block;font-size:12px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Código del certificado</label>
+      <div style="display:flex;gap:10px;">
+        <input id="ver-codigo-input" class="form-input" placeholder="Ej: CERT-2024-001234" style="flex:1;" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')verificarCertificado()">
+        <button class="btn btn-neon" onclick="verificarCertificado()" id="ver-btn">Verificar →</button>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,.3);margin-top:8px;">El código aparece en la parte inferior de tu certificado.</p>
+    </div>
+    <!-- Resultado -->
+    <div id="ver-resultado"></div>
+    <!-- Link volver -->
+    <div style="text-align:center;margin-top:20px;">
+      <button onclick="showView('v-landing')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;font-family:'Poppins',sans-serif;">← Volver al inicio</button>
+    </div>
+  </div>
+</div>
+
 <div id="cert-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:center;justify-content:center;padding:24px;">
   <div style="background:white;border-radius:20px;max-width:520px;width:100%;padding:36px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;">
     <button onclick="closeCertModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">&#x2715;</button>
@@ -8351,5 +8497,430 @@ async function inscribirseEvento(eventoId, btn) {
    HOOKS DE CARGA POR SECCIÓN (extensión del navTo)
 ══════════════════════════════════════════════════ */
 // (Estos se agregan al bloque navTo existente mediante la función ya actualizada arriba)
+
+/* ══════════════════════════════════════════════════════
+   #1  ANALYTICS / REPORTES SA
+══════════════════════════════════════════════════════ */
+var _repData = null;
+var _repCharts = {};
+var _repDeptFull = [];
+
+async function cargarReportesSA() {
+  if (_repData) { renderReportesSA(_repData); return; }
+  try {
+    var token = await getToken();
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
+    var [rP, rE, rC] = await Promise.all([
+      fetch(window._SB_URL + '/rest/v1/perfiles?select=id,rol,departamento,municipio,created_at&order=created_at.asc&limit=10000', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/eventos?select=id,fecha,tipo,titulo&order=fecha.asc&limit=5000', { headers: h }),
+      fetch(window._SB_URL + '/rest/v1/certificados?select=id,created_at&order=created_at.asc&limit=10000', { headers: h })
+    ]);
+    var perfiles = rP.ok ? await rP.json() : [];
+    var eventos  = rE.ok ? await rE.json() : [];
+    var certs    = rC.ok ? await rC.json() : [];
+    _repData = { perfiles, eventos, certs };
+    renderReportesSA(_repData);
+  } catch(e) { console.error('cargarReportesSA:', e); showToast('Error cargando reportes', 'error'); }
+}
+
+function renderReportesSA(d) {
+  var perfiles = d.perfiles || [], eventos = d.eventos || [], certs = d.certs || [];
+  var now = new Date();
+  var mesKey = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  var newMes  = perfiles.filter(p => p.created_at && p.created_at.startsWith(mesKey)).length;
+  var setN = function(id, n) { var el = document.getElementById(id); if (el) { el.textContent = n.toLocaleString('es-CO'); } };
+  setN('rep-total-users', perfiles.length);
+  setN('rep-new-month', newMes);
+  setN('rep-certs-total', certs.length);
+  setN('rep-events-total', eventos.length);
+  var trendEl = document.getElementById('rep-trend-users');
+  if (trendEl && newMes > 0) { trendEl.textContent = '+' + newMes + ' este mes'; trendEl.className = 'kpi-trend up'; }
+
+  // Destruir gráficas previas
+  Object.values(_repCharts).forEach(function(c){ try { c.destroy(); } catch(e){} });
+  _repCharts = {};
+
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var gridColor = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.05)';
+  var tickColor = isDark ? '#7A93AA' : '#6E8CA0';
+  var fontOpts  = { family: 'Poppins', size: 10 };
+  Chart.defaults.color = tickColor;
+
+  // Paleta
+  var C = { blue:'#2581C4', green:'#0E6D34', gold:'#C9A227', teal:'#00695C', purple:'#6A1B9A', red:'#C62828',
+            blueA:'rgba(37,129,196,.15)', greenA:'rgba(14,109,52,.15)', goldA:'rgba(201,162,39,.15)', tealA:'rgba(0,105,92,.15)' };
+
+  // ── 1. Crecimiento acumulado
+  function buildGrowthData(months) {
+    var keys = [];
+    for (var i = months - 1; i >= 0; i--) {
+      var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      keys.push(d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'));
+    }
+    var monthly = {}; keys.forEach(function(k){ monthly[k] = 0; });
+    perfiles.forEach(function(p){ var k = (p.created_at||'').substring(0,7); if (k in monthly) monthly[k]++; });
+    var prev = perfiles.filter(function(p){ return (p.created_at||'').substring(0,7) < keys[0]; }).length;
+    var cum = []; var s = prev;
+    var mNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var labels = keys.map(function(k){ var p = k.split('-'); return mNames[parseInt(p[1])-1]+' '+p[0].slice(2); });
+    keys.forEach(function(k){ s += monthly[k]; cum.push(s); });
+    return { labels: labels, monthly: keys.map(function(k){ return monthly[k]; }), cumulative: cum };
+  }
+  window._buildGrowthData = buildGrowthData;
+  var gd = buildGrowthData(12);
+  var ctxG = document.getElementById('chart-growth');
+  if (ctxG) {
+    _repCharts.growth = new Chart(ctxG, {
+      type: 'line',
+      data: { labels: gd.labels, datasets: [
+        { label: 'Acumulado', data: gd.cumulative, borderColor: C.blue, backgroundColor: C.blueA, fill: true, tension: 0.4, pointRadius: 3, borderWidth: 2.5 },
+        { label: 'Nuevos / mes', data: gd.monthly, borderColor: C.green, backgroundColor: 'transparent', tension: 0.4, pointRadius: 2, borderWidth: 2, borderDash: [5,4] }
+      ]},
+      options: { responsive: true, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { font: fontOpts, padding: 14 } }, tooltip: { callbacks: { label: function(ctx){ return ' '+ctx.dataset.label+': '+ctx.raw.toLocaleString('es-CO'); }}}},
+        scales: { x: { grid: { color: gridColor }, ticks: { font: fontOpts } }, y: { grid: { color: gridColor }, ticks: { font: fontOpts } } }
+      }
+    });
+  }
+
+  // ── 2. Distribución roles (doughnut)
+  var roleLbls = { voluntario:'Voluntario', coord_municipal:'C. Municipal', coord_departamental:'C. Departamental', coord_nacional:'C. Nacional', super_admin:'Super Admin' };
+  var roleCnt = {};
+  perfiles.forEach(function(p){ var r = p.rol||'voluntario'; roleCnt[r] = (roleCnt[r]||0)+1; });
+  var rKeys = Object.keys(roleCnt);
+  var ctxR = document.getElementById('chart-roles');
+  if (ctxR) {
+    _repCharts.roles = new Chart(ctxR, {
+      type: 'doughnut',
+      data: { labels: rKeys.map(function(k){ return roleLbls[k]||k; }),
+              datasets: [{ data: rKeys.map(function(k){ return roleCnt[k]; }), backgroundColor: [C.blue,C.green,C.gold,C.teal,C.purple], borderWidth: 2, borderColor: isDark?'#1C2333':'#fff' }] },
+      options: { responsive: true, cutout: '62%',
+        plugins: { legend: { position: 'right', labels: { font: fontOpts, padding: 14, boxWidth: 12 } },
+          tooltip: { callbacks: { label: function(ctx){ var total=ctx.dataset.data.reduce(function(a,b){return a+b;},0); return ' '+ctx.label+': '+ctx.raw+' ('+((ctx.raw/total)*100).toFixed(1)+'%)'; }}}
+        }
+      }
+    });
+  }
+
+  // ── 3. Top 10 departamentos (horizontal bar)
+  var deptCnt = {};
+  perfiles.forEach(function(p){ if (p.departamento) deptCnt[p.departamento] = (deptCnt[p.departamento]||0)+1; });
+  var topD = Object.entries(deptCnt).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
+  var ctxD = document.getElementById('chart-depts');
+  if (ctxD) {
+    var palette = [C.blue,C.green,C.gold,C.teal,C.purple,C.red,C.blue,C.green,C.gold,C.teal];
+    _repCharts.depts = new Chart(ctxD, {
+      type: 'bar',
+      data: { labels: topD.map(function(d){ return d[0]; }),
+              datasets: [{ label: 'Voluntarios', data: topD.map(function(d){ return d[1]; }), backgroundColor: palette, borderRadius: 6, borderWidth: 0 }] },
+      options: { indexAxis: 'y', responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx){ return ' '+ctx.raw.toLocaleString('es-CO')+' voluntarios'; }}}},
+        scales: { x: { grid: { color: gridColor }, ticks: { font: fontOpts } }, y: { ticks: { font: fontOpts } } }
+      }
+    });
+  }
+
+  // ── 4. Eventos por mes (últimos 12)
+  var evM = {}; var last12 = [];
+  for (var i = 11; i >= 0; i--) {
+    var d2 = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var k2 = d2.getFullYear() + '-' + String(d2.getMonth()+1).padStart(2,'0');
+    last12.push(k2); evM[k2] = 0;
+  }
+  eventos.forEach(function(ev){ var k = (ev.fecha||'').substring(0,7); if (k in evM) evM[k]++; });
+  var mNames2 = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var evLabels = last12.map(function(k){ var p = k.split('-'); return mNames2[parseInt(p[1])-1]+' '+p[0].slice(2); });
+  var ctxEv = document.getElementById('chart-events-month');
+  if (ctxEv) {
+    _repCharts.events = new Chart(ctxEv, {
+      type: 'bar',
+      data: { labels: evLabels,
+              datasets: [{ label: 'Eventos', data: last12.map(function(k){ return evM[k]; }), backgroundColor: C.tealA, borderColor: C.teal, borderWidth: 2, borderRadius: 6 }] },
+      options: { responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { x: { grid: { color: gridColor }, ticks: { font: fontOpts, maxRotation: 45 } }, y: { grid: { color: gridColor }, ticks: { font: fontOpts, stepSize: 1 } } }
+      }
+    });
+  }
+
+  // ── Tabla por departamento
+  _repDeptFull = Object.entries(deptCnt).sort(function(a,b){ return b[1]-a[1]; });
+  renderTablaDepts(_repDeptFull, perfiles);
+}
+
+function renderTablaDepts(depts, perfiles) {
+  var tbody = document.getElementById('rep-dept-table');
+  if (!tbody) return;
+  var total = (perfiles || _repData.perfiles).length || 1;
+  tbody.innerHTML = depts.map(function(row, i){
+    var dept = row[0], cnt = row[1];
+    var coords = (perfiles||_repData.perfiles).filter(function(p){ return p.departamento===dept && p.rol && p.rol.includes('coord'); }).length;
+    var munics = [...new Set((perfiles||_repData.perfiles).filter(function(p){ return p.departamento===dept; }).map(function(p){ return p.municipio; }).filter(Boolean))].length;
+    var pct = ((cnt/total)*100).toFixed(1);
+    return '<tr><td class="td-bold">'+(i+1)+'</td><td class="td-bold">'+dept+'</td><td>'+cnt.toLocaleString('es-CO')+'</td><td>'+coords+'</td><td>'+munics+'</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-wrap" style="flex:1;"><div class="progress-bar" style="width:'+pct+'%"></div></div><span style="font-size:11px;color:var(--muted);min-width:36px;">'+pct+'%</span></div></td></tr>';
+  }).join('');
+  // Animate progress bars
+  tbody.querySelectorAll('.progress-bar').forEach(function(bar){
+    var w = bar.style.width; bar.style.width = '0';
+    setTimeout(function(){ bar.style.transition='width 1.2s cubic-bezier(.22,1,.36,1)'; bar.style.width=w; }, 60);
+  });
+}
+
+window.filtrarTablaDepts = function(q) {
+  if (!_repData) return;
+  var filtered = q ? _repDeptFull.filter(function(r){ return r[0].toLowerCase().includes(q.toLowerCase()); }) : _repDeptFull;
+  renderTablaDepts(filtered, _repData.perfiles);
+};
+
+window.updateGrowthChart = function() {
+  if (!_repData || !_repCharts.growth || !window._buildGrowthData) return;
+  var sel = document.getElementById('rep-growth-range');
+  var months = sel ? parseInt(sel.value) || 12 : 12;
+  var gd = window._buildGrowthData(months);
+  _repCharts.growth.data.labels = gd.labels;
+  _repCharts.growth.data.datasets[0].data = gd.cumulative;
+  _repCharts.growth.data.datasets[1].data = gd.monthly;
+  _repCharts.growth.update();
+};
+
+/* ── #2  EXPORTAR EXCEL ── */
+window.exportarExcelSA = function() {
+  var data = _repData || (window._usuariosData ? { perfiles: window._usuariosData, eventos: [], certs: [] } : null);
+  if (!data || !data.perfiles || !data.perfiles.length) { showToast('Abre "Reportes y analytics" primero', 'warning'); return; }
+  var rows = data.perfiles.map(function(p){
+    return { 'Nombres': p.nombres||'', 'Apellidos': p.apellidos||'', 'Email': p.email||'', 'Rol': p.rol||'', 'Departamento': p.departamento||'', 'Municipio': p.municipio||'', 'Total horas': p.total_horas||0, 'Fecha registro': (p.created_at||'').substring(0,10) };
+  });
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Voluntarios');
+  if (data.eventos && data.eventos.length) {
+    var evRows = data.eventos.map(function(e){ return { 'Titulo': e.titulo||e.nombre||'', 'Fecha': e.fecha||'', 'Tipo': e.tipo||'' }; });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evRows), 'Eventos');
+  }
+  XLSX.writeFile(wb, 'RNJA_reporte_' + new Date().toISOString().slice(0,10) + '.xlsx');
+  showToast('Excel descargado ✓', 'success');
+};
+
+/* ── #2  EXPORTAR PDF (ventana impresión) ── */
+window.exportarPDFSA = function() {
+  var data = _repData;
+  if (!data) { showToast('Abre "Reportes y analytics" primero', 'warning'); return; }
+  var total = data.perfiles.length;
+  var deptCnt = {};
+  data.perfiles.forEach(function(p){ if(p.departamento) deptCnt[p.departamento]=(deptCnt[p.departamento]||0)+1; });
+  var topD = Object.entries(deptCnt).sort(function(a,b){return b[1]-a[1];}).slice(0,15);
+  var win = window.open('','_blank');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte RNJA '+new Date().getFullYear()+'</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;padding:32px;color:#1a1a1a;}h1{font-size:22px;color:#0E4A22;margin-bottom:4px;}h2{font-size:15px;color:#155830;margin:20px 0 8px;}p{font-size:12px;color:#555;margin-bottom:16px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#0E4A22;color:#fff;padding:8px 10px;text-align:left;}td{padding:7px 10px;border-bottom:1px solid #ddd;}.kpi-row{display:flex;gap:16px;margin-bottom:20px;}.kpi-box{flex:1;border:2px solid #0E6D34;border-radius:10px;padding:14px;text-align:center;}.kpi-num{font-size:28px;font-weight:800;color:#0E4A22;}.kpi-lbl{font-size:11px;color:#666;margin-top:4px;}@media print{body{padding:16px;}}</style></head><body>');
+  win.document.write('<h1>📊 Reporte RNJA — '+new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long'})+'</h1>');
+  win.document.write('<p>Red Nacional Jóvenes de Ambiente · Ministerio de Ambiente y Desarrollo Sostenible</p>');
+  win.document.write('<div class="kpi-row"><div class="kpi-box"><div class="kpi-num">'+total.toLocaleString('es-CO')+'</div><div class="kpi-lbl">Voluntarios totales</div></div><div class="kpi-box"><div class="kpi-num">'+data.certs.length.toLocaleString('es-CO')+'</div><div class="kpi-lbl">Certificados emitidos</div></div><div class="kpi-box"><div class="kpi-num">'+data.eventos.length.toLocaleString('es-CO')+'</div><div class="kpi-lbl">Eventos registrados</div></div></div>');
+  win.document.write('<h2>Distribución por departamento</h2><table><thead><tr><th>#</th><th>Departamento</th><th>Voluntarios</th><th>%</th></tr></thead><tbody>');
+  topD.forEach(function(r,i){ win.document.write('<tr><td>'+(i+1)+'</td><td>'+r[0]+'</td><td>'+r[1].toLocaleString('es-CO')+'</td><td>'+((r[1]/total)*100).toFixed(1)+'%</td></tr>'); });
+  win.document.write('</tbody></table><br><p style="font-size:10px;color:#aaa;">Generado el '+new Date().toLocaleString('es-CO')+' — Sistema RNJA</p></body></html>');
+  win.document.close();
+  setTimeout(function(){ win.print(); }, 400);
+};
+
+/* ══════════════════════════════════════════════════════
+   #3  VERIFICADOR PÚBLICO DE CERTIFICADOS
+══════════════════════════════════════════════════════ */
+window.verificarCertificado = async function() {
+  var input = document.getElementById('ver-codigo-input');
+  var codigo = (input ? input.value.trim() : '').toUpperCase();
+  if (!codigo) { showToast('Ingresa un código de certificado', 'warning'); return; }
+  var btn = document.getElementById('ver-btn');
+  if (btn) { btn.classList.add('btn-loading'); btn.textContent = ''; }
+  var res = document.getElementById('ver-resultado');
+  if (res) res.innerHTML = '<div style="text-align:center;padding:24px;color:rgba(255,255,255,.5);">Verificando...</div>';
+  try {
+    var h = { 'apikey': window._SB_KEY, 'Accept': 'application/json' };
+    var url = window._SB_URL + '/rest/v1/certificados?or=(id.eq.' + encodeURIComponent(codigo) + ',codigo.eq.' + encodeURIComponent(codigo) + ')&select=*,perfil:perfiles!perfil_id(nombres,apellidos,departamento,municipio)&limit=1';
+    var resp = await fetch(url, { headers: h });
+    var data = resp.ok ? await resp.json() : [];
+    if (btn) { btn.classList.remove('btn-loading'); btn.textContent = 'Verificar →'; }
+    if (!data.length) {
+      if (res) res.innerHTML = '<div class="ver-error"><div style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:28px;">❌</span><div><div style="font-family:Montserrat,sans-serif;font-weight:700;color:#FFCDD2;font-size:15px;margin-bottom:4px;">Certificado no encontrado</div><div style="color:rgba(255,255,255,.5);font-size:13px;">El código <strong style="color:#fff;">' + codigo + '</strong> no corresponde a ningún certificado válido en nuestra base de datos.</div></div></div></div>';
+      return;
+    }
+    var cert = data[0];
+    var perfil = cert.perfil || {};
+    var nombre = ((perfil.nombres||'') + ' ' + (perfil.apellidos||'')).trim() || 'Nombre no disponible';
+    var fecha = cert.fecha_emision || cert.created_at || '';
+    if (fecha) fecha = new Date(fecha).toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+    if (res) res.innerHTML = '<div class="ver-success"><div class="ver-cert-header"><div class="ver-cert-icon">🎖️</div><div><div style="font-family:Montserrat,sans-serif;font-weight:800;color:#A5D6A7;font-size:16px;">✅ Certificado Válido</div><div style="color:rgba(255,255,255,.5);font-size:12px;margin-top:3px;">Verificado en el sistema RNJA</div></div></div><div class="ver-row"><span class="ver-lbl">Titular:</span><span class="ver-val">' + nombre + '</span></div><div class="ver-row"><span class="ver-lbl">Tipo:</span><span class="ver-val">' + (cert.tipo||cert.nombre_cert||'Certificado RNJA') + '</span></div><div class="ver-row"><span class="ver-lbl">Código:</span><span class="ver-val" style="font-family:monospace;">' + (cert.codigo||cert.id) + '</span></div><div class="ver-row"><span class="ver-lbl">Fecha de emisión:</span><span class="ver-val">' + (fecha||'—') + '</span></div><div class="ver-row"><span class="ver-lbl">Departamento:</span><span class="ver-val">' + (perfil.departamento||'—') + '</span></div><div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.35);">Red Nacional Jóvenes de Ambiente · Ministerio de Ambiente y Desarrollo Sostenible · Colombia</div></div>';
+  } catch(e) {
+    if (btn) { btn.classList.remove('btn-loading'); btn.textContent = 'Verificar →'; }
+    if (res) res.innerHTML = '<div class="ver-error"><span style="color:#FFCDD2;">Error al verificar. Intenta nuevamente.</span></div>';
+  }
+};
+
+// Inicializar verificador desde URL param (?cert=CODIGO)
+(function initVerificadorURL() {
+  var params = new URLSearchParams(window.location.search);
+  var certCode = params.get('cert') || params.get('certificado') || params.get('code');
+  if (certCode) {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+      var vVer = document.getElementById('v-verificar');
+      if (vVer) vVer.classList.add('active');
+      var inp = document.getElementById('ver-codigo-input');
+      if (inp) { inp.value = certCode.toUpperCase(); window.verificarCertificado(); }
+    });
+  }
+})();
+
+/* ══════════════════════════════════════════════════════
+   #4  CALENDARIO DE EVENTOS
+══════════════════════════════════════════════════════ */
+var _calState = { year: new Date().getFullYear(), month: new Date().getMonth(), eventos: null };
+
+async function cargarCalendarioSA() {
+  if (!_calState.eventos) {
+    try {
+      var token = await getToken();
+      var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
+      var resp = await fetch(window._SB_URL + '/rest/v1/eventos?select=id,titulo,fecha,tipo&order=fecha.asc&limit=5000', { headers: h });
+      _calState.eventos = resp.ok ? await resp.json() : [];
+    } catch(e) { _calState.eventos = []; }
+  }
+  renderCalendario();
+}
+
+function renderCalendario() {
+  var y = _calState.year, m = _calState.month;
+  var mNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var label = document.getElementById('cal-mes-label');
+  if (label) label.textContent = mNames[m] + ' ' + y;
+
+  var firstDay = new Date(y, m, 1).getDay(); // 0=Dom
+  // Ajustar a lunes como primer día
+  firstDay = (firstDay === 0) ? 6 : firstDay - 1;
+  var daysInMonth = new Date(y, m+1, 0).getDate();
+  var today = new Date(); var todayStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+
+  // Indexar eventos del mes
+  var mesKey = y + '-' + String(m+1).padStart(2,'0');
+  var evByDay = {};
+  (_calState.eventos||[]).forEach(function(ev){
+    if ((ev.fecha||'').startsWith(mesKey)) {
+      var day = parseInt(ev.fecha.split('-')[2]);
+      if (!evByDay[day]) evByDay[day] = [];
+      evByDay[day].push(ev);
+    }
+  });
+
+  var grid = document.getElementById('cal-grid');
+  if (!grid) return;
+  var cells = '';
+  // Celdas vacías al inicio
+  for (var i = 0; i < firstDay; i++) cells += '<div class="cal-day other-month"></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dayStr = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var isToday = dayStr === todayStr;
+    var evs = evByDay[d] || [];
+    var hasEv = evs.length > 0;
+    var evHtml = evs.slice(0,2).map(function(e){ return '<span class="cal-event-dot">' + (e.titulo||e.tipo||'Evento') + '</span>'; }).join('');
+    if (evs.length > 2) evHtml += '<span class="cal-event-dot">+' + (evs.length-2) + ' más</span>';
+    cells += '<div class="cal-day'+(isToday?' today':'')+(hasEv?' has-events':'')+'" onclick="calSelDia('+d+')">'+'<div class="cal-day-num">'+d+'</div>'+evHtml+'</div>';
+  }
+  grid.innerHTML = cells;
+
+  // Lista eventos del mes
+  var listEl = document.getElementById('cal-events-list');
+  var titleEl = document.getElementById('cal-list-title');
+  if (titleEl) titleEl.textContent = 'Eventos en ' + mNames[m] + ' ' + y;
+  var allEvMes = (_calState.eventos||[]).filter(function(ev){ return (ev.fecha||'').startsWith(mesKey); });
+  if (listEl) {
+    if (!allEvMes.length) { listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><h4>Sin eventos</h4><p>No hay eventos registrados para este mes.</p></div>'; }
+    else {
+      listEl.innerHTML = allEvMes.map(function(ev){
+        var fechaD = ev.fecha ? new Date(ev.fecha+'T00:00:00').toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'}) : '';
+        return '<div class="event-card mb-3" style="margin-bottom:8px;"><div class="event-date"><div class="d">'+(ev.fecha?ev.fecha.split('-')[2]:'—')+'</div><div class="m">'+(ev.fecha?['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][parseInt(ev.fecha.split('-')[1])-1]:'')+'</div></div><div><div style="font-weight:600;font-size:14px;">'+(ev.titulo||'Evento')+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">'+fechaD+'</div>'+(ev.tipo?'<span class="tag tag-green" style="margin-top:6px;">'+ev.tipo+'</span>':'')+'</div></div>';
+      }).join('');
+    }
+  }
+}
+
+window.calNavMes = function(dir) {
+  _calState.month += dir;
+  if (_calState.month > 11) { _calState.month = 0; _calState.year++; }
+  if (_calState.month < 0)  { _calState.month = 11; _calState.year--; }
+  renderCalendario();
+};
+window.calIrHoy = function() {
+  var now = new Date();
+  _calState.year = now.getFullYear(); _calState.month = now.getMonth();
+  renderCalendario();
+};
+window.calSelDia = function(day) {
+  var y=_calState.year, m=_calState.month;
+  var dayStr = y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+  var evs = (_calState.eventos||[]).filter(function(ev){ return ev.fecha===dayStr; });
+  if (!evs.length) return;
+  var mNames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  showToast(evs.length+' evento'+(evs.length>1?'s':'')+' el '+day+' de '+mNames[m], 'info');
+};
+
+/* ══════════════════════════════════════════════════════
+   #5  NOTIFICACIONES REALTIME (Supabase)
+══════════════════════════════════════════════════════ */
+var _realtimeChannel = null;
+
+function initRealtime(role) {
+  if (!window._supabase || _realtimeChannel) return;
+  if (role !== 'super_admin' && role !== 'coord_nacional') return;
+  try {
+    _realtimeChannel = window._supabase
+      .channel('rnja-realtime-' + Date.now())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'solicitudes' }, function(payload) {
+        var nom = (payload.new && payload.new.nombres) ? payload.new.nombres : 'Alguien';
+        showToast('📨 Nueva solicitud: ' + nom, 'info');
+        // Actualizar badge en sidebar
+        dcDel('solicitudes'); dcDel('stats_sa');
+        var badge = document.querySelector('#sidebar-sa .nbadge');
+        if (badge) { var n = parseInt(badge.textContent)||0; badge.textContent = n+1; }
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'certificados' }, function(payload) {
+        showToast('🎖️ Nuevo certificado emitido', 'info');
+        dcDel('certs_sa');
+      })
+      .subscribe(function(status) {
+        if (status === 'SUBSCRIBED') console.log('RNJA Realtime conectado ✓');
+      });
+  } catch(e) { console.warn('Realtime no disponible:', e); }
+}
+
+/* ── Hooks navTo para nuevas secciones ── */
+(function patchNavTo() {
+  var _orig = window.navTo;
+  if (typeof _orig !== 'function') return;
+  window.navTo = function(el, sectionId) {
+    _orig.call(this, el, sectionId);
+    if (sectionId === 'sec-sa-reportes')   cargarReportesSA();
+    if (sectionId === 'sec-sa-calendario') cargarCalendarioSA();
+  };
+})();
+
+/* ── Parchar loginAs para arrancar Realtime ── */
+(function patchLoginAs() {
+  var _orig = window.loginAs;
+  if (typeof _orig !== 'function') return;
+  window.loginAs = function(role) {
+    _orig.call(this, role);
+    setTimeout(function(){ initRealtime(role); }, 2000);
+  };
+})();
+
+/* ── Agregar botón "Verificar certificado" en landing nav ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var navRight = document.querySelector('.land-nav > div:last-child');
+  if (navRight) {
+    var btn = document.createElement('button');
+    btn.className = 'btn btn-ghost btn-sm land-login-btn';
+    btn.textContent = '🔍 Verificar certificado';
+    btn.onclick = function(){ document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');}); document.getElementById('v-verificar').classList.add('active'); };
+    navRight.insertBefore(btn, navRight.querySelector('.land-ham-btn'));
+  }
+});
+
 </script></body>
 </html>
