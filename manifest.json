@@ -1,0 +1,33 @@
+{
+  "name": "RNJA — Red Nacional Jóvenes de Ambiente",
+  "short_name": "RNJA",
+  "description": "Plataforma de gestión de voluntarios ambientales de Colombia",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#062A14",
+  "theme_color": "#0E4A22",
+  "categories": ["lifestyle", "education", "productivity"],
+  "lang": "es",
+  "icons": [
+    { "src": "logo-rnja.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "logo-rnja.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mis certificados",
+      "short_name": "Certificados",
+      "url": "/?goto=certs",
+      "icons": [{ "src": "logo-rnja.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Verificar certificado",
+      "short_name": "Verificar",
+      "url": "/?view=verificar",
+      "icons": [{ "src": "logo-rnja.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    { "src": "RNJA-COLOMBIA.png", "sizes": "1280x720", "type": "image/png", "form_factor": "wide" }
+  ]
+}

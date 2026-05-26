@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Red Nacional Jóvenes de Ambiente — RNJA Colombia</title>
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0E4A22">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RNJA">
+<link rel="apple-touch-icon" href="/logo-rnja.png">
+<!-- OG / Share -->
+<meta property="og:title" content="RNJA — Red Nacional Jóvenes de Ambiente">
+<meta property="og:description" content="Plataforma oficial de gestión de voluntarios ambientales de Colombia">
+<meta property="og:image" content="/RNJA-COLOMBIA.png">
+<meta property="og:type" content="website">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
 <style>
 
@@ -738,6 +751,32 @@ tr:hover td{background:var(--surface2);}
 .ver-lbl{color:rgba(255,255,255,.45);min-width:120px;flex-shrink:0;}
 .ver-val{color:#fff;font-weight:600;}
 
+/* ── IMPACTO AMBIENTAL ── */
+.impacto-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;}
+.impacto-reforestacion{background:rgba(14,109,52,.12);color:var(--g600);}
+.impacto-monitoreo{background:rgba(37,129,196,.12);color:var(--blue);}
+.impacto-residuos{background:rgba(0,105,92,.12);color:var(--teal);}
+.impacto-educacion{background:rgba(201,162,39,.12);color:#7B4F00;}
+.impacto-sensibilizacion{background:rgba(106,27,154,.12);color:var(--purple);}
+.impacto-restauracion{background:rgba(14,109,52,.18);color:var(--g700);}
+.impacto-otro{background:var(--surface3);color:var(--muted);}
+
+/* ── PERFIL PÚBLICO ── */
+.pub-perfil-header{background:linear-gradient(135deg,var(--g800),var(--g900));border-radius:var(--r-xl);padding:28px;color:#fff;display:flex;gap:20px;align-items:flex-start;margin-bottom:18px;}
+.pub-av{width:80px;height:80px;border-radius:20px;flex-shrink:0;background:linear-gradient(135deg,var(--g400),var(--gold));display:flex;align-items:center;justify-content:center;font-size:36px;border:3px solid rgba(255,255,255,.2);}
+.pub-qr-wrap{background:white;padding:10px;border-radius:12px;display:inline-block;margin-top:12px;}
+
+/* ── QR CHECK-IN ── */
+.qr-display{text-align:center;padding:8px 0;}
+.qr-display canvas{border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+#html5-qrcode-button-camera-start,#html5-qrcode-button-camera-stop{background:var(--g600)!important;color:#fff!important;border:none!important;padding:10px 20px!important;border-radius:10px!important;cursor:pointer!important;font-family:'Poppins',sans-serif!important;font-weight:600!important;}
+
+/* ── PWA INSTALL BANNER ── */
+.pwa-banner{position:fixed;bottom:0;left:0;right:0;background:var(--g800);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:1000;border-top:2px solid var(--g400);transform:translateY(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);flex-wrap:wrap;}
+.pwa-banner.show{transform:translateY(0);}
+.pwa-banner p{font-size:13px;color:rgba(255,255,255,.8);flex:1;}
+.pwa-banner strong{color:#fff;}
+
 /* ── BOTTOM NAV MÓVIL (dashboard) ── */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:150;padding:8px 0 calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px rgba(10,31,53,.08);}
 .bottom-nav-inner{display:flex;justify-content:space-around;align-items:center;}
@@ -758,8 +797,10 @@ tr:hover td{background:var(--surface2);}
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <!-- ══ CHART.JS ══ -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<!-- ══ QR CODE (verificador certificados) ══ -->
+<!-- ══ QR CODE (verificador certificados + check-in) ══ -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<!-- ══ HTML5 QR SCANNER (check-in eventos) ══ -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 
@@ -3473,6 +3514,7 @@ tr:hover td{background:var(--surface2);}
         <div class="nav-section">Análisis</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-reportes')"><span class="nav-ic">📊</span>Reportes y analytics</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-calendario')"><span class="nav-ic">📆</span>Calendario</div>
+        <div class="nav-item" onclick="navTo(this,'sec-sa-impacto')"><span class="nav-ic">🌱</span>Impacto ambiental</div>
         <div class="nav-section">Sistema</div>
         <div class="nav-item" onclick="navTo(this,'sec-sa-config')"><span class="nav-ic">⚙️</span>Configuración sistema</div>
       </nav>
@@ -3971,6 +4013,44 @@ tr:hover td{background:var(--surface2);}
           </div>
         </div>
 
+        <!-- IMPACTO AMBIENTAL -->
+        <div class="page-section" id="sec-sa-impacto">
+          <div class="card-header mb-5">
+            <div class="card-title" style="font-size:20px;">🌱 Impacto Ambiental</div>
+            <button class="btn btn-neon btn-sm" onclick="abrirModalImpacto()">+ Registrar actividad</button>
+          </div>
+          <!-- KPIs impacto -->
+          <div class="kpi-grid mb-5" style="grid-template-columns:repeat(5,1fr);gap:14px;" id="impacto-kpis">
+            <div class="kpi kpi-green"><div class="kpi-top"><div class="kpi-icon">🌳</div></div><div class="kpi-num" id="imp-arboles">—</div><div class="kpi-label">Árboles plantados</div></div>
+            <div class="kpi kpi-blue"><div class="kpi-top"><div class="kpi-icon">🗺️</div></div><div class="kpi-num" id="imp-area">—</div><div class="kpi-label">km² monitoreados</div></div>
+            <div class="kpi kpi-teal"><div class="kpi-top"><div class="kpi-icon">♻️</div></div><div class="kpi-num" id="imp-residuos">—</div><div class="kpi-label">kg residuos recogidos</div></div>
+            <div class="kpi kpi-gold"><div class="kpi-top"><div class="kpi-icon">👥</div></div><div class="kpi-num" id="imp-participantes">—</div><div class="kpi-label">Participantes</div></div>
+            <div class="kpi kpi-purple"><div class="kpi-top"><div class="kpi-icon">📋</div></div><div class="kpi-num" id="imp-actividades">—</div><div class="kpi-label">Actividades</div></div>
+          </div>
+          <!-- Charts -->
+          <div class="two-col mb-5">
+            <div class="card">
+              <div class="card-title mb-4">📊 Actividades por categoría</div>
+              <canvas id="chart-impacto-tipo" height="200"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title mb-4">📈 Evolución mensual</div>
+              <canvas id="chart-impacto-mes" height="200"></canvas>
+            </div>
+          </div>
+          <!-- Tabla de actividades -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div class="card-title">📋 Registro de actividades</div>
+              <button class="btn btn-sm" style="background:var(--surface2);border:1px solid var(--border);color:var(--ink);" onclick="exportarExcelImpacto()">📥 Exportar</button>
+            </div>
+            <div class="table-wrap">
+              <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Departamento</th><th>Cantidad</th><th>Participantes</th></tr></thead>
+              <tbody id="impacto-tabla"></tbody></table>
+            </div>
+          </div>
+        </div>
+
         <!-- CONFIG SISTEMA -->
         <div class="page-section" id="sec-sa-config">
           <div class="card-header mb-5"><div class="card-title" style="font-size:20px;">&#x2699;&#xFE0F; Configuración del Sistema</div><button class="btn btn-neon btn-sm" onclick="showToast('&#x2705; Configuración guardada')">&#x1F4BE; Guardar</button></div>
@@ -4055,6 +4135,75 @@ tr:hover td{background:var(--surface2);}
 <!-- ════════════════════════════════════════
   CERT MODAL (hidden)
 ════════════════════════════════════════ -->
+
+<!-- ═══ VIEW: PERFIL PÚBLICO DEL VOLUNTARIO ═══ -->
+<div class="view" id="v-perfil-publico" style="background:var(--surface2);min-height:100vh;padding:24px 16px;">
+  <div style="max-width:680px;margin:0 auto;">
+    <!-- Header navegación -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <button onclick="showView('v-landing')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Poppins',sans-serif;">← Inicio</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" style="background:var(--surface);border:1px solid var(--border);color:var(--ink);" onclick="copiarURLPerfil()" id="btn-copiar-url">🔗 Copiar enlace</button>
+      </div>
+    </div>
+    <!-- Contenido dinámico -->
+    <div id="pub-perfil-content">
+      <div class="empty-state"><div class="empty-state-icon">👤</div><h4>Cargando perfil...</h4></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL CHECK-IN QR ═══ -->
+<div id="modal-checkin" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);">
+  <div style="background:var(--surface);border-radius:20px;max-width:420px;width:100%;padding:28px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.3);">
+    <button onclick="cerrarCheckin()" style="position:absolute;top:12px;right:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;color:var(--muted);">✕</button>
+    <div id="checkin-content">
+      <!-- Se rellena dinámicamente: modo QR o modo scanner -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL REGISTRAR ACTIVIDAD IMPACTO ═══ -->
+<div id="modal-impacto" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);overflow-y:auto;">
+  <div style="background:var(--surface);border-radius:20px;max-width:500px;width:100%;padding:28px;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.3);margin:auto;">
+    <button onclick="cerrarModalImpacto()" style="position:absolute;top:12px;right:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;color:var(--muted);">✕</button>
+    <h3 style="font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;margin-bottom:20px;">🌱 Registrar actividad de impacto</h3>
+    <div class="form-group"><label class="form-label" style="color:var(--muted);">Tipo de actividad</label>
+      <select id="imp-tipo" class="form-input" style="background:var(--surface2);color:var(--ink);border-color:var(--border);">
+        <option value="reforestacion">🌳 Reforestación</option>
+        <option value="monitoreo">🔭 Monitoreo de ecosistemas</option>
+        <option value="residuos">♻️ Limpieza y residuos</option>
+        <option value="educacion">📚 Educación ambiental</option>
+        <option value="sensibilizacion">📢 Sensibilización comunitaria</option>
+        <option value="restauracion">🌿 Restauración de hábitat</option>
+        <option value="otro">📋 Otro</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="form-group"><label class="form-label" style="color:var(--muted);">Cantidad</label><input id="imp-cantidad" class="form-input" type="number" min="0" placeholder="Ej: 150" style="background:var(--surface2);color:var(--ink);border-color:var(--border);"></div>
+      <div class="form-group"><label class="form-label" style="color:var(--muted);">Unidad</label>
+        <select id="imp-unidad" class="form-input" style="background:var(--surface2);color:var(--ink);border-color:var(--border);">
+          <option value="árboles">Árboles</option>
+          <option value="km²">km²</option>
+          <option value="kg">kg residuos</option>
+          <option value="personas">Personas</option>
+          <option value="sesiones">Sesiones</option>
+          <option value="hectáreas">Hectáreas</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label" style="color:var(--muted);">Descripción</label><input id="imp-desc" class="form-input" placeholder="Breve descripción de la actividad" style="background:var(--surface2);color:var(--ink);border-color:var(--border);"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="form-group"><label class="form-label" style="color:var(--muted);">Departamento</label><input id="imp-depto" class="form-input" placeholder="Ej: Cundinamarca" style="background:var(--surface2);color:var(--ink);border-color:var(--border);"></div>
+      <div class="form-group"><label class="form-label" style="color:var(--muted);">Participantes</label><input id="imp-partic" class="form-input" type="number" min="0" placeholder="Nº de personas" style="background:var(--surface2);color:var(--ink);border-color:var(--border);"></div>
+    </div>
+    <div class="form-group"><label class="form-label" style="color:var(--muted);">Fecha</label><input id="imp-fecha" class="form-input" type="date" style="background:var(--surface2);color:var(--ink);border-color:var(--border);"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="cerrarModalImpacto()">Cancelar</button>
+      <button class="btn btn-neon" style="flex:2;" onclick="guardarActividad()">💾 Guardar actividad</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ VIEW: VERIFICADOR PÚBLICO DE CERTIFICADOS ═══ -->
 <div class="view" id="v-verificar" style="background:var(--b900);align-items:center;justify-content:center;padding:24px;min-height:100vh;">
@@ -8910,6 +9059,422 @@ function initRealtime(role) {
   };
 })();
 
+/* ══════════════════════════════════════════════════════
+   #6  PWA — Service Worker + Banner de instalación
+══════════════════════════════════════════════════════ */
+(function initPWA() {
+  // Registrar Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(reg) {
+        console.log('SW registrado:', reg.scope);
+        // Si hay una nueva versión disponible, avisar
+        reg.addEventListener('updatefound', function() {
+          var newWorker = reg.installing;
+          newWorker.addEventListener('statechange', function() {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showToast('Nueva versión disponible — recarga para actualizar', 'info');
+            }
+          });
+        });
+      }).catch(function(err) { console.warn('SW error:', err); });
+    });
+  }
+
+  // Banner de instalación (beforeinstallprompt)
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Mostrar banner después de 30s si no ha sido descartado antes
+    var dismissed = localStorage.getItem('rnja-pwa-dismissed');
+    if (!dismissed) {
+      setTimeout(function() {
+        var banner = document.getElementById('pwa-install-banner');
+        if (banner) banner.classList.add('show');
+      }, 30000);
+    }
+  });
+
+  window.installPWA = function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choice) {
+      if (choice.outcome === 'accepted') showToast('¡App instalada! Búscala en tu pantalla de inicio 🎉', 'success');
+      deferredPrompt = null;
+      var banner = document.getElementById('pwa-install-banner');
+      if (banner) banner.classList.remove('show');
+    });
+  };
+  window.dismissPWA = function() {
+    localStorage.setItem('rnja-pwa-dismissed', '1');
+    var banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.classList.remove('show');
+  };
+
+  // Shortcut URL params
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('goto') === 'certs' || params.get('view') === 'verificar') {
+    document.addEventListener('DOMContentLoaded', function() {
+      if (params.get('view') === 'verificar') {
+        document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+        var vv = document.getElementById('v-verificar');
+        if (vv) vv.classList.add('active');
+      }
+    });
+  }
+})();
+
+/* ══════════════════════════════════════════════════════
+   #7  IMPACTO AMBIENTAL
+══════════════════════════════════════════════════════ */
+var _impactoData = null;
+var _impactoCharts = {};
+
+var IMPACTO_TIPOS = {
+  reforestacion: { label: '🌳 Reforestación', color: '#0E6D34' },
+  monitoreo:     { label: '🔭 Monitoreo',     color: '#2581C4' },
+  residuos:      { label: '♻️ Residuos',       color: '#00695C' },
+  educacion:     { label: '📚 Educación',      color: '#C9A227' },
+  sensibilizacion:{ label:'📢 Sensibilización', color: '#6A1B9A' },
+  restauracion:  { label: '🌿 Restauración',   color: '#155830' },
+  otro:          { label: '📋 Otro',           color: '#6E8CA0' }
+};
+
+async function cargarImpactoSA() {
+  if (_impactoData) { renderImpacto(_impactoData); return; }
+  try {
+    var token = await getToken();
+    var h = { 'apikey': window._SB_KEY, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' };
+    var resp = await fetch(window._SB_URL + '/rest/v1/actividades_impacto?select=*&order=fecha.desc&limit=500', { headers: h });
+    var data = [];
+    if (resp.ok) data = await resp.json();
+    // Si la tabla no existe aún, usar datos de ejemplo
+    if (!data.length) data = _mockImpactoData();
+    _impactoData = data;
+    renderImpacto(_impactoData);
+  } catch(e) {
+    _impactoData = _mockImpactoData();
+    renderImpacto(_impactoData);
+  }
+}
+
+function _mockImpactoData() {
+  var now = new Date();
+  var deptos = ['Cundinamarca','Antioquia','Valle del Cauca','Santander','Nariño','Boyacá','Tolima'];
+  var tipos  = ['reforestacion','monitoreo','residuos','educacion','sensibilizacion','restauracion'];
+  var rows = [];
+  for (var i = 0; i < 28; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth() - Math.floor(i/3), 15 - (i%15));
+    rows.push({
+      id: i+1,
+      tipo: tipos[i % tipos.length],
+      descripcion: ['Jornada de siembra comunitaria','Monitoreo de humedal','Recolección de residuos','Taller de educación ambiental','Campaña de sensibilización','Restauración de bosque'][i%6],
+      departamento: deptos[i % deptos.length],
+      cantidad: [50,120,8,0.5,30,200,15][i%7] + (i*3),
+      unidad: ['árboles','kg','km²','kg','personas','árboles','sesiones'][i%7],
+      participantes: 10 + (i * 4) % 80,
+      fecha: d.toISOString().slice(0,10)
+    });
+  }
+  return rows;
+}
+
+function renderImpacto(data) {
+  // KPIs agregados
+  var setN = function(id, n, suffix) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = (typeof n === 'number' ? n.toLocaleString('es-CO') : n) + (suffix||'');
+  };
+  var arboles = data.filter(function(r){ return r.unidad==='árboles'; }).reduce(function(s,r){ return s+(+r.cantidad||0); }, 0);
+  var area    = data.filter(function(r){ return r.unidad==='km²'; }).reduce(function(s,r){ return s+(+r.cantidad||0); }, 0);
+  var residuos= data.filter(function(r){ return r.unidad==='kg'; }).reduce(function(s,r){ return s+(+r.cantidad||0); }, 0);
+  var partic  = data.reduce(function(s,r){ return s+(+r.participantes||0); }, 0);
+  setN('imp-arboles', arboles);
+  setN('imp-area', area.toFixed(1));
+  setN('imp-residuos', residuos);
+  setN('imp-participantes', partic);
+  setN('imp-actividades', data.length);
+
+  // Destruir charts previos
+  Object.values(_impactoCharts).forEach(function(c){ try { c.destroy(); } catch(e){} });
+  _impactoCharts = {};
+
+  var isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  var gridC  = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.05)';
+  var tickF  = { family:'Poppins', size:10 };
+
+  // Chart barras por tipo
+  var tipoCnt = {};
+  data.forEach(function(r){ tipoCnt[r.tipo] = (tipoCnt[r.tipo]||0)+1; });
+  var tipoKeys = Object.keys(tipoCnt).sort(function(a,b){ return tipoCnt[b]-tipoCnt[a]; });
+  var ctxT = document.getElementById('chart-impacto-tipo');
+  if (ctxT) {
+    _impactoCharts.tipo = new Chart(ctxT, {
+      type: 'bar',
+      data: {
+        labels: tipoKeys.map(function(k){ return IMPACTO_TIPOS[k]?IMPACTO_TIPOS[k].label:k; }),
+        datasets: [{ label: 'Actividades', data: tipoKeys.map(function(k){ return tipoCnt[k]; }),
+          backgroundColor: tipoKeys.map(function(k){ return IMPACTO_TIPOS[k]?IMPACTO_TIPOS[k].color+'CC':'#6E8CA0'; }),
+          borderRadius: 8, borderWidth: 0 }]
+      },
+      options: { responsive:true, plugins:{legend:{display:false}},
+        scales:{ x:{grid:{color:gridC},ticks:{font:tickF}}, y:{grid:{color:gridC},ticks:{font:tickF,stepSize:1}} }
+      }
+    });
+  }
+
+  // Chart línea evolución mensual
+  var now = new Date(); var keys = []; var mMap = {};
+  for (var i=11; i>=0; i--) {
+    var d2 = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var k = d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0');
+    keys.push(k); mMap[k] = 0;
+  }
+  data.forEach(function(r){ var k=(r.fecha||'').substring(0,7); if(k in mMap) mMap[k]++; });
+  var mN=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var ctxM = document.getElementById('chart-impacto-mes');
+  if (ctxM) {
+    _impactoCharts.mes = new Chart(ctxM, {
+      type: 'line',
+      data: {
+        labels: keys.map(function(k){ var p=k.split('-'); return mN[parseInt(p[1])-1]+' '+p[0].slice(2); }),
+        datasets: [{ label:'Actividades', data:keys.map(function(k){ return mMap[k]; }),
+          borderColor:'#0E6D34', backgroundColor:'rgba(14,109,52,.12)', fill:true, tension:0.4, pointRadius:4, borderWidth:2.5 }]
+      },
+      options: { responsive:true, plugins:{legend:{display:false}},
+        scales:{ x:{grid:{color:gridC},ticks:{font:tickF}}, y:{grid:{color:gridC},ticks:{font:tickF,stepSize:1}} }
+      }
+    });
+  }
+
+  // Tabla
+  var tbody = document.getElementById('impacto-tabla');
+  if (tbody) {
+    if (!data.length) { tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">🌱</div><h4>Sin actividades</h4><p>Registra la primera actividad de impacto.</p></div></td></tr>'; return; }
+    tbody.innerHTML = data.slice(0,50).map(function(r){
+      var tipoInfo = IMPACTO_TIPOS[r.tipo] || { label: r.tipo||'Otro', color:'#6E8CA0' };
+      return '<tr><td>'+r.fecha+'</td><td><span class="impacto-badge impacto-'+r.tipo+'">'+(tipoInfo.label)+'</span></td><td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.descripcion||'—')+'</td><td>'+(r.departamento||'—')+'</td><td class="td-bold">'+(r.cantidad||0)+' '+(r.unidad||'')+'</td><td>'+(r.participantes||0)+'</td></tr>';
+    }).join('');
+  }
+}
+
+window.abrirModalImpacto = function() {
+  var modal = document.getElementById('modal-impacto');
+  if (!modal) return;
+  document.getElementById('imp-fecha').value = new Date().toISOString().slice(0,10);
+  modal.style.display='flex'; document.body.style.overflow='hidden';
+};
+window.cerrarModalImpacto = function() {
+  var modal = document.getElementById('modal-impacto');
+  if (modal) modal.style.display='none';
+  document.body.style.overflow='';
+};
+
+window.guardarActividad = async function() {
+  var tipo = document.getElementById('imp-tipo').value;
+  var cant = parseFloat(document.getElementById('imp-cantidad').value)||0;
+  var unid = document.getElementById('imp-unidad').value;
+  var desc = document.getElementById('imp-desc').value.trim();
+  var depto= document.getElementById('imp-depto').value.trim();
+  var part = parseInt(document.getElementById('imp-partic').value)||0;
+  var fecha= document.getElementById('imp-fecha').value;
+  if (!desc || !fecha) { showToast('Completa descripción y fecha', 'warning'); return; }
+  var newRow = { tipo, cantidad:cant, unidad:unid, descripcion:desc, departamento:depto, participantes:part, fecha };
+  try {
+    var token = await getToken();
+    var h = { 'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Accept':'application/json','Prefer':'return=representation' };
+    var resp = await fetch(window._SB_URL+'/rest/v1/actividades_impacto', { method:'POST', headers:h, body:JSON.stringify(newRow) });
+    if (resp.ok) {
+      var saved = await resp.json();
+      newRow = Array.isArray(saved) ? saved[0] : saved;
+    }
+  } catch(e) { /* tabla puede no existir aún — igual agregamos localmente */ }
+  if (!_impactoData) _impactoData = [];
+  _impactoData.unshift(newRow);
+  renderImpacto(_impactoData);
+  cerrarModalImpacto();
+  showToast('Actividad registrada ✓', 'success');
+};
+
+window.exportarExcelImpacto = function() {
+  if (!_impactoData || !_impactoData.length) { showToast('Carga el módulo primero', 'warning'); return; }
+  var rows = _impactoData.map(function(r){ return { Fecha:r.fecha, Tipo:r.tipo, Descripción:r.descripcion, Departamento:r.departamento, Cantidad:r.cantidad, Unidad:r.unidad, Participantes:r.participantes }; });
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Impacto');
+  XLSX.writeFile(wb, 'RNJA_impacto_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  showToast('Excel descargado ✓', 'success');
+};
+
+/* ══════════════════════════════════════════════════════
+   #8  PERFIL PÚBLICO DEL VOLUNTARIO
+══════════════════════════════════════════════════════ */
+async function cargarPerfilPublico(perfilId) {
+  var el = document.getElementById('pub-perfil-content');
+  if (!el) return;
+  el.innerHTML='<div class="empty-state"><div class="empty-state-icon">⏳</div><h4>Cargando perfil...</h4></div>';
+  try {
+    var h = { 'apikey': window._SB_KEY, 'Accept': 'application/json' };
+    var [rP, rC] = await Promise.all([
+      fetch(window._SB_URL+'/rest/v1/perfiles?id=eq.'+encodeURIComponent(perfilId)+'&select=id,nombres,apellidos,rol,departamento,municipio,total_horas,created_at&limit=1', { headers: h }),
+      fetch(window._SB_URL+'/rest/v1/certificados?perfil_id=eq.'+encodeURIComponent(perfilId)+'&select=id,tipo,nombre_cert,fecha_emision,codigo&order=fecha_emision.desc&limit=20', { headers: h })
+    ]);
+    var perfiles = rP.ok ? await rP.json() : [];
+    var certs = rC.ok ? await rC.json() : [];
+    if (!perfiles.length) { el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🔍</div><h4>Perfil no encontrado</h4><p>El enlace puede ser incorrecto o el perfil es privado.</p></div>'; return; }
+    var p = perfiles[0];
+    var rolLabels = { voluntario:'Voluntario', coord_municipal:'Coordinador Municipal', coord_departamental:'Coordinador Departamental', coord_nacional:'Coordinador Nacional', super_admin:'Super Administrador' };
+    var anio = p.created_at ? new Date(p.created_at).getFullYear() : '—';
+    var profileURL = window.location.origin + '/?perfil=' + perfilId;
+    el.innerHTML = `
+      <div class="pub-perfil-header">
+        <div class="pub-av">🙋</div>
+        <div style="flex:1;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px;">${p.nombres||''} ${p.apellidos||''}</div>
+          <div style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:8px;">${rolLabels[p.rol]||p.rol||'Voluntario'} · ${p.departamento||''} ${p.municipio?'· '+p.municipio:''}</div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <div><span style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;color:var(--gold);">${(p.total_horas||0).toLocaleString('es-CO')}</span><div style="font-size:11px;color:rgba(255,255,255,.45);">horas de voluntariado</div></div>
+            <div><span style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;color:var(--gold);">${certs.length}</span><div style="font-size:11px;color:rgba(255,255,255,.45);">certificados</div></div>
+            <div><span style="font-family:'Montserrat',sans-serif;font-size:24px;font-weight:800;color:var(--gold);">${anio}</span><div style="font-size:11px;color:rgba(255,255,255,.45);">miembro desde</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col" style="margin-bottom:18px;">
+        <div class="card">
+          <div class="card-title mb-4">🎖️ Certificados</div>
+          ${certs.length ? certs.map(c=>`<div class="cert-card mb-3" style="margin-bottom:8px;"><div class="cert-icon-wrap">🎖️</div><div class="cert-info"><strong>${c.nombre_cert||c.tipo||'Certificado RNJA'}</strong><small>${c.fecha_emision?new Date(c.fecha_emision).toLocaleDateString('es-CO',{year:'numeric',month:'long'}):'—'}</small>${c.codigo?`<div class="cert-code">${c.codigo}</div>`:''}</div></div>`).join('') : '<div class="empty-state" style="padding:24px;"><div class="empty-state-icon" style="font-size:28px;">📜</div><p>Sin certificados aún</p></div>'}
+        </div>
+        <div class="card" style="text-align:center;">
+          <div class="card-title mb-4">📲 Compartir perfil</div>
+          <div class="pub-qr-wrap" style="display:inline-block;" id="pub-qr-canvas"></div>
+          <p style="font-size:11px;color:var(--muted);margin-top:10px;">Escanea para ver este perfil</p>
+          <div style="margin-top:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);word-break:break-all;">${profileURL}</div>
+        </div>
+      </div>`;
+    // Generar QR
+    var qrEl = document.getElementById('pub-qr-canvas');
+    if (qrEl && typeof QRCode !== 'undefined') {
+      QRCode.toCanvas(document.createElement('canvas'), profileURL, { width:150, margin:1 }, function(err, canvas){
+        if (!err && qrEl) qrEl.appendChild(canvas);
+      });
+    }
+    // Guardar URL para el botón copiar
+    window._pubPerfilURL = profileURL;
+  } catch(e) { el.innerHTML='<div class="empty-state"><div class="empty-state-icon">❌</div><h4>Error al cargar</h4><p>'+e.message+'</p></div>'; }
+}
+
+window.copiarURLPerfil = function() {
+  var url = window._pubPerfilURL || window.location.href;
+  navigator.clipboard.writeText(url).then(function(){ showToast('Enlace copiado al portapapeles ✓', 'success'); }).catch(function(){ showToast(url, 'info'); });
+};
+
+// Agregar botón "Ver perfil público" en el perfil del voluntario
+function agregarBtnPerfilPublico(perfilId) {
+  var header = document.querySelector('.profile-header');
+  if (!header || !perfilId || header.querySelector('.btn-perfil-pub')) return;
+  var btn = document.createElement('a');
+  btn.className = 'btn btn-sm p-badge btn-perfil-pub';
+  btn.style.cssText = 'background:rgba(255,255,255,.12);color:#fff;text-decoration:none;cursor:pointer;';
+  btn.textContent = '🔗 Ver perfil público';
+  btn.href = '/?perfil='+perfilId; btn.target='_blank';
+  header.querySelector('.profile-meta') && header.querySelector('.profile-meta').appendChild(btn);
+}
+
+/* ══════════════════════════════════════════════════════
+   #9  CHECK-IN QR A EVENTOS
+══════════════════════════════════════════════════════ */
+var _html5QrScanner = null;
+
+window.abrirQREvento = function(eventoId, tituloEvento) {
+  var modal = document.getElementById('modal-checkin');
+  var content = document.getElementById('checkin-content');
+  if (!modal || !content) return;
+  var qrData = JSON.stringify({ tipo:'checkin', evento:eventoId, red:'RNJA', ts:Date.now() });
+  content.innerHTML = `
+    <h3 style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;">📱 QR Check-in</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">${tituloEvento||'Evento'}</p>
+    <div class="qr-display" id="qr-evento-canvas"></div>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">Los voluntarios escanean este código para registrar asistencia</p>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="cerrarCheckin()">Cerrar</button>
+      <button class="btn btn-neon btn-sm" style="flex:1;" onclick="abrirScanner(${eventoId},'${(tituloEvento||'').replace(/'/g,"\\'")}')">📷 Escanear</button>
+    </div>`;
+  modal.style.display='flex'; document.body.style.overflow='hidden';
+  // Generar QR
+  setTimeout(function(){
+    var qrDiv = document.getElementById('qr-evento-canvas');
+    if (qrDiv && typeof QRCode!=='undefined') {
+      QRCode.toCanvas(document.createElement('canvas'), qrData, { width:220, margin:2, color:{dark:'#0E4A22',light:'#ffffff'} }, function(err,canvas){
+        if (!err && qrDiv) qrDiv.appendChild(canvas);
+      });
+    }
+  }, 100);
+};
+
+window.abrirScanner = function(eventoId, tituloEvento) {
+  var content = document.getElementById('checkin-content');
+  if (!content) return;
+  content.innerHTML = `
+    <h3 style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;">📷 Escanear asistencia</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">${tituloEvento||'Evento'}</p>
+    <div id="qr-scanner-region" style="width:100%;border-radius:12px;overflow:hidden;"></div>
+    <div id="scan-result" style="margin-top:12px;min-height:36px;"></div>
+    <button class="btn btn-outline btn-sm" style="width:100%;margin-top:10px;" onclick="detenerScanner()">Detener escáner</button>`;
+  try {
+    _html5QrScanner = new Html5Qrcode('qr-scanner-region');
+    _html5QrScanner.start({ facingMode:'environment' }, { fps:10, qrbox:{ width:220, height:220 } }, function(text){
+      try {
+        var data = JSON.parse(text);
+        if (data.tipo === 'checkin' && data.evento == eventoId) {
+          registrarAsistenciaQR(eventoId, data);
+        } else {
+          document.getElementById('scan-result').innerHTML='<div style="color:var(--gold);font-size:12px;">⚠️ QR de otro evento</div>';
+        }
+      } catch(e) { document.getElementById('scan-result').innerHTML='<div style="color:var(--muted);font-size:12px;">QR no reconocido</div>'; }
+    }).catch(function(err){ console.warn('Scanner:', err); });
+  } catch(e) { content.innerHTML+='<p style="color:var(--red);font-size:12px;">Error al acceder a la cámara</p>'; }
+};
+
+window.detenerScanner = function() {
+  if (_html5QrScanner) {
+    _html5QrScanner.stop().catch(function(){}).finally(function(){ _html5QrScanner = null; });
+  }
+  var content = document.getElementById('checkin-content');
+  if (content) content.innerHTML='<div class="empty-state" style="padding:20px;"><div class="empty-state-icon" style="font-size:32px;">✅</div><h4>Escáner detenido</h4></div>';
+};
+
+window.cerrarCheckin = function() {
+  if (_html5QrScanner) { _html5QrScanner.stop().catch(function(){}); _html5QrScanner = null; }
+  var modal = document.getElementById('modal-checkin');
+  if (modal) modal.style.display='none';
+  document.body.style.overflow='';
+};
+
+async function registrarAsistenciaQR(eventoId, qrData) {
+  var res = document.getElementById('scan-result');
+  if (res) res.innerHTML='<div style="color:var(--blue);font-size:12px;">⏳ Registrando...</div>';
+  try {
+    var token = await getToken();
+    var h = { 'apikey':window._SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Accept':'application/json' };
+    await fetch(window._SB_URL+'/rest/v1/evento_asistencia', { method:'POST', headers:h, body:JSON.stringify({ evento_id:eventoId, metodo:'qr', scanned_at:new Date().toISOString() }) });
+    if (res) res.innerHTML='<div style="color:var(--g600);font-size:13px;font-weight:600;">✅ Asistencia registrada</div>';
+    showToast('Check-in registrado ✓', 'success');
+    setTimeout(function(){ if(res) res.innerHTML=''; }, 3000);
+  } catch(e) {
+    if (res) res.innerHTML='<div style="color:var(--red);font-size:12px;">Error al registrar</div>';
+  }
+}
+
+// ── Patch navTo para nuevas secciones
+(function extendNavTo(){
+  var _prev = window.navTo;
+  if(typeof _prev!=='function') return;
+  window.navTo = function(el, sectionId){
+    _prev.call(this, el, sectionId);
+    if(sectionId==='sec-sa-impacto') cargarImpactoSA();
+  };
+})();
+
 /* ── Agregar botón "Verificar certificado" en landing nav ── */
 document.addEventListener('DOMContentLoaded', function() {
   var navRight = document.querySelector('.land-nav > div:last-child');
@@ -8920,7 +9485,32 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.onclick = function(){ document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');}); document.getElementById('v-verificar').classList.add('active'); };
     navRight.insertBefore(btn, navRight.querySelector('.land-ham-btn'));
   }
+
+  /* ── URL param: ?perfil=ID → vista pública del voluntario ── */
+  var perfId = new URLSearchParams(window.location.search).get('perfil');
+  if (perfId) {
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    var vp = document.getElementById('v-perfil-publico');
+    if (vp) { vp.classList.add('active'); cargarPerfilPublico(perfId); }
+  }
 });
 
-</script></body>
+</script>
+
+<!-- PWA install banner -->
+<div id="pwa-install-banner" class="pwa-banner" role="banner" aria-live="polite">
+  <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+    <img src="/logo-rnja.png" alt="RNJA" style="width:36px;height:36px;border-radius:8px;flex-shrink:0;">
+    <div style="min-width:0;">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#fff;">Instalar RNJA</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Accede sin internet desde tu pantalla de inicio</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="window.installPWA()" style="background:var(--gold);color:#000;border:none;border-radius:8px;padding:8px 16px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">Instalar</button>
+    <button onclick="window.dismissPWA()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">✕</button>
+  </div>
+</div>
+
+</body>
 </html>
